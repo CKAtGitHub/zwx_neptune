@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-
 gs
-=======
 # Logs
->>>>>>> a6ae33eae48cf547e0133928fd64f3e650a20c2e
 logs
 *.log
 
@@ -30,7 +26,6 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
-<<<<<<< HEAD
 
 # Mac os
 .DS_Store
@@ -39,5 +34,3 @@ node_modules
 .idea
 
 *~
-=======
->>>>>>> a6ae33eae48cf547e0133928fd64f3e650a20c2e
