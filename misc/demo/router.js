@@ -14,4 +14,8 @@ router.get("/datatable", function (req, res, next) {
     res.render("datatable");
 })
 
+router.get("/form", function (req, res, next) {
+    res.render("form");
+})
+
 module.exports = router;

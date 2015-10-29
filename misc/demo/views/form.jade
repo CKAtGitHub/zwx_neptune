@@ -1,0 +1,15 @@
+//
+   Created by leon on 15/10/29.
+
+extends layout
+block content
+    script(src="/form/form.js")
+    script(src="/js/form/form.js")
+
+    div(ng-app="formDemo")
+        div.page-header
+            h1 表单
+
+        div.row
+            div.col-md-12(ng-controller="FormDemoController")
+                y9ui-form(data="data",config="config",action="action" on-click-action="onClickForm(item)")
