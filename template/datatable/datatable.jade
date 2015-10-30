@@ -1,18 +1,27 @@
 div
     div.row(style="padding-top:10px;")
         div.col-md-12
-            //设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条
+            // 设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条
             div.table-responsive
-                //table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格
+                // table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格
                 table.table.table-striped.table-bordered.table-hover.table-condensed
-                    //添加表格脚部，用于分页选
-                    tbody
+                    tfoot
+                        tr(ng-show="isPagination")
+                            td(colspan="50")
+                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage", ng-change="onPageChange()", max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                    thead
+                        tr(ng-show="isPagination")
+                            td(colspan="50")
+                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage", ng-change="onPageChange()", max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
                         tr
-                            th.text-center(ng-if="config.index") 序号
-                            th.text-center(ng-repeat="item in config.header") {{item.label}}
-                            th.text-center(ng-if="config.actions.length>0") 操作
-                        tr(ng-repeat="row in config.rows")
-                            th(ng-if="config.index") {{($index+1)+(page.currPage * page.rowNum - page.rowNum )}}
-                            td(ng-repeat="item in row") {{item.value}}
-                            td(ng-if="config.actions.length>0")
-                                a.btn.btn-primary.btn-sm(ng-repeat="action in config.actions",href="",ng-click="doAction(action.name)") {{action.label}}
+                            th.text-center(ng-if="isIndex") &#24207;&#21495;
+                            th.text-center(ng-repeat="item in header") {{item.label}}
+                            th.text-center(ng-if="action.length>0") &#25805;&#20316;
+                    tbody
+                        tr(ng-repeat="item in pageData")
+                            td.text-center(ng-if="isIndex")
+                                | {{($index+1)+(currPage * itemsPerPage - itemsPerPage
+                                | )}}
+                            td(ng-repeat="headerItem in header") {{item[headerItem.name]}}
+                            td(ng-if="action.length>0")
+                                a.btn.btn-primary.btn-sm(ng-repeat="actionItem in action", href="", ng-click="doAction(actionItem.name,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)") {{actionItem.label}}

@@ -1,0 +1,16 @@
+form.form-horizontal
+    div.form-group(ng-repeat="item in config")
+        label.col-sm-2.control-label(for="{{item.name}}") {{item.label}}
+        div.col-sm-10
+            input.form-control(id="{{item.name}}", type="{{item.type || text}}", placeholder="{{item.label}}", value="{{data[item.name]}}")
+    div.form-group
+        .col-sm-offset-2.col-sm-10
+            button.btn.btn-primary(type="button", ng-click="doSave()") 保存
+            | &nbsp
+            button.btn.btn-danger(type="button", ng-click="doReset()") 重置
+            | &nbsp
+            | &nbsp
+            | &nbsp
+            | &nbsp
+            button.btn.btn-default(type="button", ng-repeat="item in action", ng-click="doAction(item)")
+                | {{item.label}}
