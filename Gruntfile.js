@@ -10,9 +10,6 @@ module.exports = function (grunt) {
                 module: null, // no bundle module for all the html2js templates
                 base: '.',
                 jade: {
-                    //this prevents auto expansion of empty arguments
-                    //e.g. "div(ui-view)" becomes "<div ui-view></div>"
-                    //     instead of "<div ui-view="ui-view"></div>"
                     doctype: "html"
                 },
                 rename: function (moduleName) {
