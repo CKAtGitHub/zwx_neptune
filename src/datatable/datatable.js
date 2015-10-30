@@ -65,7 +65,7 @@ angular.module("datatable", ['ui.bootstrap'])
         //分页触发页面数据变更
         $scope.onPageChange = function () {
             self.pageChange();
-        }
+        };
 
 
         //回调绑定动作方法
@@ -78,7 +78,7 @@ angular.module("datatable", ['ui.bootstrap'])
                     index: index
                 });
             }
-        }
+        };
     }])
     .directive("y9uiDatatable", ["y9uiDatatableConfig", function (datatableConfig) {
         return {
@@ -101,5 +101,5 @@ angular.module("datatable", ['ui.bootstrap'])
             link: function (scope, element, attrs, ctrl) {
                 ctrl.init(datatableConfig);
             }
-        }
+        };
     }]);

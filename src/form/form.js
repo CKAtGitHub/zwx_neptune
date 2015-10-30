@@ -7,7 +7,7 @@ angular.module("y9uiForm", ["ui.bootstrap"])
 
         this.init = function () {
 
-        }
+        };
 
         $scope.doAction = function (item) {
             if (angular.isDefined($scope.onClickAction)) {
@@ -15,15 +15,15 @@ angular.module("y9uiForm", ["ui.bootstrap"])
                     item: item
                 });
             }
-        }
+        };
 
         $scope.doSave = function () {
             console.info("保存表单");
-        }
+        };
 
         $scope.doReset = function () {
             console.info("重置表单");
-        }
+        };
 
     }])
     .directive("y9uiForm", [function () {
@@ -32,7 +32,7 @@ angular.module("y9uiForm", ["ui.bootstrap"])
             controller: "FormControllect",
             replace: true,
             templateUrl: function (element, attrs) {
-                return attrs.templateUrl || "/template/form/form.html"
+                return attrs.templateUrl || "/template/form/form.html";
             },
             scope: {
                 config: "=",
@@ -45,5 +45,5 @@ angular.module("y9uiForm", ["ui.bootstrap"])
             link: function (scope, element, attrs, ctrl) {
                 ctrl.init();
             }
-        }
+        };
     }]);

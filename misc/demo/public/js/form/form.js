@@ -22,9 +22,26 @@ angular.module("formDemo", ["y9uiForm"])
                 label: "销售顾问",
                 type: "text"
             }, {
+                name: "email",
+                label: "电子邮件",
+                type: "email"
+            }, {
+                name: "regamount",
+                label: "注册资金",
+                type: "number"
+            }, {
+                name: "homepage",
+                label: "企业网站",
+                type: "url"
+            }, {
+                name: "phonenumber",
+                label: "联系电话",
+                type: "tel"
+            },
+            {
                 name: "remark",
                 label: "备注",
-                type: "text"
+                type: "textarea"
             }
         ]
 
