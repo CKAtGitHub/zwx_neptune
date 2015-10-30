@@ -1,0 +1,47 @@
+//
+   Created by leon on 15/10/30.
+
+extends layout-main
+
+block content
+    script(src="/js/bizpage/bizpage.js")
+    div(ng-app="bizPageDemo")
+        div(ng-controller="BizPageDemoController")
+            //功能导航区域
+            div.row
+                div.col-md-12
+                    ul.breadcrumb
+                        li
+                            a(href="/home")
+                                span.glyphicon.glyphicon-home
+                                span 首页
+                        li.active 订单列表
+            //通知区域
+
+            //功能按钮区域
+            div.row
+                div.col-md-12
+                    div.btn-group
+                        label.btn.btn-primary.btn-sm(ng-model="queryState" uib-btn-radio="'all'",ng-click="queryByState()" data-loading-text="正在查询...",id="all") 全部
+                        label.btn.btn-primary.btn-sm(ng-model="queryState" uib-btn-radio="'waitconfirm'",ng-click="queryByState()" data-loading-text="正在查询...",id="waitconfirm") 待确认
+                        label.btn.btn-primary.btn-sm(ng-model="queryState" uib-btn-radio="'buy'",ng-click="queryByState()" data-loading-text="正在查询...",id="waitconfirm") 待支付
+                        label.btn.btn-primary.btn-sm(ng-model="queryState" uib-btn-radio="'inservice'",ng-click="queryByState()" data-loading-text="正在查询...",id="waitconfirm") 服务中
+                    | &nbsp
+                    label.btn.btn-primary.btn-sm(ng-click="query()",data-loading-text="正在查询...",id="query") 条件查询
+                    | &nbsp
+                    label.btn.btn-primary.btn-sm(ng-click="checkNew(!checkNewIsCollapsed)",data-loading-text="正在查询...",id="checkNew") {{checkNewText}}
+            p
+            //检查新订单区域
+            div.row
+                div.col-md-12
+                    div(uib-collapse="!checkNewIsCollapsed")
+                        div.well.well-lg 检查新订单
+            //条件查询内容输入区域
+            div.row
+                div.col-md-12
+                    div(uib-collapse="!queryIsCollapsed")
+                        div.well.well-lg 条件查询内容
+            //数据表格区域
+            div.row
+                div.col-md-12
+                    y9ui-datatable(is-pagination="true",items-per-page="10",header="header",data="data",action="action",is-index="true",on-action="orderAction(type,item,index)")

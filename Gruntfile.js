@@ -13,7 +13,7 @@ module.exports = function (grunt) {
                     doctype: "html"
                 },
                 rename: function (moduleName) {
-                    return "/" + moduleName;
+                    return "/" + moduleName.replace(".jade", ".html");
                 }
             },
             main: {
@@ -26,7 +26,11 @@ module.exports = function (grunt) {
                 separator: ";"
             },
             dist: {
-                src: ["src/**/*.js", "<%= html2js.main.dest%>"],
+                src: [
+                    "src/datatable/datatable.js",
+                    "src/form/form.js",
+                    "<%= html2js.main.dest%>"
+                ],
                 dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"
             }
         },

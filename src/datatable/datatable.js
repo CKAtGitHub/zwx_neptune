@@ -34,6 +34,8 @@ angular.module("datatable", ['ui.bootstrap'])
             $scope.$watchCollection("data", function (newValue, oldValue) {
                 //如果存在数据则出发第一页
                 if (angular.isDefined(newValue) && newValue.length > 0) {
+                    //刷新总行数
+                    $scope.totalItems = newValue.length;
                     self.pageChange();
                 }
             });

@@ -8,14 +8,18 @@ var router = express.Router();
 
 router.get("/", function (req, res, next) {
     res.render("index");
-})
+});
 
 router.get("/datatable", function (req, res, next) {
     res.render("datatable");
-})
+});
 
 router.get("/form", function (req, res, next) {
     res.render("form");
-})
+});
+
+router.get("/bizpage", function (req, res, next) {
+    res.render("bizpage");
+});
 
 module.exports = router;
