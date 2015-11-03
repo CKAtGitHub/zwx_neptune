@@ -2,7 +2,7 @@
  * Created by leon on 15/10/28.
  */
 
-angular.module("datatable", ['ui.bootstrap'])
+angular.module("datatable", ['ui.bootstrap','/template/datatable/datatable.html'])
     .constant('y9uiDatatableConfig', {
         currPage: 1,
         maxSize: 10,
@@ -16,7 +16,13 @@ angular.module("datatable", ['ui.bootstrap'])
             //初始化参数
             this.config = config;
             $scope.currPage = $scope.currPage || config.currPage;
-            $scope.totalItems = $scope.data.length || 0;
+
+            $scope.totalItems = 0;
+            if ($scope.data) {
+                $scope.totalItems = $scope.data.length || 0;
+            }
+
+
             $scope.maxSize = config.maxSize;
             $scope.itemsPerPage = $scope.itemsPerPage || config.itemsPerPage;
             $scope.pageData = [];
@@ -33,7 +39,7 @@ angular.module("datatable", ['ui.bootstrap'])
             //监控数据集合是否发生改变
             $scope.$watchCollection("data", function (newValue, oldValue) {
                 //如果存在数据则出发第一页
-                if (angular.isDefined(newValue) && newValue.length > 0) {
+                if (angular.isDefined(newValue) && newValue !== null) {
                     //刷新总行数
                     $scope.totalItems = newValue.length;
                     self.pageChange();
@@ -52,7 +58,10 @@ angular.module("datatable", ['ui.bootstrap'])
                 beginIndex = $scope.currPage * $scope.itemsPerPage - $scope.itemsPerPage;
             } else {
                 beginIndex = 0;
-                endIndex = data.length;
+                endIndex = 0;
+                if ($scope.data) {
+                    endIndex = $scope.data.length;
+                }
             }
 
             for (beginIndex; beginIndex < endIndex; beginIndex++) {

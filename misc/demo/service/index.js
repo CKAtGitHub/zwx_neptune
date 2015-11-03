@@ -15,6 +15,9 @@ proxy.use("Y9", service.ProxyY9({
 proxy.action("queryOrderList", {
     proxy: "Y9",
     action: "com.yun9.ws.biz.service.QueryOrdersByStateService"
+}).action("queryOrderInfo", {
+    proxy: "Y9",
+    action: "com.yun9.ws.biz.service.QueryOrderInfoService"
 });
 
 module.exports = proxy;

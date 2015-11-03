@@ -19,7 +19,7 @@ router.get("/form", function (req, res, next) {
 });
 
 router.get("/bizpage", function (req, res, next) {
-    res.render("bizpage");
+    res.render("biz-page");
 });
 
 module.exports = router;

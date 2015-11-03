@@ -1,0 +1,132 @@
+//
+   Created by leon on 15/10/30.
+
+extends layout-main
+
+block content
+    script(src="/js/bizconfig/orderconfig.js")
+    script(src="/js/bizpage/bizpage.js")
+    div(ng-app="bizPageDemo")
+        //功能导航区域
+        div.row
+            div.col-md-12
+                ul.breadcrumb
+                    li
+                        a(href="/home")
+                            span.glyphicon.glyphicon-home
+                            span 首页
+                    li.active 订单列表
+        //通知区域
+
+        //内容区域
+        div(ng-view)
+
+        //列表模板
+        script(type="text/ng-template",id="list.html")
+            //功能按钮区域
+            div.row
+                div.col-md-12
+                    div.btn-group
+                        label.btn.btn-primary.btn-sm(ng-model="query.state" uib-btn-radio="'all'",ng-click="queryByState()" data-loading-text="正在查询...",id="all") 全部
+                        label.btn.btn-primary.btn-sm(ng-model="query.state" uib-btn-radio="'waitconfirm'",ng-click="queryByState()" data-loading-text="正在查询...",id="waitconfirm") 待确认
+                        label.btn.btn-primary.btn-sm(ng-model="query.state" uib-btn-radio="'buy'",ng-click="queryByState()" data-loading-text="正在查询...",id="buy") 待支付
+                        label.btn.btn-primary.btn-sm(ng-model="query.state" uib-btn-radio="'inservice'",ng-click="queryByState()" data-loading-text="正在查询...",id="inservice") 服务中
+                    | &nbsp
+                    label.btn.btn-primary.btn-sm(ng-click="query.toggle()",data-loading-text="正在查询...",id="query") {{query.text}}
+                    | &nbsp
+                    label.btn.btn-primary.btn-sm(ng-click="checkNew.toggle()",data-loading-text="正在查询...",id="checkNew") {{checkNew.text}}
+            p
+            //检查新订单区域
+            div.row
+                div.col-md-12
+                    div(uib-collapse="!checkNew.isCollapsed")
+                        div.well.well-lg 检查新订单
+            //条件查询内容输入区域
+            div.row
+                div.col-md-12
+                    div(uib-collapse="!query.isCollapsed")
+                        div.well.well-lg 条件查询内容
+            //数据表格区域
+            div.row
+                div.col-md-12
+                    y9ui-datatable(is-pagination="true",items-per-page="10",header="header",data="data",action="action",is-index="true",on-action="orderAction(type,item,index)")
+
+        //详情模板
+        script(type="text/ng-template",id="detail.html")
+            nav.navbar.navbar-default
+                div.navbar-header
+                    a.navbar-brand(href="") 订单详情
+
+                ul.nav.navbar-nav.navbar-right
+                    li
+                        a(href="",ng-show="isConfirm") 确认订单
+                    li
+                        a(href="") 分配顾问
+                    li
+                        a(href="",ng-click="query.previous(orderid)",ng-show="{{query.previousId(orderid)}}") 上一单
+                    li
+                        a(href="",ng-click="query.next(orderid)",ng-show="{{query.nextId(orderid)}}") 下一单
+                    li
+                        a(href="#/list") 返回
+                    li
+                        | &nbsp &nbsp &nbsp &nbsp
+
+            //div.row
+            //    div.col-md-12
+            //        div.panel.panel-default
+            //            div.panel-heading 测试
+            //            div.panel-body
+            //                p(ng-show="visible") 测试1
+            //                p(ng-hide="visible") 测试2
+            //                //button.btn.btn-primary(ng-click="toggle()") 切换
+            div.row
+                div.col-md-12
+                    div.panel.panel-default
+                        div.panel-heading 基本信息
+
+                        div.panel-body
+                            form.form-horizontal
+                                div.form-group
+                                    label.col-md-2.control-label(for="ordersn") 订单编号:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="ordersn",value="{{data.order.ordersn}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="buyerinstid") 客户名称:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="buyerinstid",value="{{data.order.buyerinstid}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="begindate") 开始日期:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="begindate",value="{{data.order.begindate}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="enddate") 结束日期:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="enddate",value="{{data.order.enddate}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="orderamount") 订单金额:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="orderamount",value="{{data.order.orderamount}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="factamount") 实际金额:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="factamount",value="{{data.order.factamount}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="createdate") 创建日期:
+                                    div.col-md-10
+                                        input.form-control(type="text",id="createdate",value="{{data.order.createdate}}",disabled)
+                                div.form-group
+                                    label.col-md-2.control-label(for="remark") 备注:
+                                    div.col-md-10
+                                        textarea.form-control(rows=3,id="remark",disabled) {{data.order.remark}}
+
+            div.row
+                div.col-md-12
+                    div.panel.panel-default
+                        div.panel-heading 产品列表
+                        y9ui-datatable(header="productHeader",data="data.orderproducts",action="productAction",is-index="true",on-action="doOrderProducts(type,item,index)")
+
+            div.row
+                div.col-md-12
+                    div.panel.panel-default
+                        div.panel-heading 工单列表
+                        y9ui-datatable(header="workOrderHeader",data="data.workorders",action="workOrderAction",is-index="true",on-action="doWorkorders(type,item,index)")

@@ -29,6 +29,8 @@ module.exports = function (grunt) {
                 src: [
                     "src/datatable/datatable.js",
                     "src/form/form.js",
+                    "src/bizmodule/bizmodule.js",
+                    "src/resource/resource.js",
                     "<%= html2js.main.dest%>"
                 ],
                 dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"
@@ -55,6 +57,14 @@ module.exports = function (grunt) {
                 }
             }
         },
+        copy: {
+            main: {
+                expand: true,
+                flatten: true,
+                src: ["<%= concat.dist.dest%>"],
+                dest: "misc/demo/public/vendor/neptune/"
+            }
+        },
         watch: {
             files: ["<%= jshint.files%>"],
             task: ["jshint"]
@@ -67,10 +77,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks("grunt-html2js");
 
 
     grunt.registerTask("clean", ["clean"]);
     grunt.registerTask("test", ["jshint"]);
     grunt.registerTask("default", ["jshint", "html2js", "concat", "uglify"]);
+    grunt.registerTask("demo", ["jshint", "html2js", "concat", "copy", "uglify"]);
 }

@@ -2,7 +2,7 @@
  * Created by leon on 15/10/29.
  */
 
-angular.module("y9uiForm", ["ui.bootstrap"])
+angular.module("y9uiForm", ["ui.bootstrap", '/template/form/form.html'])
     .controller("FormControllect", ["$scope", function ($scope) {
 
         this.init = function () {
