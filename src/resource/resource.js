@@ -2,8 +2,8 @@
  * Created by leon on 15/11/3.
  */
 
-angular.module("resource", [])
-    .provider("resourceConfig", function () {
+angular.module("ui.neptune.resource", [])
+    .provider("nptResource", function () {
 
         this.params = {};
         this.header = {};

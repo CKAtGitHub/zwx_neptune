@@ -1,8 +1,55 @@
 /**
  * Created by leon on 15/10/28.
  */
-
-angular.module("datatableDemo", ["datatable"])
+angular.module("datatableDemo", ["ui.neptune"])
+    .config(function (DatatableStoreProvider) {
+        DatatableStoreProvider.store("demodt", {
+            header: [
+                {
+                    name: "sn",
+                    label: "订单编号"
+                },
+                {
+                    name: "state",
+                    label: "订单状态"
+                },
+                {
+                    name: "clientid",
+                    label: "客户编号"
+                },
+                {
+                    name: "sales",
+                    label: "销售顾问"
+                },
+                {
+                    name: "amount",
+                    label: "订单金额"
+                },
+                {
+                    name: "createdate",
+                    label: "创建日期"
+                },
+                {
+                    name: "remark",
+                    label: "备注"
+                }
+            ],
+            action: [
+                {
+                    name: "view",
+                    label: "查看"
+                },
+                {
+                    name: "add",
+                    label: "添加"
+                },
+                {
+                    name: "del",
+                    label: "删除"
+                }
+            ]
+        })
+    })
     .controller("DatatableDemoController", function ($scope, $http) {
         $scope.orderAction = function (type, item, index) {
             console.info(type);
@@ -21,53 +68,7 @@ angular.module("datatableDemo", ["datatable"])
             if (type === "del") {
                 $scope.data.splice(index, 1);
             }
-        }
-
-        $scope.action = [
-            {
-                name: "view",
-                label: "查看"
-            },
-            {
-                name: "add",
-                label: "添加"
-            },
-            {
-                name: "del",
-                label: "删除"
-            }
-        ]
-
-        $scope.header = [
-            {
-                name: "sn",
-                label: "订单编号"
-            },
-            {
-                name: "state",
-                label: "订单状态"
-            },
-            {
-                name: "clientid",
-                label: "客户编号"
-            },
-            {
-                name: "sales",
-                label: "销售顾问"
-            },
-            {
-                name: "amount",
-                label: "订单金额"
-            },
-            {
-                name: "createdate",
-                label: "创建日期"
-            },
-            {
-                name: "remark",
-                label: "备注"
-            }
-        ]
+        };
 
         $scope.data = []
 

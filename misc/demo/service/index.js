@@ -18,7 +18,13 @@ proxy.action("queryOrderList", {
 }).action("queryOrderInfo", {
     proxy: "Y9",
     action: "com.yun9.ws.biz.service.QueryOrderInfoService"
-});
+}).action("queryUsersByOrgid", {
+    proxy: "Y9",
+    action: "com.yun9.sys.user.service.QueryUsersByOrgidService"
+}).action("queryOrgTree", {
+    proxy: "Y9",
+    action: "com.yun9.sys.inst.serivce.QueryOrgTreeService"
+});;
 
 module.exports = proxy;
 

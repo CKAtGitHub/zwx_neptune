@@ -27,10 +27,11 @@ module.exports = function (grunt) {
             },
             dist: {
                 src: [
+                    "src/app.js",
                     "src/datatable/datatable.js",
-                    "src/form/form.js",
-                    "src/bizmodule/bizmodule.js",
+                    //"src/form/form.js",
                     "src/resource/resource.js",
+                    "src/validator/*.js",
                     "<%= html2js.main.dest%>"
                 ],
                 dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"
@@ -67,7 +68,7 @@ module.exports = function (grunt) {
         },
         watch: {
             files: ["<%= jshint.files%>"],
-            task: ["jshint"]
+            tasks: ["jshint", "html2js", "concat", "copy"]
         },
         clean: ["dist/*.js"]
     });

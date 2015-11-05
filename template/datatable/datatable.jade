@@ -8,11 +8,11 @@ div
                     tfoot
                         tr(ng-show="isPagination")
                             td(colspan="50")
-                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage", ng-change="onPageChange()", max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
                     thead
                         tr(ng-show="isPagination")
                             td(colspan="50")
-                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage", ng-change="onPageChange()", max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
                         tr
                             th.text-center(ng-if="isIndex") &#24207;&#21495;
                             th.text-center(ng-repeat="item in header") {{item.label}}

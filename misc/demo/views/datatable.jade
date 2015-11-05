@@ -4,11 +4,10 @@
 extends layout
 
 block content
-    script(src="/datatable/datatable.js")
     script(src="/js/datatable/datatable.js")
     div(ng-app="datatableDemo")
         div.page-header
             h1 数据表格
 
         div(ng-controller="DatatableDemoController")
-            y9ui-datatable(is-pagination="true",items-per-page="10",header="header",data="data",action="action",is-index="true",on-action="orderAction(type,item,index)")
+            npt-datatable(name="demodt",is-pagination="true",items-per-page="10",data="data",is-index="true",on-action="orderAction(type,item,index)")
