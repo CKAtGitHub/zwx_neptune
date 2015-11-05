@@ -1,0 +1,28 @@
+div
+    div.modal.fade(id="treeSelect",tabindex="-1",role="dialog")
+        div.modal-dialog.modal-lg
+            div.modal-content
+                div.modal-header
+                    button.close(type='button',ng-click="close()",aria-label="关闭")
+                        span &times
+                    h4.modal-title 选择用户
+                div.modal-body
+                    div.row
+                        div.col-md-4
+                            div(ui-tree,id="tree-root",data-drag-enabled="false")
+                                ol(ui-tree-nodes ng-model="treeData")
+                                    li(ng-repeat="node in treeData",ui-tree-node,ng-include="'org_nodes.html'")
+                        div.col-md-8
+                            npt-datatable(name="listSelect",is-pagination="true",items-per-page="5",header="listHeader",action="listAction",data="listData",is-index="true",on-action="onListSelect(type,item,index)")
+                div.modal-footer
+                    button.btn.btn-default(ng-click="close()") 关闭
+
+    script(type="text/ng-template",id="org_nodes.html")
+        div.tree-node.tree-node-content(ui-tree-handle)
+            a.btn.btn-success.btn-xs(ng-if="node.nodes && node.nodes.length > 0",ng-click="toggle(this)")
+                span.glyphicon(ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}")
+            | &nbsp &nbsp
+            a.btn-link(ng-click="onTreeClick(node)") {{node.title}}
+
+        ol(ui-tree-nodes="",ng-model="node.nodes",ng-class="{hidden:collapsed}")
+            li(ng-repeat="node in node.nodes",ui-tree-node,ng-include="'org_nodes.html'")

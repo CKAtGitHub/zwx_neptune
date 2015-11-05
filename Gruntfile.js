@@ -28,10 +28,11 @@ module.exports = function (grunt) {
             dist: {
                 src: [
                     "src/app.js",
-                    "src/datatable/datatable.js",
-                    //"src/form/form.js",
                     "src/resource/resource.js",
                     "src/validator/*.js",
+                    "src/datatable/datatable.js",
+                    "src/treeselect/treeselect.js",
+                    //"src/form/form.js",
                     "<%= html2js.main.dest%>"
                 ],
                 dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"
@@ -62,8 +63,14 @@ module.exports = function (grunt) {
             main: {
                 expand: true,
                 flatten: true,
-                src: ["<%= concat.dist.dest%>"],
+                src: ["<%= concat.dist.dest%>", "src/neptune-ui.css"],
                 dest: "misc/demo/public/vendor/neptune/"
+            },
+            css: {
+                expand: true,
+                flatten: true,
+                src: ["src/neptune-ui.css"],
+                dest: "dist/"
             }
         },
         watch: {

@@ -18,8 +18,8 @@ router.get("/form", function (req, res, next) {
     res.render("form");
 });
 
-router.get("/bizpage", function (req, res, next) {
-    res.render("biz-page");
+router.get("/treeselect", function (req, res, next) {
+    res.render("treeselect");
 });
 
 module.exports = router;

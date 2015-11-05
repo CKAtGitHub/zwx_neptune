@@ -45,7 +45,7 @@ angular.module("ui.neptune.datatable", ['ui.bootstrap'])
             return service;
         };
     })
-    .controller("datatableControll", ["$scope", "$attrs", function ($scope, $attrs) {
+    .controller("datatableController", ["$scope", "$attrs", function ($scope, $attrs) {
         this.$init = function (config) {
             //初始化参数
             this.config = config;
@@ -81,11 +81,13 @@ angular.module("ui.neptune.datatable", ['ui.bootstrap'])
                 }
             }
 
-            for (beginIndex; beginIndex < endIndex; beginIndex++) {
-                if (beginIndex >= $scope.data.length) {
-                    break;
-                } else {
-                    $scope.pageData.push($scope.data[beginIndex]);
+            if ($scope.data) {
+                for (beginIndex; beginIndex < endIndex; beginIndex++) {
+                    if (beginIndex >= $scope.data.length) {
+                        break;
+                    } else {
+                        $scope.pageData.push($scope.data[beginIndex]);
+                    }
                 }
             }
         };
@@ -105,7 +107,7 @@ angular.module("ui.neptune.datatable", ['ui.bootstrap'])
     .directive("nptDatatable", ["DatatableStore", '$parse', function (DatatableStore, $parse) {
         return {
             restrict: "E",
-            controller: "datatableControll",
+            controller: "datatableController",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
             templateUrl: function (element, attrs) {
