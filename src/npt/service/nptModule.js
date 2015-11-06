@@ -3,7 +3,7 @@
  */
 
 angular.module("ui.neptune.service.model", [])
-    .provider("Model", function () {
+    .provider("ModelConfig", function () {
         this.models = {};
 
         /**

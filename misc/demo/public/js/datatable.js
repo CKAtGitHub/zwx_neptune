@@ -4,50 +4,89 @@
 angular.module("datatableDemo", ["ui.neptune"])
     .config(function (DatatableStoreProvider) {
         DatatableStoreProvider.store("demodt", {
-            header: [
-                {
-                    name: "sn",
+            header: {
+                sn: {
                     label: "订单编号"
                 },
-                {
-                    name: "state",
+                state: {
                     label: "订单状态"
                 },
-                {
-                    name: "clientid",
+                clientid: {
                     label: "客户编号"
                 },
-                {
-                    name: "sales",
+                sales: {
                     label: "销售顾问"
                 },
-                {
-                    name: "amount",
+                amount: {
                     label: "订单金额"
                 },
-                {
-                    name: "createdate",
+                createdate: {
                     label: "创建日期"
                 },
-                {
-                    name: "remark",
+                remark: {
                     label: "备注"
                 }
-            ],
-            action: [
-                {
-                    name: "view",
+            },
+            action: {
+                view: {
                     label: "查看"
                 },
-                {
-                    name: "add",
+                add: {
                     label: "添加"
                 },
-                {
-                    name: "del",
+                del: {
                     label: "删除"
+                },
+                edit: {
+                    label: "编辑",
+                    type: "editForm"
                 }
-            ]
+            },
+            editForm: {
+                validationAndViewRules: {
+                    sn: {
+                        label: "订单编号:",
+                        inputType: 'text',
+                        required: true,
+                        placeholder: "请输入订单编号"
+                    },
+                    state: {
+                        label: "订单状态",
+                        inputType: 'text',
+                        pattern: {
+                            rule: /[0-9]/,
+                            message: '必须包含一个数字'
+                        },
+                        required: true
+                    },
+                    clientid: {
+                        label: "客户编号",
+                        inputType: "text",
+                        required: true
+                    },
+                    sales: {
+                        label: "销售顾问",
+                        inputType: "text",
+                        placeholder: "请选择销售顾问.",
+                        required: true
+                    },
+                    amount: {
+                        label: "订单金额",
+                        inputType: "number",
+                        required: true
+                    },
+                    createdate: {
+                        label: "创建日期",
+                        inputType: "text",
+                        required: true
+                    },
+                    remark: {
+                        label: "备注",
+                        inputType: "text",
+                        required: false
+                    }
+                }
+            }
         })
     })
     .controller("DatatableDemoController", function ($scope, $http) {

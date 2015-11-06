@@ -1,0 +1,9 @@
+extends layout/layout-form-for
+block content
+    script(src="/js/form-for.js")
+    div(ng-app="formForDemo")
+        div.page-header
+            h1 表单
+        div.row(ng-controller="FormForDemoController")
+            div.col-md-12
+                form(form-for="formData",form-for-builder="schema",service="DemoForm")

@@ -18,6 +18,10 @@ router.get("/form", function (req, res, next) {
     res.render("form");
 });
 
+router.get("/formFor", function (req, res, next) {
+    res.render("form-for");
+});
+
 router.get("/selectTree", function (req, res, next) {
     res.render("select-tree");
 });

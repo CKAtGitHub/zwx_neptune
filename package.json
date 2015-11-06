@@ -23,6 +23,7 @@
   "homepage": "https://github.com/hl198181/pluto#readme",
   "devDependencies": {
     "angular": "^1.4.7",
+    "angular-form-for": "^4.1.7",
     "angular-mocks": "^1.4.7",
     "angular-sanitize": "^1.4.7",
     "body-parser": "^1.14.1",

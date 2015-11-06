@@ -26,7 +26,7 @@ angular.module("ui.neptune.directive.form", [])
         };
 
     }])
-    .directive("nptForm", [function () {
+    .directive("nptForm", ["ModelConfig", function (modelConfig) {
         return {
             restrict: "E",
             controller: "FormControllect",
@@ -35,15 +35,27 @@ angular.module("ui.neptune.directive.form", [])
                 return attrs.templateUrl || "/template/form/form.html";
             },
             scope: {
-                config: "=",
+                model: "=?",
                 data: "=",
-                action: "=",
                 onClickAction: "&",
                 onSave: "&",
                 onReset: "&"
             },
-            link: function (scope, element, attrs, ctrl) {
-                ctrl.init();
+            compile: function (element) {
+                //初始化界面html
+                return {
+                    pre: function (scope, element, attrs, ctrls) {
+
+                        if (attrs.name && !scope.model) {
+                            modelConfig.model(attrs.name, function (model) {
+                                scope.model = model;
+                            });
+                        }
+                    },
+                    post: function (scope, element, attrs, ctrls) {
+                        var demo = element;
+                    }
+                };
             }
         };
     }]);

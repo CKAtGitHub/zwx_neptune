@@ -1,27 +1,39 @@
 div
-    div.row(style="padding-top:10px;")
-        div.col-md-12
-            // 设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条
-            div.table-responsive
-                // table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格
-                table.table.table-striped.table-bordered.table-hover.table-condensed
-                    tfoot
-                        tr(ng-show="isPagination")
-                            td(colspan="50")
-                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
-                    thead
-                        tr(ng-show="isPagination")
-                            td(colspan="50")
-                                uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
-                        tr
-                            th.text-center(ng-if="isIndex") &#24207;&#21495;
-                            th.text-center(ng-repeat="item in header") {{item.label}}
-                            th.text-center(ng-if="action.length>0") &#25805;&#20316;
-                    tbody
-                        tr(ng-repeat="item in pageData")
-                            td.text-center(ng-if="isIndex")
-                                | {{($index+1)+(currPage * itemsPerPage - itemsPerPage
-                                | )}}
-                            td(ng-repeat="headerItem in header") {{item[headerItem.name]}}
-                            td(ng-if="action.length>0")
-                                a.btn.btn-primary.btn-sm(ng-repeat="actionItem in action", href="", ng-click="doAction(actionItem.name,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)") {{actionItem.label}}
+    div.modal.fade(id="editFormFor",name="editFormFor",tabindex="-1",role="dialog")
+        div.modal-dialog.modal-lg
+            div.modal-content
+                div.modal-header
+                    button.close(type='button',ng-click="editForm.close()",aria-label="关闭")
+                        span &times
+                    h4.modal-title 编辑
+                div.modal-body
+                    form(form-for="editForm.data",controller="editFormController",form-for-builder,validation-rules="editForm.validationAndViewRules",submit-with="editForm.submit(data)")
+                        submit-button(label="确定",buttonClass="btn btn-primary",icon="fa fa-user")
+                        button.btn.btn-danger(type="button",ng-click="editForm.reset()") 重置
+                div.modal-footer
+                    button.btn.btn-default(ng-click="editForm.close()") 关闭
+
+    div.col-md-12
+        // 设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条
+        div.table-responsive
+            // table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格
+            table.table.table-striped.table-bordered.table-hover.table-condensed
+                tfoot
+                    tr(ng-show="isPagination")
+                        td(colspan="50")
+                            uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                thead
+                    tr(ng-show="isPagination")
+                        td(colspan="50")
+                            uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                    tr
+                        th.text-center(ng-if="isIndex") &#24207;&#21495;
+                        th.text-center(ng-repeat="item in header.items") {{item.label}}
+                        th.text-center(ng-if="action.items.length>0") &#25805;&#20316;
+                tbody
+                    tr(ng-repeat="item in pageData")
+                        td.text-center(ng-if="isIndex")
+                            | {{($index+1)+(currPage * itemsPerPage - itemsPerPage)}}
+                        td(ng-repeat="headerItem in header.items") {{item[headerItem.name]}}
+                        td(ng-if="action.items.length>0")
+                            a.btn.btn-primary.btn-xs(ng-repeat="actionItem in action.items", href="", ng-click="action.onClick(actionItem,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)") {{actionItem.label}}
