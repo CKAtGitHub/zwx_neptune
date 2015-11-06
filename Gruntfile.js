@@ -28,7 +28,7 @@ module.exports = function (grunt) {
             dist: {
                 src: [
                     "src/app.js",
-                    "src/npt/*.js",
+                    "src/npt/service/*.js",
                     "src/npt/validator/*.js",
                     "src/npt/filter/*.js",
                     "src/npt/directive/*.js",
