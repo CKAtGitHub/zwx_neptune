@@ -1,0 +1,21 @@
+//
+   Created by huangbinglong on 15/11/6.
+extends layout/layout
+block content
+   script(src="js/bizvalidator.js")
+   script(src="js/showErrors.min.js")
+   div(ng-app="bizValidatorDemo",ng-controller='bizValidatorCtrl as ctrl')
+      form.form-horizontal(name='userForm',ng-submit='ctrl.submit()',novalidate)
+         div.form-group(show-errors="{ trigger: 'keypress',showSuccess:true }")
+            label.col-md-2.control-label(for="ordersn") 订单编号:
+            div.col-md-10
+               input.form-control(name='ordersn',ng-model='ordersn',type="text",npt-biz-validator='ordersnExist')
+         div.form-group(show-errors="{ trigger: 'keypress',showSuccess:true }")
+            label.col-md-2.control-label(for="buyerinstid") 订单编号2:
+            div.col-md-10
+               input.form-control(type="text",name="buyerinstid",ng-model="buyerinstid",npt-biz-validator='ordersnExist2')
+         div.form-group
+            label.col-md-2.control-label(for="enddate") 结束日期:
+            div.col-md-10
+               input.form-control(type="text",id="enddate" placeholder="10000002322065",value="10000002322065---10000002315692")
+         input.form-control(type='submit' value='提交')

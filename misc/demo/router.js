@@ -26,4 +26,12 @@ router.get("/selectTree", function (req, res, next) {
     res.render("select-tree");
 });
 
+router.get("/bizvalidator", function (req, res, next) {
+    res.render("bizvalidator");
+});
+
+router.get("/bizfilter", function (req, res, next) {
+    res.render("bizfilter");
+});
+
 module.exports = router;
