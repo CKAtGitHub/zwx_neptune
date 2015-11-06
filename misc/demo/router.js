@@ -18,8 +18,8 @@ router.get("/form", function (req, res, next) {
     res.render("form");
 });
 
-router.get("/treeselect", function (req, res, next) {
-    res.render("treeselect");
+router.get("/selectTree", function (req, res, next) {
+    res.render("select-tree");
 });
 
 router.get("/bizvalidator", function (req, res, next) {

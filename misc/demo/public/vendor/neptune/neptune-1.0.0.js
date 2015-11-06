@@ -6,9 +6,12 @@ angular.module("ui.neptune", [
     "ui.neptune.directive"
 ]);
 
-angular.module("ui.neptune.service", ["ui.neptune.service.resource"]);
-angular.module("ui.neptune.validator", ['ui.neptune.validator.8Number2date','ui.neptune.validator.bizValidator']);
-angular.module("ui.neptune.filter", ['ui.neptune.filter.bizFilter']);
+angular.module("ui.neptune.service", [
+    "ui.neptune.service.resource",
+    "ui.neptune.service.model"
+]);
+angular.module("ui.neptune.validator", ['ui.neptune.validator.number2date']);
+angular.module("ui.neptune.filter", []);
 
 angular.module("ui.neptune.directive", [
     "ui.neptune.directive.datatable",
@@ -17,7 +20,47 @@ angular.module("ui.neptune.directive", [
 ;/**
  * Created by leon on 15/11/6.
  */
-;/**
+
+angular.module("ui.neptune.service.model", [])
+    .provider("Model", function () {
+        this.models = {};
+
+        /**
+         * 注册一个模型,可以链式调用
+         * @param name
+         * @param model
+         * @returns {*}
+         */
+        this.model = function (name, model) {
+            if (!model) {
+                model = name;
+                name = model.name;
+            }
+
+            if (!name) {
+                throw new Error("module must have a name.");
+            }
+            this.models[name] = model;
+            return this;
+        };
+
+        this.$get = function () {
+            var self = this;
+            var service = {
+                /**
+                 * 根据名称获取模型.
+                 * @param name
+                 * @param done
+                 */
+                model: function (name, done) {
+                    if (name && done) {
+                        done(self.models[name]);
+                    }
+                }
+            };
+            return service;
+        };
+    });;/**
  * Created by leon on 15/11/3.
  */
 
@@ -104,8 +147,8 @@ angular.module("ui.neptune.service.resource", [])
 ;;/**
  * Created by leon on 15/11/5.
  */
-angular.module("ui.neptune.validator.8Number2date", [])
-    .directive("npt8Number2date", function () {
+angular.module("ui.neptune.validator.number2date", [])
+    .directive("nptNumber2date", function () {
         return {
             require: 'ngModel',
             link: function (scope, ele, attrs, ctrl) {
@@ -123,7 +166,7 @@ angular.module("ui.neptune.validator.8Number2date", [])
                             valid = true;
                         }
                     }
-                    ctrl.$setValidity("npt8Number2date", valid);
+                    ctrl.$setValidity("nptNumber2date", valid);
                     return value;
                 };
 
@@ -135,381 +178,6 @@ angular.module("ui.neptune.validator.8Number2date", [])
                 //});
             }
         };
-    });;/*!
- * mars
- * Copyright(c) 2015 huangbinglong
- * MIT Licensed
- */
-
-angular.module('ui.neptune.validator.bizValidator', ['ui.neptune.service.resource'])
-    .directive('nptBizValidator', function ($q, nptResource, nptBizValidatorService, nptBizValidatorProvider, nptBizValidatorHelper) {
-        return {
-            restrict: 'A',
-            require: '?ngModel',
-            link: function (scope, elm, attr, ctrl) {
-                var bizConfig = attr.nptBizValidatorOpts || {};
-                if (!ctrl) return;
-                ctrl.$asyncValidators.bizvalidate = function (modelValue, viewValue) {
-                    var modeName = attr.ngModel;
-                    var extraScope = {};
-                    if(modeName)extraScope[modeName] = modelValue;
-                    scope = angular.extend({}, scope, extraScope);
-                    bizConfig = angular.isObject(bizConfig) ? bizConfig : angular.fromJson(bizConfig);
-                    var baseConfig = nptBizValidatorProvider.getConfig(attr.nptBizValidator) || {};
-                    bizConfig = nptBizValidatorHelper.extendConfig(baseConfig, bizConfig);
-                    var bizName = bizConfig.bizName;
-                    var validator = bizConfig.validator;
-                    var bizParams = bizConfig.bizParams;
-                    var validExpression = bizConfig.validExpression;
-                    if (!validExpression){
-                        validExpression={};
-                        validExpression[attr.ngModel] = attr.ngModel;
-                    }
-                    if (!bizName || !validator) {
-                        throw new Error('无效的nptBizValidator配置；' + (attr.name || attr.ngModel));
-                    }
-                    var deferred = $q.defer();
-
-                    if (!bizName || !validator ||
-                        ((angular.isString(validator) && !nptBizValidatorService[validator]) ||
-                        (!angular.isString(validator) && !angular.isFunction(validator)))) {
-                        deferred.reject(new Error('无效的nptBizValidator配置；' + (attr.name || attr.ngModel)));
-                        return deferred.promise;
-                    }
-                    bizParams = nptBizValidatorHelper.parseParams(bizParams, scope);
-                    nptResource.post(bizName, bizParams, function (data) {
-                        validExpression = nptBizValidatorHelper.parseParams(validExpression, scope);
-                        var result = nptBizValidatorHelper.execute(validator, data, validExpression);
-                        if (result) {
-                            deferred.resolve();
-                        } else {
-                            deferred.reject();
-                        }
-                    }, function (error) {
-                        deferred.reject(error);
-                    });
-
-                    return deferred.promise;
-                };
-
-                attr.$observe('nptBizValidatorOpts', function (config) {
-                    bizConfig = config ? config : {};
-                    ctrl.$validate();
-                });
-
-            }
-        };
-    }).factory('nptBizValidatorHelper', function ($parse, nptBizValidatorService) {
-        return {
-            extendConfig: function (baseConfig, bizConfig) {
-                if (baseConfig.bizParams) {
-                    baseConfig.bizParams = angular.extend(baseConfig.bizParams, bizConfig.bizParams || {});
-                    delete bizConfig.bizParams;
-                }
-                return angular.extend(baseConfig, bizConfig);
-            },
-            parseParams: function (config, scope) {
-                if (angular.isObject(config)) {
-                    var ret = {};
-                    for (var key in config) {
-                        ret[key] = this.parseParams(config[key], scope);
-                    }
-                    return ret;
-                } else if (angular.isDefined(config)) {
-                    return $parse(config)(scope);
-                }
-                return undefined;
-            },
-            execute: function (validator, data, expression) {
-                if (angular.isString(validator)) {
-                    return nptBizValidatorService[validator](data, expression);
-                } else if (angular.isFunction(validator)) {
-                    return validator(data, expression);
-                }
-                throw new Error('无法执行验证器：' + validator);
-            }
-        };
-    })
-    .service('nptBizValidatorService', function ($filter) {
-        this.exist = function (data, expression) {
-            if (!data) {
-                return false;
-            }
-            if (!expression) { // 不存在表达式
-                if (angular.isArray(data)) {
-                    return data.length > 0;
-                } else {
-                    return !!data;
-                }
-            }
-            var resultArr = [];
-            if (angular.isString(expression)) {
-                resultArr = $filter('filter')(angular.isArray(data) ? data : [data], expression);
-            } else {
-                resultArr = $filter('filter')(angular.isArray(data) ? data : [data], function (value, index, array) {
-                    for (var key in expression) {
-                        if (expression[key] != value[key]) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-            }
-            if (resultArr && resultArr.length > 0) {
-                return true;
-            }
-            return false;
-
-        };
-        this.noExist = function (data, expression) {
-            return !this.exist(data, expression);
-        };
-    }).provider('nptBizValidatorProvider', function () {
-        var config = {};
-        this.addConfig = function (name, bizConfig) {
-            config[name] = bizConfig;
-        };
-        this.$get = function () {
-            return {
-                getConfig: function (name) {
-                    if (!name)return undefined;
-                    var conf = config[name];
-                    if (!conf) return undefined;
-                    return angular.copy(conf);
-                }
-            };
-        };
-    }).config(function (nptBizValidatorProviderProvider) {
-        /**
-         * 增加配置说明：
-         * 通过nptBizValidatorProviderProvider.addConfig增加配置
-         * addConfig 第一个参数为配置名称
-         * 第二个参数为配置对象，其中：
-         *bizName：
-         * bizParams：
-         * validator：
-         * validExpression：
-         */
-        //nptBizValidatorProviderProvider.addConfig('ordersnExist', {
-        //    "bizName": "queryOrderList",
-        //    "validator": "exist",
-        //    "validExpression": {
-        //        "ordersn": "ordersn"
-        //    }
-        //});
-        //
-        //nptBizValidatorProviderProvider.addConfig('ordersnExist2', {
-        //    "bizName": "queryOrderList",
-        //    "bizParams": {"userid": "10000001498059", "instid": "session.instid"},
-        //    "validator": function (data, expression) {
-        //        if (data) {
-        //            for (var i = 0; i < data.length;i++) {
-        //                if (data[i].ordersn == expression) {
-        //                    return true;
-        //                }
-        //            }
-        //        }
-        //        return false;
-        //    }
-        //});
-    });;/*!
- * mars
- * Copyright(c) 2015 huangbinglong
- * MIT Licensed
- */
-angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
-    .directive('nptBizFilter', function ($parse, nptResource, nptBizFilterHelper) {
-        return {
-            restrict: 'A',
-            require: '?ngModel',
-            link: function (scope, elm, attr, ctrl) {
-                var filterConfig = attr.nptBizFilter;
-                if (!filterConfig)throw new Error('无效的指令器配置,' + attr.ngModel);
-                var filters = filterConfig.split("|");
-                var modelName = filters[0] || attr.ngModel;
-                var asNameArray = filters[filters.length - 1].split(/\s+as\s+/);
-                var asName = (asNameArray.length == 2) ? asNameArray[1] : undefined;
-                filters[filters.length - 1] = (asNameArray.length == 2) ? asNameArray[0] : filters[filters.length - 1];
-                scope.$watch(modelName, function (newValue, oldValue) {
-                    var extraScope = {};
-                    extraScope.$value = newValue;
-                    extraScope = angular.extend({}, scope, extraScope);
-                    nptBizFilterHelper.fire($parse(filters[0])(extraScope), filters.slice(1), extraScope)
-                        .then(function (data) {
-                            if (asName) {
-                                scope[asName] = data;
-                            } else if (attr.ngModel) {
-                                scope[attr.ngModel] = data;
-                            } else {
-                                data = angular.isObject(data) ? angular.fromJson(data) : data;
-                                $(elm).html(data);
-                            }
-                        }, function (error) {
-                            throw error;
-                        });
-                });
-            }
-        };
-    })
-    .service('nptBizFilterHelper', function ($q, $filter, $parse, nptBizFilterProvider, nptResource) {
-        this.fire = function (originData, filters, scope) {
-            var deferred = $q.defer();
-            var self = this;
-            var index = 0;
-            var doFilter = function (data) {
-                if (index == filters.length) {
-                    deferred.resolve(data);
-                    return;
-                }
-                var currentFilter = filters[index];
-                self.filter(data, currentFilter, scope).then(function (nData) {
-                    index++;
-                    doFilter(nData);
-                }, function (error) {
-                    throw error;
-                });
-            };
-            this.filter(originData).then(function (data) {
-                doFilter(data);
-            });
-
-            return deferred.promise;
-        };
-        this.filter = function (data, filterExpression, scope) {
-            var deferred = $q.defer();
-            if (!filterExpression) {
-                deferred.resolve(data);
-                return deferred.promise;
-            }
-            filterExpression = this.parseFilterExpression(filterExpression, scope);
-            var filterName = filterExpression.filterName,
-                expression = filterExpression.expression;
-
-            var bizConfig = nptBizFilterProvider.getConfig(filterName);
-            if (bizConfig) { // 存在业务过滤器，需要异步处理
-                return this.doBizFilter(filterName, expression, scope);
-            } else {
-                deferred.resolve($filter(filterName)(data, expression));
-                return deferred.promise;
-            }
-        };
-        this.doBizFilter = function (name, params, scope) {
-            var deferred = $q.defer();
-            params = params || {};
-            params = angular.isObject(params) ? params : angular.fromJson(params);
-            var bizConfig = nptBizFilterProvider.getConfig(name);
-            bizConfig.bizParams = bizConfig.bizParams || {};
-            bizConfig.bizParams = this.linkContex(bizConfig.bizParams, scope);
-            angular.extend(bizConfig.bizParams, params);
-            var self = this;
-            nptResource.post(bizConfig.bizName, bizConfig.bizParams, function (data) {
-                if (bizConfig.chains) {
-                    self.fire(data, bizConfig.chains, scope).then(function (cData) {
-                        deferred.resolve(cData);
-                    });
-                } else {
-                    deferred.resolve(data);
-                }
-            }, function (error) {
-                deferred.reject(error);
-            });
-            return deferred.promise;
-        };
-
-        this.linkContex = function (param, scope) {
-            if (angular.isObject(param)) {
-                var linkedParam = {};
-                for (var key in param) {
-                    linkedParam[key] = this.linkContex(param[key], scope);
-                }
-                return linkedParam;
-            }
-            return this.quoteValueOfExpression($parse(param)(scope), scope);
-        };
-
-        this.quoteValueOfExpression = function (expression) {
-            if (!angular.isString(expression)) {
-                return expression;
-            }
-            var needQuoteOperate = {
-                "!==": /!==\s*/,
-                "===": /===\s*/,
-                "==": /==\s*/,
-                "<=": /<=\s*/,
-                ">=": />=\s*/,
-                "!=": /!=\s*/,
-                "<": /<\s*/,
-                ">": />\s*/,
-                "=": /=\s*/
-            };
-            for (var op in needQuoteOperate) {
-                var arr = expression.split(needQuoteOperate[op]);
-                if (arr.length == 2) {
-                    if (angular.isString(arr[1]) &&
-                        arr[1].indexOf("\"") !== 0 &&
-                        arr[1].indexOf("'") !== 0) {
-                        return arr[0] + op + "\"" + arr[1] + "\"";
-                    }
-                }
-
-            }
-            return expression;
-        };
-
-        this.parseFilterExpression = function (filterExpression, scope) {
-            if (!filterExpression) {
-                return {};
-            }
-            if (filterExpression.indexOf(":") > 0) {
-                var parsedExpression = {};
-                filterExpression = filterExpression.split(":");
-                var filterName = filterExpression[0];
-                filterExpression = filterExpression.slice(1);
-                filterExpression = filterExpression.join(":");
-                filterExpression = filterExpression.startsWith("{") ? angular.fromJson(filterExpression) : filterExpression;
-                parsedExpression.filterName = filterName;
-                parsedExpression.expression = this.linkContex(filterExpression, scope);
-                return parsedExpression;
-            } else {
-                return {
-                    filterName: filterExpression
-                };
-            }
-        };
-    })
-    .filter('pickup', function ($parse) {
-        return function (input, expression) {
-            var output = input;
-            if (angular.isArray(input)) {
-                output = input[0];
-            } else if (!angular.isObject(input)) {
-                return output;
-            }
-            output = output || {};
-            return $parse(expression)(output);
-        };
-    })
-    .provider('nptBizFilterProvider', function () {
-        var config = {};
-        this.addConfig = function (name, bizConfig) {
-            config[name] = bizConfig;
-        };
-        this.$get = function () {
-            return {
-                getConfig: function (name) {
-                    if (!name)return undefined;
-                    var conf = config[name];
-                    if (!conf) return undefined;
-                    return angular.copy(conf);
-                }
-            };
-        };
-    }).config(function (nptBizFilterProviderProvider) {
-        //nptBizFilterProviderProvider.addConfig('orderFilter', {
-        //    "bizName": "queryOrderList",
-        //    "bizParams": {"instid": "session.instid"},
-        //    "chains":["limitTo: 5"]
-        //});
     });;/**
  * Created by leon on 15/10/28.
  */
