@@ -1,0 +1,29 @@
+//
+   Created by huangbinglong on 15/11/6.
+extends layout/layout
+block content
+   script(src="js/angular-filter.min.js")
+   script(src="js/bizfilter.js")
+   div(ng-app="bizFilterDemo",ng-controller='bizFilterCtrl as ctrl')
+      form.form-horizontal(novalidate)
+         ul.list-group
+            li.list-group-item
+               a(href="javascript:void(0);") 有效的订单编号：10000002322065
+                  div.form-group
+                        div.col-md-10
+                           input.form-control(name='ordersn',ng-model='ordersn',type="text")
+            li.list-group-item
+               a(href="javascript:void(0);") 根据上面的ordersn查询订单，查询时可以额外增加参数(这里加了userid)；查询后可以继续拼接自定义的bizFilter获取系统的filter进行数据过滤：
+            li.list-group-item
+               a(href="javascript:void(0);") {{ordersn}}得到的订单名称是
+               br
+               span(npt-biz-filter='ordersn|orderFilter:{"userid":"10000001498059"}|pick:"ordersn=="+$value|pickup:"name"')
+            li.list-group-item
+               a(href="javascript:void(0);") 将过滤到的结果申明成新变量(anotherParam)
+               br(npt-biz-filter='ordersn|orderFilter:{"userid":"10000001498059"}|pick:"ordersn=="+$value as anotherParam')
+               | anotherParam：{{anotherParam|json}}
+            li.list-group-item
+               a(href="javascript:void(0);") 直接将ordersn过滤成名称的过滤器，不需要再复杂配置
+               div.form-group
+                  div.col-md-10
+                     input.form-control(ng-model='aParam',type="text",npt-biz-filter='ordersn|orderFilterSnToName')

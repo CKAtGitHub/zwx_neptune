@@ -22,4 +22,12 @@ router.get("/treeselect", function (req, res, next) {
     res.render("treeselect");
 });
 
+router.get("/bizvalidator", function (req, res, next) {
+    res.render("bizvalidator");
+});
+
+router.get("/bizfilter", function (req, res, next) {
+    res.render("bizfilter");
+});
+
 module.exports = router;
