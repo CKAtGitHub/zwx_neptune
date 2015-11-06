@@ -6,8 +6,11 @@ angular.module("ui.neptune", [
     "ui.neptune.directive"
 ]);
 
-angular.module("ui.neptune.service", ["ui.neptune.service.resource"]);
-angular.module("ui.neptune.validator", ['ui.neptune.validator.8Number2date']);
+angular.module("ui.neptune.service", [
+    "ui.neptune.service.resource",
+    "ui.neptune.service.model"
+]);
+angular.module("ui.neptune.validator", ['ui.neptune.validator.number2date']);
 angular.module("ui.neptune.filter", []);
 
 angular.module("ui.neptune.directive", [
@@ -17,7 +20,47 @@ angular.module("ui.neptune.directive", [
 ;/**
  * Created by leon on 15/11/6.
  */
-;/**
+
+angular.module("ui.neptune.service.model", [])
+    .provider("Model", function () {
+        this.models = {};
+
+        /**
+         * 注册一个模型,可以链式调用
+         * @param name
+         * @param model
+         * @returns {*}
+         */
+        this.model = function (name, model) {
+            if (!model) {
+                model = name;
+                name = model.name;
+            }
+
+            if (!name) {
+                throw new Error("module must have a name.");
+            }
+            this.models[name] = model;
+            return this;
+        };
+
+        this.$get = function () {
+            var self = this;
+            var service = {
+                /**
+                 * 根据名称获取模型.
+                 * @param name
+                 * @param done
+                 */
+                model: function (name, done) {
+                    if (name && done) {
+                        done(self.models[name]);
+                    }
+                }
+            };
+            return service;
+        };
+    });;/**
  * Created by leon on 15/11/3.
  */
 
@@ -104,8 +147,8 @@ angular.module("ui.neptune.service.resource", [])
 ;;/**
  * Created by leon on 15/11/5.
  */
-angular.module("ui.neptune.validator.8Number2date", [])
-    .directive("npt8Number2date", function () {
+angular.module("ui.neptune.validator.number2date", [])
+    .directive("nptNumber2date", function () {
         return {
             require: 'ngModel',
             link: function (scope, ele, attrs, ctrl) {
@@ -123,7 +166,7 @@ angular.module("ui.neptune.validator.8Number2date", [])
                             valid = true;
                         }
                     }
-                    ctrl.$setValidity("npt8Number2date", valid);
+                    ctrl.$setValidity("nptNumber2date", valid);
                     return value;
                 };
 
