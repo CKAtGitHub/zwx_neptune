@@ -1,8 +1,8 @@
 /**
  * Created by leon on 15/11/5.
  */
-angular.module("ui.neptune.validator.8Number2date", [])
-    .directive("npt8Number2date", function () {
+angular.module("ui.neptune.validator.number2date", [])
+    .directive("nptNumber2date", function () {
         return {
             require: 'ngModel',
             link: function (scope, ele, attrs, ctrl) {
@@ -20,7 +20,7 @@ angular.module("ui.neptune.validator.8Number2date", [])
                             valid = true;
                         }
                     }
-                    ctrl.$setValidity("npt8Number2date", valid);
+                    ctrl.$setValidity("nptNumber2date", valid);
                     return value;
                 };
 

@@ -7,7 +7,7 @@ angular.module("ui.neptune", [
 ]);
 
 angular.module("ui.neptune.service", ["ui.neptune.service.resource"]);
-angular.module("ui.neptune.validator", ['ui.neptune.validator.8Number2date']);
+angular.module("ui.neptune.validator", ['ui.neptune.validator.number2date']);
 angular.module("ui.neptune.filter", []);
 
 angular.module("ui.neptune.directive", [
