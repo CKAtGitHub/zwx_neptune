@@ -2,7 +2,7 @@
  * Created by leon on 15/11/3.
  */
 
-angular.module("ui.neptune.resource", [])
+angular.module("ui.neptune.service.resource", [])
     .provider("nptResource", function () {
 
         this.params = {};

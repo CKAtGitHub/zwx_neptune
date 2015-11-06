@@ -1,7 +1,7 @@
 /**
  * Created by leon on 15/11/5.
  */
-angular.module("ui.neptune.8Number2date", [])
+angular.module("ui.neptune.validator.8Number2date", [])
     .directive("npt8Number2date", function () {
         return {
             require: 'ngModel',

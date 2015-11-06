@@ -7,7 +7,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         html2js: {
             options: {
-                module: null, // no bundle module for all the html2js templates
+                module: "ui.neptune.tpls", // no bundle module for all the html2js templates
                 base: '.',
                 jade: {
                     doctype: "html"
@@ -28,11 +28,10 @@ module.exports = function (grunt) {
             dist: {
                 src: [
                     "src/app.js",
-                    "src/resource/resource.js",
-                    "src/validator/*.js",
-                    "src/datatable/datatable.js",
-                    "src/treeselect/treeselect.js",
-                    //"src/form/form.js",
+                    "src/npt/*.js",
+                    "src/npt/validator/*.js",
+                    "src/npt/filter/*.js",
+                    "src/npt/directive/*.js",
                     "<%= html2js.main.dest%>"
                 ],
                 dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"

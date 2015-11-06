@@ -2,7 +2,7 @@
  * Created by leon on 15/10/28.
  */
 
-angular.module("ui.neptune.datatable", ['ui.bootstrap'])
+angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
     .provider("DatatableStore", function () {
         this.storeConfig = {};
 

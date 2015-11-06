@@ -1,10 +1,27 @@
-angular.module("ui.neptune", ['ui.neptune.tpls', "ui.neptune.resource", "ui.neptune.validator", "ui.neptune.datatable", "ui.neptune.treeselect"]);
-angular.module("ui.neptune.validator", ['ui.neptune.8Number2date']);
-angular.module("ui.neptune.tpls", ['/template/datatable/datatable.html', '/template/treeselect/treeselect.html']);;/**
+angular.module("ui.neptune", [
+    'ui.neptune.tpls',
+    "ui.neptune.service",
+    "ui.neptune.validator",
+    "ui.neptune.filter",
+    "ui.neptune.directive"
+]);
+
+angular.module("ui.neptune.service", ["ui.neptune.service.resource"]);
+angular.module("ui.neptune.validator", ['ui.neptune.validator.8Number2date']);
+angular.module("ui.neptune.filter", []);
+
+angular.module("ui.neptune.directive", [
+    "ui.neptune.directive.datatable",
+    "ui.neptune.directive.selectTree"
+]);
+;/**
+ * Created by leon on 15/11/6.
+ */
+;/**
  * Created by leon on 15/11/3.
  */
 
-angular.module("ui.neptune.resource", [])
+angular.module("ui.neptune.service.resource", [])
     .provider("nptResource", function () {
 
         this.params = {};
@@ -87,7 +104,7 @@ angular.module("ui.neptune.resource", [])
 ;;/**
  * Created by leon on 15/11/5.
  */
-angular.module("ui.neptune.8Number2date", [])
+angular.module("ui.neptune.validator.8Number2date", [])
     .directive("npt8Number2date", function () {
         return {
             require: 'ngModel',
@@ -122,7 +139,7 @@ angular.module("ui.neptune.8Number2date", [])
  * Created by leon on 15/10/28.
  */
 
-angular.module("ui.neptune.datatable", ['ui.bootstrap'])
+angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
     .provider("DatatableStore", function () {
         this.storeConfig = {};
 
@@ -278,11 +295,59 @@ angular.module("ui.neptune.datatable", ['ui.bootstrap'])
             }
         };
     }]);;/**
+ * Created by leon on 15/10/29.
+ */
+
+angular.module("ui.neptune.directive.form", [])
+    .controller("FormControllect", ["$scope", function ($scope) {
+
+        this.init = function () {
+
+        };
+
+        $scope.doAction = function (item) {
+            if (angular.isDefined($scope.onClickAction)) {
+                $scope.onClickAction({
+                    item: item
+                });
+            }
+        };
+
+        $scope.doSave = function () {
+            console.info("保存表单");
+        };
+
+        $scope.doReset = function () {
+            console.info("重置表单");
+        };
+
+    }])
+    .directive("nptForm", [function () {
+        return {
+            restrict: "E",
+            controller: "FormControllect",
+            replace: true,
+            templateUrl: function (element, attrs) {
+                return attrs.templateUrl || "/template/form/form.html";
+            },
+            scope: {
+                config: "=",
+                data: "=",
+                action: "=",
+                onClickAction: "&",
+                onSave: "&",
+                onReset: "&"
+            },
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.init();
+            }
+        };
+    }]);;/**
  * Created by leon on 15/11/5.
  */
 
-angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
-    .provider("TreeSelectConfig", function () {
+angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
+    .provider("SelectTreeConfig", function () {
         this.treeHandler = {};
 
         this.listHandler = {};
@@ -350,7 +415,7 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
             return service;
         };
     })
-    .controller("treeselectController", ["$scope", "nptResource", function ($scope) {
+    .controller("SelectTreeController", ["$scope", "nptResource", function ($scope) {
 
         this.init = function (element) {
             $scope.element = element;
@@ -365,14 +430,14 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
             $scope.modalElement.modal("show");
         };
     }])
-    .directive("nptTreeSelect", ["$parse", "TreeSelectConfig", function ($parse, treeSelectConfig) {
+    .directive("nptSelectTree", ["$parse", "SelectTreeConfig", function ($parse, selectTreeConfig) {
         return {
             restrict: "E",
-            controller: "treeselectController",
+            controller: "SelectTreeController",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
             templateUrl: function (element, attrs) {
-                return attrs.templateUrl || "/template/treeselect/treeselect.html";
+                return attrs.templateUrl || "/template/select-tree/select-tree.html";
             },
             scope: {
                 onSelect: "&",
@@ -384,10 +449,10 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
 
                 scope.close = ctrl.close;
 
-                scope.listHeader = treeSelectConfig.listHeader(scope.selectType);
-                scope.listAction = treeSelectConfig.listAction(scope.selectType);
+                scope.listHeader = selectTreeConfig.listHeader(scope.selectType);
+                scope.listAction = selectTreeConfig.listAction(scope.selectType);
 
-                treeSelectConfig.treeData(scope.selectType, function (data) {
+                selectTreeConfig.treeData(scope.selectType, function (data) {
                     scope.treeData = data;
                 });
 
@@ -395,7 +460,7 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
                 //tree点击
                 scope.onTreeClick = function (node) {
                     console.info("点击tree");
-                    treeSelectConfig.listData(scope.selectType, node.id, function (data) {
+                    selectTreeConfig.listData(scope.selectType, node.id, function (data) {
                         scope.listData = data;
                     });
                 };
@@ -419,7 +484,9 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
             }
         };
     }]);
-;angular.module("/template/datatable/datatable.html", []).run(["$templateCache", function($templateCache) {
+;angular.module('ui.neptune.tpls', ['/template/datatable/datatable.html', '/template/form/form.html', '/template/select-tree/select-tree.html']);
+
+angular.module("/template/datatable/datatable.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/datatable/datatable.html",
     "<div><div style=\"padding-top:10px;\" class=\"row\"><div class=\"col-md-12\"><!-- 设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条--><div class=\"table-responsive\"><!-- table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格--><table class=\"table table-striped table-bordered table-hover table-condensed\"><tfoot><tr ng-show=\"isPagination\"><td colspan=\"50\"><uib-pagination style=\"margin:0px;\" total-items=\"totalItems\" ng-model=\"currPage\" items-per-page=\"itemsPerPage\" max-size=\"maxSize\" boundary-links=\"true\" first-text=\"首页\" previous-text=\"上一页\" next-text=\"下一页\" last-text=\"尾页\" class=\"pagination-sm\"></uib-pagination></td></tr></tfoot><thead><tr ng-show=\"isPagination\"><td colspan=\"50\"><uib-pagination style=\"margin:0px;\" total-items=\"totalItems\" ng-model=\"currPage\" items-per-page=\"itemsPerPage\" max-size=\"maxSize\" boundary-links=\"true\" first-text=\"首页\" previous-text=\"上一页\" next-text=\"下一页\" last-text=\"尾页\" class=\"pagination-sm\"></uib-pagination></td></tr><tr><th ng-if=\"isIndex\" class=\"text-center\">&#24207;&#21495;</th><th ng-repeat=\"item in header\" class=\"text-center\">{{item.label}}</th><th ng-if=\"action.length&gt;0\" class=\"text-center\">&#25805;&#20316;</th></tr></thead><tbody><tr ng-repeat=\"item in pageData\"><td ng-if=\"isIndex\" class=\"text-center\">{{($index+1)+(currPage * itemsPerPage - itemsPerPage\n" +
     ")}}</td><td ng-repeat=\"headerItem in header\">{{item[headerItem.name]}}</td><td ng-if=\"action.length&gt;0\"><a ng-repeat=\"actionItem in action\" href=\"\" ng-click=\"doAction(actionItem.name,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)\" class=\"btn btn-primary btn-sm\">{{actionItem.label}}</a></td></tr></tbody></table></div></div></div></div>");
@@ -433,7 +500,7 @@ angular.module("/template/form/form.html", []).run(["$templateCache", function($
     "&nbsp<button type=\"button\" ng-repeat=\"item in action\" ng-click=\"doAction(item)\" class=\"btn btn-default\">{{item.label}}</button></div></div></form>");
 }]);
 
-angular.module("/template/treeselect/treeselect.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/template/treeselect/treeselect.html",
+angular.module("/template/select-tree/select-tree.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/template/select-tree/select-tree.html",
     "<div><div id=\"treeSelect\" tabindex=\"-1\" role=\"dialog\" class=\"modal fade\"><div class=\"modal-dialog modal-lg\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" ng-click=\"close()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择用户</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-4\"><div ui-tree id=\"tree-root\" data-drag-enabled=\"false\"><ol ui-tree-nodes ng-model=\"treeData\"><li ng-repeat=\"node in treeData\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></div></div><div class=\"col-md-8\"><npt-datatable name=\"listSelect\" is-pagination=\"true\" items-per-page=\"5\" header=\"listHeader\" action=\"listAction\" data=\"listData\" is-index=\"true\" on-action=\"onListSelect(type,item,index)\"></npt-datatable></div></div></div><div class=\"modal-footer\"><button ng-click=\"close()\" class=\"btn btn-default\">关闭</button></div></div></div></div><script type=\"text/ng-template\" id=\"org_nodes.html\"><div ui-tree-handle class=\"tree-node tree-node-content\"><a ng-if=\"node.nodes &amp;&amp; node.nodes.length &gt; 0\" ng-click=\"toggle(this)\" class=\"btn btn-success btn-xs\"><span ng-class=\"{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}\" class=\"glyphicon\"></span></a>&nbsp &nbsp<a ng-click=\"onTreeClick(node)\" class=\"btn-link\">{{node.title}}</a></div><ol ui-tree-nodes=\"\" ng-model=\"node.nodes\" ng-class=\"{hidden:collapsed}\"><li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></script></div>");
 }]);

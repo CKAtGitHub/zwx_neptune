@@ -1,12 +1,12 @@
 //
    Created by leon on 15/10/28.
-extends layout
+extends layout/layout
 block content
-    script(src="/js/treeselect/treeselect.js")
+    script(src="/js/select-tree.js")
     div(ng-app="treeSelectDemo")
         div.page-header
             h1 树形选择
         div(ng-controller="treeSelectDemoController")
             button.btn.btn-primary(type="button",ng-click="show()") 打开窗口
-            npt-tree-select(name="demoTreeSelect",select-type="selectUser",on-select="onSelect(type,item,index)")
+            npt-select-tree(name="demoTreeSelect",select-type="selectUser",on-select="onSelect(type,item,index)")
             p 选择内容:{{item}}

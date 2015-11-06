@@ -1,3 +1,16 @@
-angular.module("ui.neptune", ['ui.neptune.tpls', "ui.neptune.resource", "ui.neptune.validator", "ui.neptune.datatable", "ui.neptune.treeselect"]);
-angular.module("ui.neptune.validator", ['ui.neptune.8Number2date']);
-angular.module("ui.neptune.tpls", ['/template/datatable/datatable.html', '/template/treeselect/treeselect.html']);
+angular.module("ui.neptune", [
+    'ui.neptune.tpls',
+    "ui.neptune.service",
+    "ui.neptune.validator",
+    "ui.neptune.filter",
+    "ui.neptune.directive"
+]);
+
+angular.module("ui.neptune.service", ["ui.neptune.service.resource"]);
+angular.module("ui.neptune.validator", ['ui.neptune.validator.8Number2date']);
+angular.module("ui.neptune.filter", []);
+
+angular.module("ui.neptune.directive", [
+    "ui.neptune.directive.datatable",
+    "ui.neptune.directive.selectTree"
+]);

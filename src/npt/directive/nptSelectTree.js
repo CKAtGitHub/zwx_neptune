@@ -2,8 +2,8 @@
  * Created by leon on 15/11/5.
  */
 
-angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
-    .provider("TreeSelectConfig", function () {
+angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
+    .provider("SelectTreeConfig", function () {
         this.treeHandler = {};
 
         this.listHandler = {};
@@ -71,7 +71,7 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
             return service;
         };
     })
-    .controller("treeselectController", ["$scope", "nptResource", function ($scope) {
+    .controller("SelectTreeController", ["$scope", "nptResource", function ($scope) {
 
         this.init = function (element) {
             $scope.element = element;
@@ -86,14 +86,14 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
             $scope.modalElement.modal("show");
         };
     }])
-    .directive("nptTreeSelect", ["$parse", "TreeSelectConfig", function ($parse, treeSelectConfig) {
+    .directive("nptSelectTree", ["$parse", "SelectTreeConfig", function ($parse, selectTreeConfig) {
         return {
             restrict: "E",
-            controller: "treeselectController",
+            controller: "SelectTreeController",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
             templateUrl: function (element, attrs) {
-                return attrs.templateUrl || "/template/treeselect/treeselect.html";
+                return attrs.templateUrl || "/template/select-tree/select-tree.html";
             },
             scope: {
                 onSelect: "&",
@@ -105,10 +105,10 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
 
                 scope.close = ctrl.close;
 
-                scope.listHeader = treeSelectConfig.listHeader(scope.selectType);
-                scope.listAction = treeSelectConfig.listAction(scope.selectType);
+                scope.listHeader = selectTreeConfig.listHeader(scope.selectType);
+                scope.listAction = selectTreeConfig.listAction(scope.selectType);
 
-                treeSelectConfig.treeData(scope.selectType, function (data) {
+                selectTreeConfig.treeData(scope.selectType, function (data) {
                     scope.treeData = data;
                 });
 
@@ -116,7 +116,7 @@ angular.module("ui.neptune.treeselect", ['ui.bootstrap', 'ui.tree'])
                 //tree点击
                 scope.onTreeClick = function (node) {
                     console.info("点击tree");
-                    treeSelectConfig.listData(scope.selectType, node.id, function (data) {
+                    selectTreeConfig.listData(scope.selectType, node.id, function (data) {
                         scope.listData = data;
                     });
                 };

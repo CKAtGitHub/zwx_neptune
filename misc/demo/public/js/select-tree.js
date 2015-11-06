@@ -3,9 +3,9 @@
  */
 
 angular.module("treeSelectDemo", ["ui.neptune"])
-    .config(function (TreeSelectConfigProvider) {
+    .config(function (SelectTreeConfigProvider) {
 
-        TreeSelectConfigProvider.setListHandler("selectUser", function (nptResource, id, done) {
+        SelectTreeConfigProvider.setListHandler("selectUser", function (nptResource, id, done) {
             //根据组织ID查询用户列表
             nptResource.post("queryUsersByOrgid", {
                 "orgid": id
@@ -18,7 +18,7 @@ angular.module("treeSelectDemo", ["ui.neptune"])
             });
         });
 
-        TreeSelectConfigProvider.setTreeHandler("selectUser", function (nptResource, done) {
+        SelectTreeConfigProvider.setTreeHandler("selectUser", function (nptResource, done) {
             var org = {
                 builderOrgTreeNode: function (nodes, data) {
                     if (data) {

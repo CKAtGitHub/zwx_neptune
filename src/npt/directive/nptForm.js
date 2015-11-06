@@ -2,7 +2,7 @@
  * Created by leon on 15/10/29.
  */
 
-angular.module("y9uiForm", ["ui.bootstrap", '/template/form/form.html'])
+angular.module("ui.neptune.directive.form", [])
     .controller("FormControllect", ["$scope", function ($scope) {
 
         this.init = function () {
@@ -26,7 +26,7 @@ angular.module("y9uiForm", ["ui.bootstrap", '/template/form/form.html'])
         };
 
     }])
-    .directive("y9uiForm", [function () {
+    .directive("nptForm", [function () {
         return {
             restrict: "E",
             controller: "FormControllect",
