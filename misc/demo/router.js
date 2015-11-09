@@ -34,4 +34,7 @@ router.get("/bizfilter", function (req, res, next) {
     res.render("bizfilter");
 });
 
+router.get("/formly-example", function (req, res, next) {
+    res.render("formly-example");
+});
 module.exports = router;
