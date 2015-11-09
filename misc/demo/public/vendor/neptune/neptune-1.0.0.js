@@ -6,9 +6,20 @@ angular.module("ui.neptune", [
     "ui.neptune.directive"
 ]);
 
-angular.module("ui.neptune.service", ["ui.neptune.service.resource","ui.neptune.service.model"]);
-angular.module("ui.neptune.validator", ['ui.neptune.validator.number2date','ui.neptune.validator.bizValidator']);
-angular.module("ui.neptune.filter", ['ui.neptune.filter.bizFilter']);
+angular.module("ui.neptune.service", [
+    "ui.neptune.service.resource",
+    "ui.neptune.service.datatableStore",
+    "ui.neptune.service.formStore"
+]);
+
+angular.module("ui.neptune.validator", [
+    'ui.neptune.validator.number2date',
+    'ui.neptune.validator.bizValidator'
+]);
+
+angular.module("ui.neptune.filter", ['' +
+'ui.neptune.filter.bizFilter'
+]);
 
 angular.module("ui.neptune.directive", [
     "ui.neptune.directive.datatable",
@@ -16,29 +27,24 @@ angular.module("ui.neptune.directive", [
     "ui.neptune.directive.form"
 ]);
 ;/**
- * Created by leon on 15/11/6.
+ * Created by leon on 15/11/9.
  */
 
-angular.module("ui.neptune.service.model", [])
-    .provider("ModelConfig", function () {
-        this.models = {};
+angular.module("ui.neptune.service.datatableStore", [])
+    .provider("nptDatatableStore", function () {
 
-        /**
-         * 注册一个模型,可以链式调用
-         * @param name
-         * @param model
-         * @returns {*}
-         */
-        this.model = function (name, model) {
-            if (!model) {
-                model = name;
-                name = model.name;
+        this.datatables = {};
+
+        this.datatable = function (name, datatable) {
+            if (!datatable) {
+                datatable = name;
+                name = datatable.name;
             }
 
             if (!name) {
-                throw new Error("module must have a name.");
+                throw new Error("datatable must have a name.");
             }
-            this.models[name] = model;
+            this.datatables[name] = datatable;
             return this;
         };
 
@@ -46,14 +52,83 @@ angular.module("ui.neptune.service.model", [])
             var self = this;
             var service = {
                 /**
-                 * 根据名称获取模型.
+                 * 根据名称获取表单.
                  * @param name
                  * @param done
                  */
-                model: function (name, done) {
+                datatable: function (name, done) {
                     if (name && done) {
-                        done(self.models[name]);
+                        if (self.datatables[name]) {
+                            done(self.datatables[name]);
+                        } else {
+                            throw new Error("not found datatable " + name);
+                        }
                     }
+                },
+                putDatatable: function (name, datatable) {
+                    self.datatable(name, datatable);
+                }
+            };
+            return service;
+        };
+    });;/**
+ * Created by leon on 15/11/9.
+ */
+
+angular.module("ui.neptune.service.formStore", [])
+    .provider("nptFormStore", function () {
+
+        this.formConfigs = {};
+
+        this.formFor = function (name, form) {
+            if (!form) {
+                form = name;
+                name = form.name;
+            }
+
+            if (!name) {
+                throw new Error("formFor must have a name.");
+            }
+
+            form.type = "formFor";
+            this.formConfigs[name] = form;
+            return this;
+        };
+
+        this.formly = function (name, form) {
+            if (!form) {
+                form = name;
+                name = form.name;
+            }
+
+            if (!name) {
+                throw new Error("formly must have a name.");
+            }
+            
+            form.type = "formly";
+            this.formConfigs[name] = form;
+            return this;
+        };
+
+
+        this.$get = function () {
+            var self = this;
+            var service = {
+                /**
+                 * 根据名称获取表单.
+                 * @param name
+                 * @param done
+                 */
+                from: function (name, done) {
+                    if (name && done) {
+                        done(self.formConfigs[name]);
+                    }
+                },
+                putFormFor: function (name, form) {
+                    self.formFor(name, form);
+                },
+                putFormly: function (name, form) {
+                    self.formly(name, form);
                 }
             };
             return service;
@@ -556,56 +631,23 @@ angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
  */
 
 angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "formFor.bootstrapTemplates"])
-    .provider("DatatableStore", function () {
-        this.storeConfig = {};
-
-        this.config = {
+    .constant("DatatableConfig", function () {
+        return {
             currPage: 1,
             maxSize: 10,
             itemsPerPage: 5,
             isIndex: false,
             isPagination: false
         };
-
-        this.store = function (name, module) {
-
-            if (!module) {
-                module = name;
-                name = module.name;
-            }
-
-            if (!name) {
-                throw new Error("must have name.");
-            }
-
-            this.storeConfig[name] = module;
-
-            return this;
-        };
-
-        this.$get = function () {
-            var self = this;
-            var service = {
-                getStore: function (name, done) {
-                    if (done) {
-                        done(self.storeConfig[name]);
-                    }
-                },
-                getConfig: function () {
-                    return self.config;
-                }
-            };
-            return service;
-        };
     })
-    .controller("datatableController", ["$scope", "$attrs", "DatatableStore", function ($scope, $attrs, DatatableStore) {
+    .controller("datatableController", ["$scope", "$attrs", "nptDatatableStore", "DatatableConfig", "nptFormStore", function ($scope, $attrs, nptDatatableStore, datatableConfig, nptFormStore) {
         var self = this;
-        $scope.editFormController = {};
+
 
         //初始化参数
-        this.config = DatatableStore.getConfig();
-        $scope.currPage = $scope.currPage || this.config.currPage;
+        this.config = datatableConfig();
 
+        $scope.currPage = $scope.currPage || this.config.currPage;
         $scope.totalItems = 0;
         if ($scope.data) {
             $scope.totalItems = $scope.data.length || 0;
@@ -620,17 +662,29 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
         $scope.action = {
             items: [],
             onClick: function (action, item, index) {
-                if (action.type === "editForm") {
-                    //清理数据
-                    $scope.editForm.data = {};
-                    $scope.editForm.originData = {};
-                    //清理表单状态
-                    $scope.editFormController.resetErrors();
+                if (action.type === "form") {
 
-                    //拷贝数据
-                    angular.copy(item, $scope.editForm.data);
-                    angular.copy(item, $scope.editForm.originData);
-                    $scope.editForm.open();
+                    //获取表单配置数据
+                    nptFormStore.from(action.target, function (formConfig) {
+                        //初始化表单配置
+                        self.editForm[formConfig.type].config = formConfig;
+                        self.editForm.type = formConfig.type;
+                        //清理数据
+                        self.editForm.data = {};
+                        self.editForm.originData = {};
+                        //清理表单状态
+                        if (self.editForm[formConfig.type].reset) {
+                            self.editForm[formConfig.type].reset();
+                        }
+
+                        //拷贝数据
+                        angular.copy(item, self.editForm.data);
+                        angular.copy(item, self.editForm.originData);
+
+                        if (self.editForm[formConfig.type].open) {
+                            self.editForm[formConfig.type].open();
+                        }
+                    });
                 } else {
                     if ($scope.onAction) {
                         $scope.onAction({
@@ -647,17 +701,41 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
             items: []
         };
 
-        $scope.editForm = {
+        this.editForm = {
             data: {},
+            type: "none",
             originData: {},
-            submit: function (data) {
-                console.info(JSON.stringify(data));
+            init: function (element) {
+                this.formFor.init(element);
+                this.formly.init(element);
             },
-            reset: function () {
-                angular.copy($scope.editForm.originData, $scope.editForm.data);
-                $scope.editFormController.resetErrors();
+            formFor: {
+                editFormController: {},
+                submit: function (data) {
+                    console.info(JSON.stringify(data));
+                },
+                reset: function () {
+                    angular.copy(self.editForm.originData, self.editForm.data);
+                    //this.editFormController.resetErrors();
+                },
+                init: function (element) {
+                    this.modalEle = $(element).find("#editFormFor");
+                    this.open = function () {
+                        this.modalEle.modal("show");
+                    };
+
+                    this.close = function () {
+                        this.modalEle.modal('hide');
+                    };
+                }
+            },
+            formly: {
+                init: function (element) {
+
+                }
             }
         };
+        $scope.editForm = this.editForm;
 
         this.initAction = function (actionConfig) {
             if (actionConfig) {
@@ -665,7 +743,8 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
                     var action = {
                         name: key,
                         label: actionConfig[key].label,
-                        type: actionConfig[key].type || "none"
+                        type: actionConfig[key].type || "none",
+                        target: actionConfig[key].target || undefined
                     };
                     $scope.action.items.push(action);
                 }
@@ -683,34 +762,15 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
             }
         };
 
-        this.initEditForm = function (editFormConfig) {
-            if (editFormConfig) {
-                $scope.editForm.validationAndViewRules = editFormConfig.validationAndViewRules || {};
-            }
-        };
-
         if ($scope.options) {
             this.initHeader(options.header);
             this.initAction(options.action);
-            this.initEditForm(options.editForm);
         } else {
-            DatatableStore.getStore($scope.name, function (storeConfig) {
+            nptDatatableStore.datatable($scope.name, function (storeConfig) {
                 self.initHeader(storeConfig.header);
                 self.initAction(storeConfig.action);
-                self.initEditForm(storeConfig.editForm);
             });
         }
-
-        this.$init = function (element) {
-            $scope.editForm.modalEle = $(element).find("#editFormFor");
-            $scope.editForm.open = function () {
-                $scope.editForm.modalEle.modal("show");
-            };
-
-            $scope.editForm.close = function () {
-                $scope.editForm.modalEle.modal('hide');
-            };
-        };
 
         this.$pageChange = function () {
             //初始化分页数据
@@ -760,9 +820,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
                 onAction: "&" //操作按钮点击回调
             },
             link: function (scope, element, attrs, ctrl) {
-                ctrl.$init(element);
-
-                scope.editFormController.registerSubmitButton();
+                ctrl.editForm.init(element);
                 //监控数据集合是否发生改变
                 scope.$watchCollection("data", function (newValue, oldValue) {
                     //如果存在数据则出发第一页
@@ -811,7 +869,7 @@ angular.module("ui.neptune.directive.form", [])
         };
 
     }])
-    .directive("nptForm", ["ModelConfig", function (modelConfig) {
+    .directive("nptForm", [function () {
         return {
             restrict: "E",
             controller: "FormControllect",
@@ -830,15 +888,15 @@ angular.module("ui.neptune.directive.form", [])
                 //初始化界面html
                 return {
                     pre: function (scope, element, attrs, ctrls) {
-
-                        if (attrs.name && !scope.model) {
-                            modelConfig.model(attrs.name, function (model) {
-                                scope.model = model;
-                            });
-                        }
+                        //
+                        //if (attrs.name && !scope.model) {
+                        //    .model(attrs.name, function (model) {
+                        //        scope.model = model;
+                        //    });
+                        //}
                     },
                     post: function (scope, element, attrs, ctrls) {
-                        var demo = element;
+                        //var demo = element;
                     }
                 };
             }
@@ -989,7 +1047,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
 
 angular.module("/template/datatable/datatable.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/datatable/datatable.html",
-    "<div><div id=\"editFormFor\" name=\"editFormFor\" tabindex=\"-1\" role=\"dialog\" class=\"modal fade\"><div class=\"modal-dialog modal-lg\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" ng-click=\"editForm.close()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">编辑</h4></div><div class=\"modal-body\"><form form-for=\"editForm.data\" controller=\"editFormController\" form-for-builder validation-rules=\"editForm.validationAndViewRules\" submit-with=\"editForm.submit(data)\"><submit-button label=\"确定\" buttonClass=\"btn btn-primary\" icon=\"fa fa-user\"></submit-button><button type=\"button\" ng-click=\"editForm.reset()\" class=\"btn btn-danger\">重置</button></form></div><div class=\"modal-footer\"><button ng-click=\"editForm.close()\" class=\"btn btn-default\">关闭</button></div></div></div></div><div class=\"col-md-12\"><!-- 设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条--><div class=\"table-responsive\"><!-- table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格--><table class=\"table table-striped table-bordered table-hover table-condensed\"><tfoot><tr ng-show=\"isPagination\"><td colspan=\"50\"><uib-pagination style=\"margin:0px;\" total-items=\"totalItems\" ng-model=\"currPage\" items-per-page=\"itemsPerPage\" max-size=\"maxSize\" boundary-links=\"true\" first-text=\"首页\" previous-text=\"上一页\" next-text=\"下一页\" last-text=\"尾页\" class=\"pagination-sm\"></uib-pagination></td></tr></tfoot><thead><tr ng-show=\"isPagination\"><td colspan=\"50\"><uib-pagination style=\"margin:0px;\" total-items=\"totalItems\" ng-model=\"currPage\" items-per-page=\"itemsPerPage\" max-size=\"maxSize\" boundary-links=\"true\" first-text=\"首页\" previous-text=\"上一页\" next-text=\"下一页\" last-text=\"尾页\" class=\"pagination-sm\"></uib-pagination></td></tr><tr><th ng-if=\"isIndex\" class=\"text-center\">&#24207;&#21495;</th><th ng-repeat=\"item in header.items\" class=\"text-center\">{{item.label}}</th><th ng-if=\"action.items.length&gt;0\" class=\"text-center\">&#25805;&#20316;</th></tr></thead><tbody><tr ng-repeat=\"item in pageData\"><td ng-if=\"isIndex\" class=\"text-center\">{{($index+1)+(currPage * itemsPerPage - itemsPerPage)}}</td><td ng-repeat=\"headerItem in header.items\">{{item[headerItem.name]}}</td><td ng-if=\"action.items.length&gt;0\"><a ng-repeat=\"actionItem in action.items\" href=\"\" ng-click=\"action.onClick(actionItem,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)\" class=\"btn btn-primary btn-xs\">{{actionItem.label}}</a></td></tr></tbody></table></div></div></div>");
+    "<div><div id=\"editFormFor\" name=\"editFormFor\" tabindex=\"-1\" role=\"dialog\" class=\"modal fade\"><div class=\"modal-dialog modal-lg\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" ng-click=\"editForm.formFor.close()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">编辑</h4></div><div class=\"modal-body\"><form form-for=\"editForm.data\" controller=\"editForm.formFor.editFormController\" form-for-builder validation-rules=\"editForm.formFor.config.validationAndViewRules\" submit-with=\"editForm.formFor.submit(data)\"><submit-button label=\"确定\" buttonClass=\"btn btn-primary\" icon=\"fa fa-user\"></submit-button><button type=\"button\" ng-click=\"editForm.formFor.reset()\" class=\"btn btn-danger\">重置</button></form><p>{{editForm.formFor.config || json}}</p></div><div class=\"modal-footer\"><button ng-click=\"editForm.formFor.close()\" class=\"btn btn-default\">关闭</button></div></div></div></div><div class=\"col-md-12\"><!-- 设置为响应式表格 当页面宽度不够显示表格内容时会出现滚动条--><div class=\"table-responsive\"><!-- table-striped表示隔行显示不同颜色条纹；table-hover鼠标悬停变色；table-bordered表格线框;table-condensed紧缩表格--><table class=\"table table-striped table-bordered table-hover table-condensed\"><tfoot><tr ng-show=\"isPagination\"><td colspan=\"50\"><uib-pagination style=\"margin:0px;\" total-items=\"totalItems\" ng-model=\"currPage\" items-per-page=\"itemsPerPage\" max-size=\"maxSize\" boundary-links=\"true\" first-text=\"首页\" previous-text=\"上一页\" next-text=\"下一页\" last-text=\"尾页\" class=\"pagination-sm\"></uib-pagination></td></tr></tfoot><thead><tr ng-show=\"isPagination\"><td colspan=\"50\"><uib-pagination style=\"margin:0px;\" total-items=\"totalItems\" ng-model=\"currPage\" items-per-page=\"itemsPerPage\" max-size=\"maxSize\" boundary-links=\"true\" first-text=\"首页\" previous-text=\"上一页\" next-text=\"下一页\" last-text=\"尾页\" class=\"pagination-sm\"></uib-pagination></td></tr><tr><th ng-if=\"isIndex\" class=\"text-center\">&#24207;&#21495;</th><th ng-repeat=\"item in header.items\" class=\"text-center\">{{item.label}}</th><th ng-if=\"action.items.length&gt;0\" class=\"text-center\">&#25805;&#20316;</th></tr></thead><tbody><tr ng-repeat=\"item in pageData\"><td ng-if=\"isIndex\" class=\"text-center\">{{($index+1)+(currPage * itemsPerPage - itemsPerPage)}}</td><td ng-repeat=\"headerItem in header.items\">{{item[headerItem.name]}}</td><td ng-if=\"action.items.length&gt;0\"><a ng-repeat=\"actionItem in action.items\" href=\"\" ng-click=\"action.onClick(actionItem,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)\" class=\"btn btn-primary btn-xs\">{{actionItem.label}}</a></td></tr></tbody></table></div></div></div>");
 }]);
 
 angular.module("/template/form/form.html", []).run(["$templateCache", function($templateCache) {
