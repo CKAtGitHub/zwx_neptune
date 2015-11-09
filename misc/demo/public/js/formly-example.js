@@ -88,7 +88,7 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap', "ngAnimate", 'ngMe
                             var value = modelValue || viewValue;
                             return !value || /(\d{1,3}\.){3}\d{1,3}/.test(value);
                         },
-                        message: '$viewValue + " is not a valid IP Address"'
+                        message: '$viewValue + " 不是一个ip地址."'
                     }
                 }
             }
