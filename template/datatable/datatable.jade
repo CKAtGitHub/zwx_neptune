@@ -22,19 +22,19 @@ div
                 tfoot
                     tr(ng-show="isPagination")
                         td(colspan="50")
-                            uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                            uib-pagination.pagination-sm(style="margin:0px;", total-items="datatable.page.totalItems", ng-model="datatable.page.currPage", items-per-page="datatable.page.itemsPerPage",  max-size="datatable.page.maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
                 thead
                     tr(ng-show="isPagination")
                         td(colspan="50")
-                            uib-pagination.pagination-sm(style="margin:0px;", total-items="totalItems", ng-model="currPage", items-per-page="itemsPerPage",  max-size="maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
+                            uib-pagination.pagination-sm(style="margin:0px;", total-items="datatable.page.totalItems", ng-model="datatable.page.currPage", items-per-page="datatable.page.itemsPerPage",  max-size="datatable.page.maxSize", boundary-links="true", first-text="首页", previous-text="上一页", next-text="下一页", last-text="尾页")
                     tr
-                        th.text-center(ng-if="isIndex") &#24207;&#21495;
-                        th.text-center(ng-repeat="item in header.items") {{item.label}}
-                        th.text-center(ng-if="action.items.length>0") &#25805;&#20316;
+                        th.text-center(ng-if="datatable.page.isIndex") &#24207;&#21495;
+                        th.text-center(ng-repeat="item in datatable.header.items") {{item.label}}
+                        th.text-center(ng-if="datatable.action.items.length>0") &#25805;&#20316;
                 tbody
-                    tr(ng-repeat="item in pageData")
-                        td.text-center(ng-if="isIndex")
-                            | {{($index+1)+(currPage * itemsPerPage - itemsPerPage)}}
-                        td(ng-repeat="headerItem in header.items") {{item[headerItem.name]}}
-                        td(ng-if="action.items.length>0")
-                            a.btn.btn-primary.btn-xs(ng-repeat="actionItem in action.items", href="", ng-click="action.onClick(actionItem,item,currPage * itemsPerPage - itemsPerPage + $parent.$index)") {{actionItem.label}}
+                    tr(ng-repeat="item in datatable.page.data")
+                        td.text-center(ng-if="datatable.page.isIndex")
+                            | {{($index+1)+(datatable.page.currPage * datatable.page.itemsPerPage - datatable.page.itemsPerPage)}}
+                        td(ng-repeat="headerItem in datatable.header.items") {{item[headerItem.name]}}
+                        td(ng-if="datatable.action.items.length>0")
+                            a.btn.btn-primary.btn-xs(ng-repeat="actionItem in datatable.action.items", href="", ng-click="datatable.action.onClick(actionItem,item,datatable.page.currPage * datatable.page.itemsPerPage - datatable.page.itemsPerPage + $parent.$index)") {{actionItem.label}}
