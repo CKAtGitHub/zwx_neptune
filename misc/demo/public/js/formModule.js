@@ -33,28 +33,32 @@ angular.module('formModule', [])
 
         factory.loadFields = function (moduleName) {
 
-            function toUpperCase(value) {
-                return (value || '').toUpperCase();
-            }
-
-            function toLowerCase(value) {
-                return (value || '').toLowerCase();
-            }
-
             return $timeout(function() {
                 return [
                     {
                         "key": "firstName",
                         "type": "input",
+                        ngModelAttrs: {
+                            nptBizValidator: {
+                                attribute: 'npt-biz-validator'
+                            }
+                        },
                         "templateOptions": {
                             "required": true,
-                            "label": "First Name"
+                            "label": "订单编号：10000002322065",
+                            "nptBizValidator":"ordersnExist"
                         }
                     },
                     {
                         "key": "lastName",
                         "type": "input",
+                        ngModelAttrs: {
+                            nptBizFilter: {
+                                attribute: 'npt-biz-filter'
+                            }
+                        },
                         "templateOptions": {
+                            "nptBizFilter": 'model["firstName"]|orderFilterSnToName',
                             "label": "Last Name"
                         },
                         "expressionProperties": {

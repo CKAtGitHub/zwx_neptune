@@ -14,7 +14,7 @@ angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
                 var filters = filterConfig.split("|");
                 var modelName = filters[0] || attr.ngModel;
                 var asNameArray = filters[filters.length - 1].split(/\s+as\s+/);
-                var asName = (asNameArray.length == 2) ? asNameArray[1] : undefined;
+                var asName = (asNameArray.length == 2) ? asNameArray[1] :  attr.ngModel;
                 filters[filters.length - 1] = (asNameArray.length == 2) ? asNameArray[0] : filters[filters.length - 1];
                 scope.$watch(modelName, function (newValue, oldValue) {
                     var extraScope = {};
@@ -23,9 +23,8 @@ angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
                     nptBizFilterHelper.fire($parse(filters[0])(extraScope), filters.slice(1), extraScope)
                         .then(function (data) {
                             if (asName) {
-                                scope[asName] = data;
-                            } else if (attr.ngModel) {
-                                scope[attr.ngModel] = data;
+                                var setter = $parse(asName).assign;
+                                setter(scope,data);
                             } else {
                                 data = angular.isObject(data) ? angular.fromJson(data) : data;
                                 $(elm).html(data);

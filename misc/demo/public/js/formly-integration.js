@@ -2,7 +2,7 @@
  * Created by leon on 15/11/9.
  */
 
-angular.module('formlyExample', ['formly', 'formlyBootstrap', 'formModule'])
+angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'formModule',"angular.filter"])
     .controller("formlyExampleController", function (formModuleFactory,formlyExampleHelper) {
         var vm = this;
 
@@ -41,7 +41,21 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap', 'formModule'])
             extends: 'input'
         });
 
-    }).provider('formlyExampleConfig', function () {
+    })
+    .config(function(nptBizFilterProviderProvider,nptBizValidatorProviderProvider) {
+        nptBizFilterProviderProvider.addConfig('orderFilterSnToName', {
+            "bizName": "queryOrderList",
+            "bizParams": {"instid": "10000001463017","userid": "10000001498059"},
+            "chains":['limitTo: 5','pick:"ordersn=="+$value','pickup:"name"']
+        });
+
+        nptBizValidatorProviderProvider.addConfig('ordersnExist', {
+            "bizName": "queryOrderList",
+            "bizParams": {"userid": "10000001498059", "instid": "10000001463017"},
+            "validator": "exist"
+        });
+    })
+    .provider('formlyExampleConfig', function () {
         var config = {
             asyncValidators: {},
             validators: {}

@@ -80,22 +80,7 @@ angular.module("ui.neptune.service.formStore", [])
 
         this.formConfigs = {};
 
-        this.formFor = function (name, form) {
-            if (!form) {
-                form = name;
-                name = form.name;
-            }
-
-            if (!name) {
-                throw new Error("formFor must have a name.");
-            }
-
-            form.type = "formFor";
-            this.formConfigs[name] = form;
-            return this;
-        };
-
-        this.formly = function (name, form) {
+        this.form = function (name, form) {
             if (!form) {
                 form = name;
                 name = form.name;
@@ -104,7 +89,6 @@ angular.module("ui.neptune.service.formStore", [])
             if (!name) {
                 throw new Error("formly must have a name.");
             }
-            
             form.type = "formly";
             this.formConfigs[name] = form;
             return this;
@@ -124,11 +108,8 @@ angular.module("ui.neptune.service.formStore", [])
                         done(self.formConfigs[name]);
                     }
                 },
-                putFormFor: function (name, form) {
-                    self.formFor(name, form);
-                },
-                putFormly: function (name, form) {
-                    self.formly(name, form);
+                put: function (name, form) {
+                    self.form(name, form);
                 }
             };
             return service;
@@ -235,7 +216,8 @@ angular.module('ui.neptune.validator.bizValidator', ['ui.neptune.service.resourc
                     var modeName = attr.ngModel;
                     var extraScope = {};
                     if(modeName)extraScope[modeName] = modelValue;
-                    scope = angular.extend({}, scope, extraScope);
+                    extraScope.$value = modelValue;
+                    extraScope = angular.extend({}, scope, extraScope);
                     bizConfig = angular.isObject(bizConfig) ? bizConfig : angular.fromJson(bizConfig);
                     var baseConfig = nptBizValidatorProvider.getConfig(attr.nptBizValidator) || {};
                     bizConfig = nptBizValidatorHelper.extendConfig(baseConfig, bizConfig);
@@ -258,9 +240,9 @@ angular.module('ui.neptune.validator.bizValidator', ['ui.neptune.service.resourc
                         deferred.reject(new Error('无效的nptBizValidator配置；' + (attr.name || attr.ngModel)));
                         return deferred.promise;
                     }
-                    bizParams = nptBizValidatorHelper.parseParams(bizParams, scope);
+                    bizParams = nptBizValidatorHelper.parseParams(bizParams, extraScope);
                     nptResource.post(bizName, bizParams, function (data) {
-                        validExpression = nptBizValidatorHelper.parseParams(validExpression, scope);
+                        validExpression = nptBizValidatorHelper.parseParams(validExpression, extraScope);
                         var result = nptBizValidatorHelper.execute(validator, data, validExpression);
                         if (result) {
                             deferred.resolve();
@@ -444,7 +426,7 @@ angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
                 var filters = filterConfig.split("|");
                 var modelName = filters[0] || attr.ngModel;
                 var asNameArray = filters[filters.length - 1].split(/\s+as\s+/);
-                var asName = (asNameArray.length == 2) ? asNameArray[1] : undefined;
+                var asName = (asNameArray.length == 2) ? asNameArray[1] :  attr.ngModel;
                 filters[filters.length - 1] = (asNameArray.length == 2) ? asNameArray[0] : filters[filters.length - 1];
                 scope.$watch(modelName, function (newValue, oldValue) {
                     var extraScope = {};
@@ -453,9 +435,8 @@ angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
                     nptBizFilterHelper.fire($parse(filters[0])(extraScope), filters.slice(1), extraScope)
                         .then(function (data) {
                             if (asName) {
-                                scope[asName] = data;
-                            } else if (attr.ngModel) {
-                                scope[attr.ngModel] = data;
+                                var setter = $parse(asName).assign;
+                                setter(scope,data);
                             } else {
                                 data = angular.isObject(data) ? angular.fromJson(data) : data;
                                 $(elm).html(data);
@@ -706,9 +687,20 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
             type: "none",
             originData: {},
             init: function (element) {
-                this.formFor.init(element);
-                this.formly.init(element);
+                this.modalEle = $(element).find("#editFormFor");
+                this.open = function () {
+                    this.modalEle.modal("show");
+                };
+
+                this.close = function () {
+                    this.modalEle.modal('hide');
+                };
             },
+            onSubmit: function onSubmit() {
+                //vm.options.updateInitialValue();
+                alert(JSON.stringify(vm.model), null, 2);
+            },
+
             formFor: {
                 editFormController: {},
                 submit: function (data) {
@@ -719,14 +711,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formFor", "fo
                     //this.editFormController.resetErrors();
                 },
                 init: function (element) {
-                    this.modalEle = $(element).find("#editFormFor");
-                    this.open = function () {
-                        this.modalEle.modal("show");
-                    };
 
-                    this.close = function () {
-                        this.modalEle.modal('hide');
-                    };
                 }
             },
             formly: {
