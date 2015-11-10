@@ -2,7 +2,7 @@
  * Created by leon on 15/10/28.
  */
 
-angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
+angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "formlyBootstrap"])
     .constant("DatatableConfig", function () {
         return {
             currPage: 1,
@@ -12,23 +12,15 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
             isPagination: false
         };
     })
-    .controller("datatableController", ["$scope", "$attrs", "nptDatatableStore", "DatatableConfig", "nptFormStore", function ($scope, $attrs, nptDatatableStore, datatableConfig, nptFormStore) {
+    .controller("datatableController", ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal) {
         var self = this;
 
         this.$datatable = {
             init: function (config, scope) {
                 var selfDt = this;
 
-                if (config) {
-                    selfDt.header.init(config.header);
-                    selfDt.action.init(config.action);
-                } else {
-                    nptDatatableStore.datatable($scope.name, function (config) {
-                        selfDt.header.init(config.header);
-                        selfDt.action.init(config.action);
-                    });
-                }
-
+                this.header.init(config.header);
+                this.action.init(config.action);
                 selfDt.page.init(datatableConfig(), scope);
 
             },
@@ -62,28 +54,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
                 items: [],
                 onClick: function (action, item, index) {
                     if (action.type === "form") {
-
-                        //获取表单配置数据
-                        nptFormStore.from(action.target, function (formConfig) {
-                            //初始化表单配置
-                            self.editForm[formConfig.type].config = formConfig;
-                            self.editForm.type = formConfig.type;
-                            //清理数据
-                            self.editForm.data = {};
-                            self.editForm.originData = {};
-                            //清理表单状态
-                            if (self.editForm[formConfig.type].reset) {
-                                self.editForm[formConfig.type].reset();
-                            }
-
-                            //拷贝数据
-                            angular.copy(item, self.editForm.data);
-                            angular.copy(item, self.editForm.originData);
-
-                            if (self.editForm[formConfig.type].open) {
-                                self.editForm[formConfig.type].open();
-                            }
-                        });
+                        self.$forms.open(action.target, item);
                     } else {
                         if ($scope.onAction) {
                             $scope.onAction({
@@ -140,32 +111,100 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
         };
         $scope.datatable = this.$datatable;
 
-        this.editForm = {
-            data: {},
-            options: {},
-            fields: [],
-            init: function (element) {
-                this.modalEle = $(element).find("#editFormFor");
-                this.open = function () {
-                    this.modalEle.modal("show");
-                };
-
-                this.close = function () {
-                    this.modalEle.modal('hide');
-                };
-
+        this.$forms = {
+            items: [],
+            element: undefined,
+            init: function (config, element) {
+                var self = this;
+                this.element = element;
+                for (var key in config.forms) {
+                    this.getForm(config.forms[key], this.builderForm, self);
+                }
+            },
+            getForm: function (name, done, self) {
+                //通过formStore获取表单配置
+                nptFormStore.form(name, function (config) {
+                    done(config, self);
+                });
+            },
+            builderForm: function (config, self) {
+                if (config) {
+                    var form = {
+                        id: config.name,
+                        model: {},
+                        options: config.options,
+                        fields: config.fields
+                    };
+                    self.items.push(form);
+                }
+            },
+            onSubmit: function onSubmit(id) {
+                //form.options.updateInitialValue();
+                var form = this.findFormById(id);
+                if (form) {
+                    alert(JSON.stringify(form.model), null, 2);
+                }
+            },
+            reset: function () {
 
             },
-            onSubmit: function onSubmit() {
-                //vm.options.updateInitialValue();
-                alert(JSON.stringify(this.data), null, 2);
+            open: function (id, data) {
+                var form = this.findFormById(id);
+                if (form) {
+
+                    var result = $uibModal.open({
+                        templateUrl: '/template/datatable/datatable-edit.html',
+                        controller: 'editDatatableController',
+                        controllerAs: 'vm',
+                        resolve: {
+                            formData: function () {
+                                return {
+                                    fields: form.fields,
+                                    model: data,
+                                    options: form.options
+                                };
+                            }
+                        }
+                    }).result;
+
+                    result.then(function (model) {
+                        var test = model;
+                    });
+                }
+            },
+            close: function (id) {
+                $uibModal.close();
+            },
+            findFormById: function (id) {
+                for (var index in self.$forms.items) {
+                    if (self.$forms.items[index].id === id) {
+                        return self.$forms.items[index];
+                    }
+                }
             }
         };
-        $scope.editForm = this.editForm;
-
+        $scope.forms = this.$forms;
     }])
-    .
-    directive("nptDatatable", ['$parse', function ($parse) {
+    .controller("editDatatableController", function ($modalInstance, formData) {
+        var vm = this;
+        // function assignment
+        vm.ok = ok;
+        vm.cancel = cancel;
+
+        // variable assignment
+        vm.formData = formData;
+        vm.originalFields = angular.copy(vm.formData.fields);
+
+        // function definition
+        function ok() {
+            $modalInstance.close(vm.formData.model);
+        }
+
+        function cancel() {
+            $modalInstance.dismiss('cancel');
+        }
+    })
+    .directive("nptDatatable", ['$parse', "nptDatatableStore", function ($parse, nptDatatableStore) {
         return {
             restrict: "E",
             controller: "datatableController",
@@ -184,8 +223,16 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap'])
                 onAction: "&" //操作按钮点击回调
             },
             link: function (scope, element, attrs, ctrl) {
-                ctrl.$datatable.init(scope.options, scope);
-                ctrl.editForm.init(element);
+
+                if (scope.options) {
+                    ctrl.$datatable.init(scope.options, scope);
+                    ctrl.$forms.init(scope.options, element);
+                } else {
+                    nptDatatableStore.datatable(scope.name, function (config) {
+                        ctrl.$datatable.init(config, scope);
+                        ctrl.$forms.init(config, element);
+                    });
+                }
 
                 //监控数据集合是否发生改变
                 scope.$watchCollection("data", function (newValue, oldValue) {

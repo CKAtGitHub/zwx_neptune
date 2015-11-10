@@ -35,19 +35,21 @@ angular.module("datatableStoreDemo", ["ui.neptune"]).
                 },
                 add: {
                     label: "添加",
-                    type: "addForm"
+                    type: "form",
+                    target: "demo"
                 },
                 del: {
                     label: "删除"
                 },
                 edit: {
                     label: "编辑",
-                    type: "editForm"
+                    type: "form",
+                    target: "order"
                 }
             },
             forms: {
                 edit: "order",
-                add: "orderFormly"
+                add: "demo"
             }
         });
     });

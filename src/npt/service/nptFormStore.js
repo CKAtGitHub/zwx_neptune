@@ -16,7 +16,7 @@ angular.module("ui.neptune.service.formStore", [])
             if (!name) {
                 throw new Error("formly must have a name.");
             }
-            form.type = "formly";
+            form.name = name;
             this.formConfigs[name] = form;
             return this;
         };
@@ -30,13 +30,14 @@ angular.module("ui.neptune.service.formStore", [])
                  * @param name
                  * @param done
                  */
-                from: function (name, done) {
+                form: function (name, done) {
                     if (name && done) {
                         done(self.formConfigs[name]);
                     }
                 },
                 put: function (name, form) {
                     self.form(name, form);
+                    return this;
                 }
             };
             return service;

@@ -1,0 +1,10 @@
+div
+    div.modal-header
+        button.close(type='button',ng-click="vm.cancel()",aria-label="关闭")
+            span &times
+        h4.modal-title 编辑
+    div.modal-body
+        formly-form(model="vm.formData.model",fields="vm.formData.fields",form="vm.form")
+    div.modal-footer
+        button.btn.btn-primary(type="button",ng-click="vm.ok()") 确定
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") 取消
