@@ -52,7 +52,10 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'form
         nptBizValidatorProviderProvider.addConfig('ordersnExist', {
             "bizName": "queryOrderList",
             "bizParams": {"userid": "10000001498059", "instid": "10000001463017"},
-            "validator": "exist"
+            "validator": "exist",
+            "validExpression":{
+                "ordersn":"$value"
+            }
         });
     })
     .provider('formlyExampleConfig', function () {
