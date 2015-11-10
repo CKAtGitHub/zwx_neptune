@@ -8,7 +8,7 @@ angular.module("formStoreDemo", [])
             options: {},
             fields: [
                 {
-                    key: 'sn:',
+                    key: 'sn',
                     type: 'input',
                     templateOptions: {
                         required: true,
@@ -17,7 +17,7 @@ angular.module("formStoreDemo", [])
                     }
                 },
                 {
-                    key: 'state:',
+                    key: 'state',
                     type: 'input',
                     templateOptions: {
                         required: true,
@@ -26,7 +26,7 @@ angular.module("formStoreDemo", [])
                     }
                 },
                 {
-                    key: 'clientid:',
+                    key: 'clientid',
                     type: 'input',
                     templateOptions: {
                         required: true,
@@ -35,7 +35,7 @@ angular.module("formStoreDemo", [])
                     }
                 },
                 {
-                    key: 'sales:',
+                    key: 'sales',
                     type: 'input',
                     templateOptions: {
                         required: true,
@@ -44,7 +44,7 @@ angular.module("formStoreDemo", [])
                     }
                 },
                 {
-                    key: 'amount:',
+                    key: 'amount',
                     type: 'input',
                     templateOptions: {
                         required: true,
@@ -52,7 +52,7 @@ angular.module("formStoreDemo", [])
                     }
                 },
                 {
-                    key: 'createdate:',
+                    key: 'createdate',
                     type: 'input',
                     templateOptions: {
                         required: true,
@@ -60,12 +60,22 @@ angular.module("formStoreDemo", [])
                     }
                 },
                 {
-                    key: 'remark:',
+                    key: 'remark',
                     type: 'input',
                     templateOptions: {
                         label: '备注:'
                     }
                 }
             ]
-        })
+        }).put("demo", {
+            fields: [
+                {
+                    key: 'lastName',
+                    type: 'input',
+                    templateOptions: {
+                        label: 'Last Name'
+                    }
+                }
+            ]
+        });
     });

@@ -16,6 +16,7 @@ angular.module("ui.neptune.service.datatableStore", [])
             if (!name) {
                 throw new Error("datatable must have a name.");
             }
+            this.datatable.name = name;
             this.datatables[name] = datatable;
             return this;
         };
