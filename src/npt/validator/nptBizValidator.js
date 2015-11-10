@@ -16,7 +16,8 @@ angular.module('ui.neptune.validator.bizValidator', ['ui.neptune.service.resourc
                     var modeName = attr.ngModel;
                     var extraScope = {};
                     if(modeName)extraScope[modeName] = modelValue;
-                    scope = angular.extend({}, scope, extraScope);
+                    extraScope.$value = modelValue;
+                    extraScope = angular.extend({}, scope, extraScope);
                     bizConfig = angular.isObject(bizConfig) ? bizConfig : angular.fromJson(bizConfig);
                     var baseConfig = nptBizValidatorProvider.getConfig(attr.nptBizValidator) || {};
                     bizConfig = nptBizValidatorHelper.extendConfig(baseConfig, bizConfig);
@@ -39,9 +40,9 @@ angular.module('ui.neptune.validator.bizValidator', ['ui.neptune.service.resourc
                         deferred.reject(new Error('无效的nptBizValidator配置；' + (attr.name || attr.ngModel)));
                         return deferred.promise;
                     }
-                    bizParams = nptBizValidatorHelper.parseParams(bizParams, scope);
+                    bizParams = nptBizValidatorHelper.parseParams(bizParams, extraScope);
                     nptResource.post(bizName, bizParams, function (data) {
-                        validExpression = nptBizValidatorHelper.parseParams(validExpression, scope);
+                        validExpression = nptBizValidatorHelper.parseParams(validExpression, extraScope);
                         var result = nptBizValidatorHelper.execute(validator, data, validExpression);
                         if (result) {
                             deferred.resolve();
