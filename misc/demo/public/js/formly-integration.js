@@ -3,10 +3,14 @@
  */
 
 angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'formModule',"angular.filter"])
-    .controller("formlyExampleController", function (formModuleFactory,formlyExampleHelper) {
+    .controller("formlyExampleController", function ($scope,formModuleFactory,formlyExampleHelper) {
         var vm = this;
 
-        this.onSubmit = function onSubmit() {
+        vm.choiceUser = function choiceUser() {
+            alert('click');
+        };
+
+        vm.onSubmit = function onSubmit() {
             vm.options.updateInitialValue();
             alert(JSON.stringify(vm.model), null, 2);
         };
@@ -39,6 +43,22 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'form
         formlyConfig.setType({
             name: 'ipAddress',
             extends: 'input'
+        });
+
+        formlyConfig.setType({
+            name: 'choiceAbleInput',
+            template:'<div class="input-group"><input ng-model="model[options.key]" readonly="readonly"' +
+            'type="text" class="form-control" placeholder="选择用户">' +
+            '<span class="input-group-btn">' +
+            '<button class="btn btn-default" type="button">选择用户</button></span>' +
+            '</div>',
+            defaultOptions: {
+                ngModelAttrs: {
+                    nptChoiceByDialog: {
+                        attribute: 'npt-choice-by_dialog'
+                    }
+                }
+            }
         });
 
     })
@@ -115,4 +135,18 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'form
             return vtors;
         };
         return helper;
+    }).directive('nptChoiceByDialog',function($parse) {
+        return {
+            restrict: 'A',
+            require: '?ngModel',
+            link: function(scope, elm, attr, ctrl) {
+                if (!ctrl) return;
+                $(elm).parent().children().find("button").on("click",function() {
+                   alert("选择订单");
+                    scope.$apply(function() {
+                        $parse(attr.ngModel).assign(scope,"10000002322065");
+                    });
+                });
+            }
+        };
     });
