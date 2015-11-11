@@ -82,6 +82,13 @@ angular.module('formModule', [])
                             "placeholder": "127.0.0.1"
                         },
                         "hideExpression": "!model.knowIpAddress"
+                    },
+                    {
+                        "key":"choiceUser",
+                        "type":"choiceAbleInput",
+                        "templateOptions": {
+                            nptChoiceByDialog:"order"
+                        }
                     }
                 ];
             },2000);
