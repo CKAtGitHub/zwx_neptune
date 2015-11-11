@@ -4,6 +4,15 @@
 
 angular.module("datatableStoreDemo", ["ui.neptune"]).
     run(function (nptDatatableStore) {
+
+        //store.datatable("name")
+        //    .header(function () {
+        //
+        //    })
+        //    .action(function{
+        //
+        //    });
+
         nptDatatableStore.putDatatable("demodt", {
             header: {
                 sn: {
@@ -35,21 +44,18 @@ angular.module("datatableStoreDemo", ["ui.neptune"]).
                 },
                 add: {
                     label: "添加",
-                    type: "form",
+                    type: "add",
                     target: "demo"
                 },
                 del: {
-                    label: "删除"
+                    label: "删除",
+                    type: "del"
                 },
                 edit: {
                     label: "编辑",
-                    type: "form",
+                    type: "edit",
                     target: "order"
                 }
-            },
-            forms: {
-                edit: "order",
-                add: "demo"
             }
         });
     });

@@ -12,4 +12,4 @@ block content
             h1 数据表格
 
         div(ng-controller="DatatableDemoController")
-            npt-datatable(name="demodt",is-pagination="true",items-per-page="10",data="data",is-index="true",on-action="orderAction(type,item,index)")
+            npt-datatable(name="demodt",controller="datatableController",is-pagination="true",items-per-page="10",data="data",is-index="true",on-action="orderAction(action,item,index)",on-add-listens="onAddListens",on-del-listens="onDelListens",on-edit-listens="onEditListens")

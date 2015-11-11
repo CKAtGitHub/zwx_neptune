@@ -12,8 +12,12 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
             isPagination: false
         };
     })
-    .controller("datatableController", ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal) {
+    .controller("datatableController", ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", "$q", "$injector", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal, $q, $injector) {
         var self = this;
+
+        if ($scope.controller) {
+            $scope.controller = this;
+        }
 
         this.$datatable = {
             init: function (config, scope) {
@@ -23,6 +27,155 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                 this.action.init(config.action);
                 selfDt.page.init(datatableConfig(), scope);
 
+                if (scope.onAddListens) {
+                    for (var i in scope.onAddListens) {
+                        this.putAddListen(scope.onAddListens[i]);
+                    }
+                }
+
+                if (scope.onDelListens) {
+                    for (var j in scope.onDelListens) {
+                        this.putDelListen(scope.onDelListens[j]);
+                    }
+                }
+
+                if (scope.onEditListens) {
+                    for (var k in scope.onEditListens) {
+                        this.putEditListen(scope.onEditListens[k]);
+                    }
+                }
+
+            },
+            putAddListen: function (listen) {
+                if (typeof listen === "function") {
+                    this.onAddListens.push(listen);
+                }
+            },
+            putDelListen: function (listen) {
+                if (typeof listen === "function") {
+                    this.onDelListens.push(listen);
+                }
+            },
+            putEditListen: function (listen) {
+                if (typeof listen === "function") {
+                    this.onEditListens.push(listen);
+                }
+            },
+            onAddListens: [],
+            onDelListens: [],
+            onEditListens: [],
+            handler: {
+                add: function (action, item, index) {
+                    var result = self.$forms.open(action.target, {});
+                    if (result) {
+                        result = result.then(function (data) {
+                            var params = {
+                                action: action,
+                                index: index,
+                                data: data,
+                            };
+
+                            var promisesArr = [];
+                            angular.forEach(self.$datatable.onAddListens, function (value) {
+                                if (angular.isFunction(value)) {
+                                    promisesArr.push($q.when($injector.invoke(value, this, {
+                                        "params": params
+                                    })));
+                                }
+                            });
+
+                            $q.all(promisesArr).then(function () {
+                                //执行成功,将数据添加到表格
+                                $scope.data.push(params.data);
+                            }, function (error) {
+                                console.info("添加执行失败!" + JSON.stringify(error));
+                            });
+
+                        }, function (error) {
+                            console.info("添加操作取消");
+                        });
+                        return result;
+                    }
+                },
+                del: function (action, item, index) {
+                    var deferd = $q.defer();
+                    var promise = deferd.promise;
+
+                    var params = {
+                        action: action,
+                        item: item,
+                        index: index
+                    };
+
+                    deferd.resolve(params);
+
+                    promise.then(function (data) {
+                        console.info("开始删除数据");
+                    }, function (error) {
+                        console.info("删除数据错误!" + error);
+                    });
+
+                    var promisesArr = [promise];
+                    angular.forEach(self.$datatable.onDelListens, function (value) {
+                        if (angular.isFunction(value)) {
+                            promisesArr.push($q.when($injector.invoke(value, this, {
+                                "params": params
+                            })));
+                        }
+                    });
+
+                    var result = $q.all(promisesArr).then(function () {
+                        $scope.data.splice(params.index, 1);
+                    }, function (error) {
+                        console.info("删除失败!" + error);
+                    });
+
+                    return result;
+                },
+                edit: function (action, item, index) {
+                    var result = self.$forms.open(action.target, item);
+                    if (result) {
+                        result.then(function (data) {
+                            //重新组织参数
+                            var params = {
+                                action: action,
+                                index: index,
+                                data: data,
+                                item: angular.copy(item) //防止修改
+                            };
+                            var promisesArr = [];
+                            angular.forEach(self.$datatable.onEditListens, function (value) {
+                                if (angular.isFunction(value)) {
+                                    promisesArr.push($q.when($injector.invoke(value, this, {
+                                        "params": params
+                                    })));
+                                }
+                            });
+
+                            $q.all(promisesArr).then(function (data) {
+                                console.info("编辑操作成功!");
+                                //将新数据更新到表格
+                                angular.extend(item, params.data);
+                            }, function (error) {
+                                console.info("编辑操作失败!");
+                            });
+
+                        }, function (error) {
+                            console.info("编辑操作取消");
+                        });
+                    }
+
+                    return result;
+                },
+                none: function (action, item, index) {
+                    if ($scope.onAction) {
+                        $scope.onAction({
+                            action: action,
+                            item: item,
+                            index: index
+                        });
+                    }
+                }
             },
             header: {
                 init: function (config) {
@@ -53,16 +206,8 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                 },
                 items: [],
                 onClick: function (action, item, index) {
-                    if (action.type === "form") {
-                        self.$forms.open(action.target, item);
-                    } else {
-                        if ($scope.onAction) {
-                            $scope.onAction({
-                                type: action.name,
-                                item: item,
-                                index: index
-                            });
-                        }
+                    if (self.$datatable.handler[action.type]) {
+                        self.$datatable.handler[action.type](action, item, index);
                     }
                 }
             },
@@ -112,75 +257,37 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
         $scope.datatable = this.$datatable;
 
         this.$forms = {
-            items: [],
-            element: undefined,
-            init: function (config, element) {
-                var self = this;
-                this.element = element;
-                for (var key in config.forms) {
-                    this.getForm(config.forms[key], this.builderForm, self);
-                }
+            init: function () {
             },
-            getForm: function (name, done, self) {
-                //通过formStore获取表单配置
-                nptFormStore.form(name, function (config) {
-                    done(config, self);
-                });
-            },
-            builderForm: function (config, self) {
-                if (config) {
-                    var form = {
-                        id: config.name,
-                        model: {},
-                        options: config.options,
-                        fields: config.fields
-                    };
-                    self.items.push(form);
-                }
-            },
-            onSubmit: function onSubmit(id) {
-                //form.options.updateInitialValue();
-                var form = this.findFormById(id);
-                if (form) {
-                    alert(JSON.stringify(form.model), null, 2);
-                }
-            },
-            reset: function () {
+            open: function (name, data) {
+                this.originData = data;
+                var formData = {};
+                angular.copy(data, formData);
 
-            },
-            open: function (id, data) {
-                var form = this.findFormById(id);
-                if (form) {
-
-                    var result = $uibModal.open({
-                        templateUrl: '/template/datatable/datatable-edit.html',
-                        controller: 'editDatatableController',
-                        controllerAs: 'vm',
-                        resolve: {
-                            formData: function () {
-                                return {
-                                    fields: form.fields,
-                                    model: data,
-                                    options: form.options
-                                };
-                            }
+                var result = $uibModal.open({
+                    animation: true,
+                    templateUrl: '/template/datatable/datatable-edit.html',
+                    controller: 'editDatatableController',
+                    controllerAs: 'vm',
+                    resolve: {
+                        formData: function ($q) {
+                            var deferd = $q.defer();
+                            nptFormStore.form(name, function (config) {
+                                deferd.resolve({
+                                    fields: config.fields,
+                                    model: formData,
+                                    options: config.options
+                                });
+                            });
+                            return deferd.promise;
                         }
-                    }).result;
-
-                    result.then(function (model) {
-                        var test = model;
-                    });
-                }
-            },
-            close: function (id) {
-                $uibModal.close();
-            },
-            findFormById: function (id) {
-                for (var index in self.$forms.items) {
-                    if (self.$forms.items[index].id === id) {
-                        return self.$forms.items[index];
                     }
-                }
+                }).result;
+
+                return result;
+            },
+            close: function () {
+                $uibModal.close();
             }
         };
         $scope.forms = this.$forms;
@@ -220,19 +327,23 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                 isIndex: "=?", //是否显示序号
                 isPagination: "@",//是否分页
                 itemsPerPage: "=?", //每页显示行数
-                onAction: "&" //操作按钮点击回调
+                controller: "=",
+                onAction: "&",
+                onAddListens: "=",
+                onEditListens: "=",
+                onDelListens: "="
             },
             link: function (scope, element, attrs, ctrl) {
-
                 if (scope.options) {
                     ctrl.$datatable.init(scope.options, scope);
-                    ctrl.$forms.init(scope.options, element);
+
                 } else {
                     nptDatatableStore.datatable(scope.name, function (config) {
                         ctrl.$datatable.init(config, scope);
-                        ctrl.$forms.init(config, element);
                     });
                 }
+
+                ctrl.$forms.init();
 
                 //监控数据集合是否发生改变
                 scope.$watchCollection("data", function (newValue, oldValue) {
