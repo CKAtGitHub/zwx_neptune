@@ -6,7 +6,7 @@
 
 'use strict';
 angular.module('formModule', [])
-    .factory('formModuleFactory', function ($q,$timeout) {
+    .factory('formModuleFactory', function ($q,$timeout,$sce) {
 
         function FormModule(fileds,model) {
             this.fields = fileds;
@@ -88,6 +88,21 @@ angular.module('formModule', [])
                         "type":"choiceAbleInput",
                         "templateOptions": {
                             nptChoiceByDialog:"order"
+                        }
+                    },
+                    {
+                        "key":"selectAddress",
+                        "type":"ui-select-single",
+                        templateOptions: {
+                            optionsAttr: 'bs-options',
+                            ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
+                            label: '单选',
+                            valueProp: 'id',
+                            labelProp: 'label',
+                            placeholder: 'Select option',
+                            options: [],
+                            datasource:"order",
+                            datasourceParams:{userid:"123",instid:"model['firstName']"}
                         }
                     }
                 ];

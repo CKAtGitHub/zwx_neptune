@@ -2,13 +2,12 @@
  * Created by leon on 15/11/9.
  */
 
-angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'formModule',"angular.filter"])
+angular.module('formlyExample', ['formly', 'formlyBootstrap',
+    'ui.neptune', 'formModule',"angular.filter",'ui.select','ngSanitize',
+    'ngAnimate',
+    'ngMessages'])
     .controller("formlyExampleController", function ($scope,formModuleFactory,formlyExampleHelper) {
         var vm = this;
-
-        vm.choiceUser = function choiceUser() {
-            alert('click');
-        };
 
         vm.onSubmit = function onSubmit() {
             vm.options.updateInitialValue();
@@ -20,7 +19,24 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'form
             vm.originalFields = angular.copy(vm.fields);
         });
     })
-    .run(function (formlyConfig, formlyValidationMessages, $q,formlyExampleConfig) {
+    .run(function (formlyConfig, formlyValidationMessages, $q,formlyExampleConfig,$timeout) {
+
+        var testData = [
+            {
+                "id": "1",
+                "label":"Option 1"
+            },
+            {
+                "id": "2",
+                "label":"Option 2"
+            },
+            {
+                "id": "3",
+                "label":"Option 3"
+            }
+        ];
+
+        formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
 
         formlyExampleConfig.addAsyncValidator("ipAddress",
             {
@@ -39,6 +55,7 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'form
             });
 
         formlyValidationMessages.addStringMessage('required', '这个内容必须填写.');
+        formlyValidationMessages.addStringMessage('bizvalidate', '无效的值');
 
         formlyConfig.setType({
             name: 'ipAddress',
@@ -61,8 +78,44 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap','ui.neptune', 'form
             }
         });
 
+        formlyConfig.setType({
+            name: 'ui-select-single',
+            extends: 'select',
+            templateUrl:"ui-select-single.html",
+            defaultOptions:{
+                templateOptions:{
+                refresh:function refreshAddresses(address, field) {
+                    console.log("要求资源："+field.templateOptions.datasource);
+                    console.log("要求资源请求参数：："+JSON.stringify(field.templateOptions.datasourceParams));
+                    var promise;
+                    if (!address) {
+                        promise = $q.when(testData);
+                    } else {
+                        var defered = $q.defer();
+                        $timeout(function() {
+                            defered.resolve(testData);
+                        },300);
+                        promise = defered.promise;
+                    }
+                    return promise.then(function(arr) {
+                        field.templateOptions.options = arr;
+                    });
+                },
+                refreshDelay:0
+                }
+            }
+        });
+
     })
-    .config(function(nptBizFilterProviderProvider,nptBizValidatorProviderProvider) {
+    .config(function(nptBizFilterProviderProvider,nptBizValidatorProviderProvider,formlyConfigProvider) {
+
+
+        formlyConfigProvider.setWrapper({
+            name: 'validation',
+            types: ['input','ipAddress','choiceAbleInput'],
+            templateUrl: 'error-messages.html'
+        });
+
         nptBizFilterProviderProvider.addConfig('orderFilterSnToName', {
             "bizName": "queryOrderList",
             "bizParams": {"instid": "10000001463017","userid": "10000001498059"},
