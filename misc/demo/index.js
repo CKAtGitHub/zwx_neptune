@@ -18,6 +18,8 @@ app.use(express.static(path.join(workPath, "misc/demo/public")));
 app.use(express.static(path.join(workPath, "src")));
 //app.use("/template", express.static(path.join(workPath, "template")));
 app.use("/bizmodule", express.static(path.join(workPath, "misc/demo/bizmodule")));
+app.use("/node_modules", express.static(path.join(workPath, "node_modules")));
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -32,7 +34,6 @@ app.use(repository());
 app.use("/model", repository.service());
 
 app.use("/", router);
-
 
 
 //注册服务
