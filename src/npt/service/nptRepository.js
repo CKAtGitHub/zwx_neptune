@@ -3,10 +3,22 @@
  */
 
 angular.module("ui.neptune.service.repository", [])
-    .provider("Repository", function () {
-
+    .provider("nptRepository", function () {
         this.baseURL = "/service";
         this.actionKey = "y9action";
+        this._interceptors = [processParams];
+
+        //重新组织参数结构
+        function processParams(response) {
+            return {
+                originResponse: response,
+                data: response.data.data,
+                cache: response.data.cache,
+                cause: response.data.cause,
+                code: response.data.code,
+                throwable: response.data.throwable
+            };
+        }
 
         this.setBaseURL = function (baseURL) {
             if (baseURL) {
@@ -20,14 +32,14 @@ angular.module("ui.neptune.service.repository", [])
             }
         };
 
-        this.$get = function ($http) {
+        this.$get = function ($http, $q, nptCache) {
             var self = this;
             //资源对象
             function Repository() {
                 this._params = {};
                 this._lastParams = undefined;
                 this._header = {};
-                this._baseURL = self.backendUrl;
+                this._baseURL = self.baseURL;
                 this._action = undefined;
                 this._interceptors = [];
             }
@@ -37,7 +49,7 @@ angular.module("ui.neptune.service.repository", [])
                 return this;
             };
 
-            Repository.prototype.params = function (key, value) {
+            Repository.prototype.header = function (key, value) {
                 putKeyValue(key, value, this._header);
                 return this;
             };
@@ -61,33 +73,50 @@ angular.module("ui.neptune.service.repository", [])
                 //记录最后一次的查询参数
                 this._lastParams = runParams;
                 //执行查询
-                return post(runParams);
+                return post(runParams, this);
             };
 
             Repository.prototype.refresh = function () {
                 if (this._lastParams) {
-                    return post(this._lastParams);
+                    return post(this._lastParams, this);
                 }
             };
 
-            function post(params) {
+            function post(params, scope) {
                 var postData = {};
                 postData[self.actionKey] = {
-                    name: this._action,
+                    name: scope._action,
                     params: params
                 };
 
-                var result = $http.post(self.backendUrl, postData);
-                result.then(success, failed);
+                var result = $http.post(scope._baseURL, postData).then(function (response) {
+                    //处理逻辑code
+                    if (response.data.code === "100") {
+                        return response;
+                    } else {
+                        return $q.reject(response.data.cause);
+                    }
+                }, function (error) {
+                    return "服务器错误!";
+                });
+
+                //将全局拦截器插入
+                angular.forEach(self._interceptors, function (value) {
+                    result = result.then(value);
+                });
+
+                //记录Cache
+                result = result.then(function (response) {
+                    nptCache.useByResponse(response);
+                    return response;
+                });
+
+                //将实例拦截器插入
+                angular.forEach((scope._interceptors), function (value) {
+                    result = result.then(value);
+                });
+
                 return result;
-            }
-
-            function success(data) {
-                console.info("调用完成");
-            }
-
-            function failed(error) {
-                console.info("调用个失败");
             }
 
             function putKeyValue(key, value, target) {
@@ -99,7 +128,7 @@ angular.module("ui.neptune.service.repository", [])
                     if (angular.isArray(key)) {
                         angular.forEach(key, function (value) {
                             angular.extend(target, value);
-                        })
+                        });
                     } else {
                         angular.extend(target, key);
                     }
@@ -113,9 +142,11 @@ angular.module("ui.neptune.service.repository", [])
             function repositoryFactory(action) {
                 var repository = new Repository();
                 repository.setAction(action);
+
+                return repository;
             }
 
             return repositoryFactory;
-        }
+        };
     })
 ;
