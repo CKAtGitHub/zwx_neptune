@@ -43,5 +43,32 @@ angular.module("ui.neptune.service.datatableStore", [])
                 }
             };
             return service;
+
+            //function Datatable(name) {
+            //    this.name = name;
+            //    this._header = [];
+            //    this._action = [];
+            //}
+            //
+            //Datatable.prototype.header = function header(header) {
+            //    if (data && angular.isArray(header)) {
+            //        this._header.concat(header);
+            //    }
+            //    return this;
+            //};
+            //
+            //Datatable.prototype.action = function (name, action) {
+            //
+            //};
+            //
+            //
+            //function datatableFactory(name) {
+            //    var dataTable = new Datatable(name);
+            //
+            //
+            //    return dataTable
+            //}
+            //
+            //return datatableFactory;
         };
     });

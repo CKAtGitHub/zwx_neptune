@@ -71,6 +71,33 @@ angular.module("ui.neptune.service.datatableStore", [])
                 }
             };
             return service;
+
+            //function Datatable(name) {
+            //    this.name = name;
+            //    this._header = [];
+            //    this._action = [];
+            //}
+            //
+            //Datatable.prototype.header = function header(header) {
+            //    if (data && angular.isArray(header)) {
+            //        this._header.concat(header);
+            //    }
+            //    return this;
+            //};
+            //
+            //Datatable.prototype.action = function (name, action) {
+            //
+            //};
+            //
+            //
+            //function datatableFactory(name) {
+            //    var dataTable = new Datatable(name);
+            //
+            //
+            //    return dataTable
+            //}
+            //
+            //return datatableFactory;
         };
     });;/**
  * Created by leon on 15/11/9.
@@ -695,9 +722,17 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                                 }
                             });
 
+                            //配置中的listen
+                            angular.forEach(action.listens, function (value) {
+                                promisesArr.push($q.when($injector.invoke(value, this, {
+                                    "params": params
+                                })));
+                            });
+
                             $q.all(promisesArr).then(function () {
                                 //执行成功,将数据添加到表格
                                 $scope.data.push(params.data);
+                                console.info("添加执行成功.");
                             }, function (error) {
                                 console.info("添加执行失败!" + JSON.stringify(error));
                             });
@@ -735,6 +770,13 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                         }
                     });
 
+                    //配置中的listen
+                    angular.forEach(action.listens, function (value) {
+                        promisesArr.push($q.when($injector.invoke(value, this, {
+                            "params": params
+                        })));
+                    });
+
                     var result = $q.all(promisesArr).then(function () {
                         $scope.data.splice(params.index, 1);
                     }, function (error) {
@@ -761,6 +803,13 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                                         "params": params
                                     })));
                                 }
+                            });
+
+                            //配置中的listen
+                            angular.forEach(action.listens, function (value) {
+                                promisesArr.push($q.when($injector.invoke(value, this, {
+                                    "params": params
+                                })));
                             });
 
                             $q.all(promisesArr).then(function (data) {
@@ -809,7 +858,8 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                                 name: key,
                                 label: config[key].label,
                                 type: config[key].type || "none",
-                                target: config[key].target || undefined
+                                target: config[key].target || undefined,
+                                listens: config[key].listens || []
                             };
                             this.items.push(action);
                         }
