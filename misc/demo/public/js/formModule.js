@@ -92,7 +92,7 @@ angular.module('formModule', [])
                     },
                     {
                         "key":"selectAddress",
-                        "type":"ui-select-single",
+                        "type":"ui-select",
                         templateOptions: {
                             label: '单选',
                             valueProp: 'id',

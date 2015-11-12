@@ -13,7 +13,7 @@ block content
             div(ng-if='vm.loadingData.$$state.status === 0', style='margin:20px 0;font-size:2em')
                 strong 正在加载...
             div(ng-if='vm.loadingData.$$status.state !== 0')
-                form(ng-submit="vm.onSubmit()",novalidate)
-                    formly-form(model="vm.model",fields="vm.fields",form="vm.form",options="vm.options")
+                form(ng-submit="vm.onSubmit()",name="vm.form",novalidate)
+                    formly-form(model="vm.model",fields="vm.fields",options="vm.options",form="vm.form")
                         button.btn.btn-primary(type="submit") 确定
                         button.btn.btn-default(type="button",ng-click="vm.options.resetModel()") 重置

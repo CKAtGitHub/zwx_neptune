@@ -2,16 +2,16 @@
  * Created by leon on 15/11/9.
  */
 
-angular.module('formlyExample', ['formly', 'formlyBootstrap',
-    'ui.neptune', 'formModule', "angular.filter", 'ui.select', 'ngSanitize',
-    'ngAnimate',
-    'ngMessages'])
+angular.module('formlyExample', ['ui.neptune', 'formModule',"ui.neptune.formly.wrapper-validation",
+    "ui.neptune.formly.ui-select"])
     .controller("formlyExampleController", function ($scope, formModuleFactory, formlyExampleHelper) {
         var vm = this;
 
         vm.onSubmit = function onSubmit() {
-            vm.options.updateInitialValue();
-            alert(JSON.stringify(vm.model), null, 2);
+            if (vm.form.$valid) {
+                vm.options.updateInitialValue();
+                alert(JSON.stringify(vm.model), null, 2);
+            }
         };
         vm.loadingData = formModuleFactory.loadModule("order", "orderid").then(function (module) {
             vm.model = module.model;
@@ -62,42 +62,6 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
                 }
             }
         });
-
-        formlyConfig.setType({
-            name: 'ui-select-single',
-            extends: 'select',
-            templateUrl: "ui-select-single.html",
-            defaultOptions: {
-                templateOptions: {
-                    optionsAttr: 'bs-options',
-                    ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
-                    refresh: function refreshAddresses(address, field) {
-                        console.log("要求资源：" + field.templateOptions.datasource);
-                        console.log("要求资源请求参数：：" + JSON.stringify(field.templateOptions.datasourceParams));
-                        var promise;
-                        if (!field.templateOptions.options || field.templateOptions.options.length == 0 &&
-                            field.templateOptions.datasource) {
-                            var defered = $q.defer();
-                            promise = defered.promise;
-                            nptResource.post(field.templateOptions.datasource,
-                                field.templateOptions.datasourceParams,
-                                function (data) {
-                                    defered.resolve(data);
-                                }, function (error) {
-
-                                });
-                        } else {
-                            promise = $q.when(field.templateOptions.options);
-                        }
-                        return promise.then(function (arr) {
-                            field.templateOptions.options = arr;
-                        });
-                    },
-                    refreshDelay: 0
-                }
-            }
-        });
-
     })
     .config(function (nptBizFilterProviderProvider, nptBizValidatorProviderProvider, formlyConfigProvider) {
 
