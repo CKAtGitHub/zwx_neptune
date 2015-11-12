@@ -16,7 +16,7 @@ angular.module("repositoryDemo", ["ui.neptune"])
     .controller("RepositoryDemoController", function (Order, $scope, nptCache) {
         var vm = this;
         vm.post = function () {
-            Order.post().then(function (response) {
+            vm.order = Order.post().then(function (response) {
                 $scope.data = response.data;
                 $scope.cache = nptCache.get();
             }, function (error) {
