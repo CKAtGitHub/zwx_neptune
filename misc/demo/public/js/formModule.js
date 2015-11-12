@@ -98,11 +98,11 @@ angular.module('formModule', [])
                             ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
                             label: '单选',
                             valueProp: 'id',
-                            labelProp: 'label',
+                            labelProp: 'name',
                             placeholder: 'Select option',
                             options: [],
-                            datasource:"order",
-                            datasourceParams:{userid:"123",instid:"model['firstName']"}
+                            datasource:"queryOrderList",
+                            datasourceParams:{"userid": "10000001498059", "instid": "10000001463017"}
                         }
                     }
                 ];

@@ -19,22 +19,7 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
             vm.originalFields = angular.copy(vm.fields);
         });
     })
-    .run(function (formlyConfig, formlyValidationMessages, $q,formlyExampleConfig,$timeout) {
-
-        var testData = [
-            {
-                "id": "1",
-                "label":"Option 1"
-            },
-            {
-                "id": "2",
-                "label":"Option 2"
-            },
-            {
-                "id": "3",
-                "label":"Option 3"
-            }
-        ];
+    .run(function (formlyConfig, formlyValidationMessages, $q,formlyExampleConfig,nptResource) {
 
         formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
 
@@ -88,14 +73,18 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
                     console.log("要求资源："+field.templateOptions.datasource);
                     console.log("要求资源请求参数：："+JSON.stringify(field.templateOptions.datasourceParams));
                     var promise;
-                    if (!address) {
-                        promise = $q.when(testData);
-                    } else {
+                    if(!field.templateOptions.options || field.templateOptions.options.length == 0) {
                         var defered = $q.defer();
-                        $timeout(function() {
-                            defered.resolve(testData);
-                        },300);
                         promise = defered.promise;
+                        nptResource.post(field.templateOptions.datasource,
+                            field.templateOptions.datasourceParams,
+                        function(data) {
+                            defered.resolve(data);
+                        },function(error) {
+
+                            });
+                    } else {
+                        promise = $q.when(field.templateOptions.options);
                     }
                     return promise.then(function(arr) {
                         field.templateOptions.options = arr;
