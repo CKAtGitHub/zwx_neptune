@@ -3,10 +3,10 @@
  */
 
 angular.module('formlyExample', ['formly', 'formlyBootstrap',
-    'ui.neptune', 'formModule',"angular.filter",'ui.select','ngSanitize',
+    'ui.neptune', 'formModule', "angular.filter", 'ui.select', 'ngSanitize',
     'ngAnimate',
     'ngMessages'])
-    .controller("formlyExampleController", function ($scope,formModuleFactory,formlyExampleHelper) {
+    .controller("formlyExampleController", function ($scope, formModuleFactory, formlyExampleHelper) {
         var vm = this;
 
         vm.onSubmit = function onSubmit() {
@@ -19,7 +19,7 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
             vm.originalFields = angular.copy(vm.fields);
         });
     })
-    .run(function (formlyConfig, formlyValidationMessages, $q,formlyExampleConfig,nptResource) {
+    .run(function (formlyConfig, formlyValidationMessages, $q, formlyExampleConfig, nptResource) {
 
         formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'fc.$touched || form.$submitted';
 
@@ -49,7 +49,7 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
 
         formlyConfig.setType({
             name: 'choiceAbleInput',
-            template:'<div class="input-group"><input ng-model="model[options.key]" readonly="readonly"' +
+            template: '<div class="input-group"><input ng-model="model[options.key]" readonly="readonly"' +
             'type="text" class="form-control" placeholder="选择用户">' +
             '<span class="input-group-btn">' +
             '<button class="btn btn-default" type="button">选择用户</button></span>' +
@@ -66,58 +66,60 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
         formlyConfig.setType({
             name: 'ui-select-single',
             extends: 'select',
-            templateUrl:"ui-select-single.html",
-            defaultOptions:{
-                templateOptions:{
-                refresh:function refreshAddresses(address, field) {
-                    console.log("要求资源："+field.templateOptions.datasource);
-                    console.log("要求资源请求参数：："+JSON.stringify(field.templateOptions.datasourceParams));
-                    var promise;
-                    if(!field.templateOptions.options || field.templateOptions.options.length == 0 &&
-                        field.templateOptions.datasource) {
-                        var defered = $q.defer();
-                        promise = defered.promise;
-                        nptResource.post(field.templateOptions.datasource,
-                            field.templateOptions.datasourceParams,
-                        function(data) {
-                            defered.resolve(data);
-                        },function(error) {
+            templateUrl: "ui-select-single.html",
+            defaultOptions: {
+                templateOptions: {
+                    optionsAttr: 'bs-options',
+                    ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
+                    refresh: function refreshAddresses(address, field) {
+                        console.log("要求资源：" + field.templateOptions.datasource);
+                        console.log("要求资源请求参数：：" + JSON.stringify(field.templateOptions.datasourceParams));
+                        var promise;
+                        if (!field.templateOptions.options || field.templateOptions.options.length == 0 &&
+                            field.templateOptions.datasource) {
+                            var defered = $q.defer();
+                            promise = defered.promise;
+                            nptResource.post(field.templateOptions.datasource,
+                                field.templateOptions.datasourceParams,
+                                function (data) {
+                                    defered.resolve(data);
+                                }, function (error) {
 
-                            });
-                    } else {
-                        promise = $q.when(field.templateOptions.options);
-                    }
-                    return promise.then(function(arr) {
-                        field.templateOptions.options = arr;
-                    });
-                },
-                refreshDelay:0
+                                });
+                        } else {
+                            promise = $q.when(field.templateOptions.options);
+                        }
+                        return promise.then(function (arr) {
+                            field.templateOptions.options = arr;
+                        });
+                    },
+                    refreshDelay: 0
                 }
             }
         });
 
     })
-    .config(function(nptBizFilterProviderProvider,nptBizValidatorProviderProvider,formlyConfigProvider) {
+    .config(function (nptBizFilterProviderProvider, nptBizValidatorProviderProvider, formlyConfigProvider) {
 
 
         formlyConfigProvider.setWrapper({
             name: 'validation',
-            types: ['input','ipAddress','choiceAbleInput'],
+            types: ['input', 'ipAddress', 'choiceAbleInput'],
             templateUrl: 'error-messages.html'
         });
 
         nptBizFilterProviderProvider.addConfig('orderFilterSnToName', {
             "bizName": "queryOrderList",
-            "bizParams": {"instid": "10000001463017","userid": "10000001498059"},
-            "chains":['limitTo: 5','pick:"ordersn=="+$value','pickup:"name"']
+            "bizParams": {"instid": "10000001463017", "userid": "10000001498059"},
+            "chains": ['limitTo: 5', 'pick:"ordersn=="+$value', 'pickup:"name"']
         });
 
         nptBizValidatorProviderProvider.addConfig('ordersnExist', {
             "bizName": "queryOrderList",
             "bizParams": {"userid": "10000001498059", "instid": "10000001463017"},
             "validator": "exist",
-            "validExpression":{
-                "ordersn":"$value"
+            "validExpression": {
+                "ordersn": "$value"
             }
         });
     })
@@ -140,35 +142,35 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
                 getAsyncValidator: function (name) {
                     return config.asyncValidators[name];
                 },
-                addValidator:function (name, cnf) {
+                addValidator: function (name, cnf) {
                     config.validators[name] = cnf;
                 },
-                addAsyncValidator:function (name, cnf) {
+                addAsyncValidator: function (name, cnf) {
                     config.asyncValidators[name] = cnf;
                 }
             }
         }
     }).
-    factory('formlyExampleHelper',function(formlyExampleConfig) {
+    factory('formlyExampleHelper', function (formlyExampleConfig) {
         var helper = {};
 
         helper.toFields = function (fields) {
             // 转换validator
-            fields.forEach(function(field) {
+            fields.forEach(function (field) {
                 if (field.validators && angular.isString(field.validators)) {
                     field.validators = helper.toValidator(field.validators);
                 }
                 if (field.asyncValidators && angular.isString(field.asyncValidators)) {
-                    field.asyncValidators = helper.toValidator(field.asyncValidators,true);
+                    field.asyncValidators = helper.toValidator(field.asyncValidators, true);
                 }
             });
             return fields;
         };
 
-        helper.toValidator = function (validators,isAsync) {
-            validators = angular.isArray(validators)?validators:[validators];
+        helper.toValidator = function (validators, isAsync) {
+            validators = angular.isArray(validators) ? validators : [validators];
             var vtors = {};
-            angular.forEach(validators,function(vtor) {
+            angular.forEach(validators, function (vtor) {
                 if (isAsync) {
                     vtors[vtor] = formlyExampleConfig.getAsyncValidator(vtor);
                 } else {
@@ -178,16 +180,16 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
             return vtors;
         };
         return helper;
-    }).directive('nptChoiceByDialog',function($parse) {
+    }).directive('nptChoiceByDialog', function ($parse) {
         return {
             restrict: 'A',
             require: '?ngModel',
-            link: function(scope, elm, attr, ctrl) {
+            link: function (scope, elm, attr, ctrl) {
                 if (!ctrl) return;
-                $(elm).parent().children().find("button").on("click",function() {
-                   alert("选择订单");
-                    scope.$apply(function() {
-                        $parse(attr.ngModel).assign(scope,"10000002322065");
+                $(elm).parent().children().find("button").on("click", function () {
+                    alert("选择订单");
+                    scope.$apply(function () {
+                        $parse(attr.ngModel).assign(scope, "10000002322065");
                     });
                 });
             }

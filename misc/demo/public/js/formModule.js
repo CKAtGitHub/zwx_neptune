@@ -94,8 +94,6 @@ angular.module('formModule', [])
                         "key":"selectAddress",
                         "type":"ui-select-single",
                         templateOptions: {
-                            optionsAttr: 'bs-options',
-                            ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
                             label: '单选',
                             valueProp: 'id',
                             labelProp: 'name',
