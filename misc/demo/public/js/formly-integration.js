@@ -73,7 +73,8 @@ angular.module('formlyExample', ['formly', 'formlyBootstrap',
                     console.log("要求资源："+field.templateOptions.datasource);
                     console.log("要求资源请求参数：："+JSON.stringify(field.templateOptions.datasourceParams));
                     var promise;
-                    if(!field.templateOptions.options || field.templateOptions.options.length == 0) {
+                    if(!field.templateOptions.options || field.templateOptions.options.length == 0 &&
+                        field.templateOptions.datasource) {
                         var defered = $q.defer();
                         promise = defered.promise;
                         nptResource.post(field.templateOptions.datasource,
