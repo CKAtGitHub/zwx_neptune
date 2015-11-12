@@ -32,6 +32,7 @@ module.exports = function (grunt) {
                     "src/npt/validator/*.js",
                     "src/npt/filter/*.js",
                     "src/npt/directive/*.js",
+                    "src/npt/formly/*.js",
                     "<%= html2js.main.dest%>"
                 ],
                 dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"

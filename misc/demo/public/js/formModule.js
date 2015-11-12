@@ -92,13 +92,14 @@ angular.module('formModule', [])
                     },
                     {
                         "key":"selectAddress",
-                        "type":"ui-select-single",
+                        "type":"ui-select",
                         templateOptions: {
                             label: '单选',
                             valueProp: 'id',
                             labelProp: 'name',
                             placeholder: 'Select option',
                             options: [],
+                            searchProp:'id',
                             datasource:"queryOrderList",
                             datasourceParams:{"userid": "10000001498059", "instid": "10000001463017"}
                         }
