@@ -11,7 +11,7 @@ angular.module("ui.neptune.formly.ui-select")
             extends: 'select',
             template: ['<ui-select data-ng-model="model[options.key]" data-required="{{to.required}}" data-disabled="{{to.disabled}}" theme="bootstrap">',
                 '<ui-select-match placeholder="{{to.placeholder}}" data-allow-clear="true">{{$select.selected[to.labelProp]}}</ui-select-match>',
-                '<ui-select-choices data-repeat="{{to.ngOptions}}" data-refresh="to.refresh($select.search, options)" data-refresh-delay="{{to.refreshDelay}}">',
+                '<ui-select-choices data-repeat="{{to.ngOptions}}" data-refresh="to.refresh($select.search,model, options)" data-refresh-delay="{{to.refreshDelay}}">',
                 '<div ng-bind-html="option[to.labelProp] | highlight: $select.search"></div>',
                 '<small>',
                 '{{to.valueProp}}: <span ng-bind-html="\'\'+option[to.valueProp] | highlight: $select.search"></span>',
@@ -22,8 +22,9 @@ angular.module("ui.neptune.formly.ui-select")
                 templateOptions: {
                     optionsAttr: 'bs-options',
                     ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
-                    refresh: function refreshAddresses(input, field) {
+                    refresh: function refreshAddresses(input, model,field) {
                         function loadData(success, fail) {
+                            console.log(angular.toJson(model));
                             var params = {};
                             if (field.templateOptions.searchProp) {
                                 params[field.templateOptions.searchProp] = input;

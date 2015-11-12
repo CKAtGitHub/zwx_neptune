@@ -99,6 +99,7 @@ angular.module('formModule', [])
                             labelProp: 'name',
                             placeholder: 'Select option',
                             options: [],
+                            searchProp:'id',
                             datasource:"queryOrderList",
                             datasourceParams:{"userid": "10000001498059", "instid": "10000001463017"}
                         }
