@@ -1090,29 +1090,10 @@ angular.module("ui.neptune.directive.form", [])
  * Created by leon on 15/11/5.
  */
 
-angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
-    .provider("SelectTreeConfig", function () {
+angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'ui.grid', 'ui.grid.selection'])
+    .provider("SelectTree", function () {
         this.treeHandler = {};
-
         this.listHandler = {};
-
-        this.defaultListHeader = [
-            {
-                name: "name",
-                label: "姓名"
-            }
-        ];
-
-        this.listHeader = {};
-
-        this.defaultListAction = [
-            {
-                name: "select",
-                label: "选择"
-            }
-        ];
-
-        this.listAction = {};
 
         this.setTreeHandler = function (type, handler) {
             if (type && handler) {
@@ -1139,76 +1120,102 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
                     if (self.listHandler[type] && done) {
                         self.listHandler[type](nptResource, id, done);
                     }
-                },
-                listHeader: function (type) {
-                    if (self.listHeader[type]) {
-                        return self.listHeader[type];
-                    } else {
-                        return self.defaultListHeader;
-                    }
-                },
-                listAction: function (type) {
-                    if (self.listAction[type]) {
-                        return self.listAction[type];
-                    } else {
-                        return self.defaultListAction;
-                    }
                 }
             };
 
             return service;
         };
     })
-    .controller("SelectTreeController", ["$scope", "nptResource", function ($scope) {
-
-        this.init = function (element) {
-            $scope.element = element;
-            $scope.modalElement = $(element).find(".modal");
-        };
-
-        this.close = function () {
-            $scope.modalElement.modal('hide');
-        };
-
+    .controller("SelectTreeController", function ($scope, $uibModal, SelectTree) {
         this.open = function () {
-            $scope.modalElement.modal("show");
+            var result = $uibModal.open({
+                animation: true,
+                templateUrl: '/template/select-tree/select-tree-modal.html',
+                controller: 'SelectTreeModalController',
+                controllerAs: 'vm',
+                resolve: {
+                    treeData: function ($q) {
+                        var deferd = $q.defer();
+
+                        //检索tree
+                        SelectTree.treeData($scope.selectType, function (data) {
+                            var params = {
+                                model: data,
+                                selectType: $scope.selectType
+                            };
+                            deferd.resolve(params);
+                        });
+
+                        return deferd.promise;
+                    }
+                }
+            }).result;
+            return result;
         };
-    }])
-    .directive("nptSelectTree", ["$parse", "SelectTreeConfig", function ($parse, selectTreeConfig) {
+    })
+    .controller("SelectTreeModalController", function ($scope, treeData, SelectTree, $modalInstance) {
+        var vm = this;
+        // function assignment
+        vm.ok = ok;
+        vm.cancel = cancel;
+        vm.loading = false;
+
+        // variable assignment
+        vm.treeData = treeData;
+
+        // function definition
+        function ok() {
+            var selectData = $scope.gridApi.selection.getSelectedRows();
+            $modalInstance.close(selectData);
+        }
+
+        function cancel() {
+            $modalInstance.dismiss('cancel');
+        }
+
+        //tree点击
+        vm.onTreeClick = function (node) {
+            console.info("点击tree");
+            vm.loading = true;
+            SelectTree.listData(treeData.selectType, node.id, function (data) {
+                vm.gridOptions.data = data;
+                vm.loading = false;
+            }, function (error) {
+                vm.loading = false;
+            });
+        };
+
+        vm.gridOptions = {
+            enableRowSelection: true,
+            enableSelectAll: false,
+            enableFullRowSelection: true,
+            selectionRowHeaderWidth: 35,
+            rowHeight: 35,
+            showGridFooter: true,
+            multiSelect: false,
+            data: [],
+            onRegisterApi: function (gridApi) {
+                $scope.gridApi = gridApi;
+            },
+            columnDefs: [
+                {name: 'name', displayName: "名称"},
+            ]
+        };
+    })
+    .
+    directive("nptSelectTree", ["$parse", function ($parse) {
         return {
             restrict: "E",
-            controller: "SelectTreeController",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
+            controller: "SelectTreeController",
             templateUrl: function (element, attrs) {
                 return attrs.templateUrl || "/template/select-tree/select-tree.html";
             },
             scope: {
-                onSelect: "&",
                 selectType: "@"
             },
             link: function (scope, element, attrs, ctrl) {
-                //初始化
-                ctrl.init(element);
-
-                scope.close = ctrl.close;
-
-                scope.listHeader = selectTreeConfig.listHeader(scope.selectType);
-                scope.listAction = selectTreeConfig.listAction(scope.selectType);
-
-                selectTreeConfig.treeData(scope.selectType, function (data) {
-                    scope.treeData = data;
-                });
-
-
-                //tree点击
-                scope.onTreeClick = function (node) {
-                    console.info("点击tree");
-                    selectTreeConfig.listData(scope.selectType, node.id, function (data) {
-                        scope.listData = data;
-                    });
-                };
-
                 scope.onListSelect = function (type, item, index) {
                     console.info("点击list");
                     if (scope.onSelect) {
@@ -1228,99 +1235,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
             }
         };
     }]);
-;/*!
- * mars
- * Copyright(c) 2015 huangbinglong
- * MIT Licensed
- */
-
-angular.module("ui.neptune.formly", [
-    "ui.neptune.formly.ui-select",
-    "ui.neptune.formly.wrapper-validation"]);
-
-angular.module("ui.neptune.formly.ui-select",
-    ["ui.neptune.service.resource",'ui.select', 'ngSanitize',
-    'ngAnimate',
-    'ngMessages',"angular.filter"]);
-
-angular.module("ui.neptune.formly.wrapper-validation",[]);;/*!
- * mars
- * Copyright(c) 2015 huangbinglong
- * MIT Licensed
- */
-
-angular.module("ui.neptune.formly.ui-select")
-    .run(function (formlyConfig,$q,nptResource) {
-        formlyConfig.setType({
-            name: 'ui-select',
-            extends: 'select',
-            template: ['<ui-select data-ng-model="model[options.key]" data-required="{{to.required}}" data-disabled="{{to.disabled}}" theme="bootstrap">',
-                '<ui-select-match placeholder="{{to.placeholder}}" data-allow-clear="true">{{$select.selected[to.labelProp]}}</ui-select-match>',
-                '<ui-select-choices data-repeat="{{to.ngOptions}}" data-refresh="to.refresh($select.search, options)" data-refresh-delay="{{to.refreshDelay}}">',
-                '<div ng-bind-html="option[to.labelProp] | highlight: $select.search"></div>',
-                '<small>',
-                '{{to.valueProp}}: <span ng-bind-html="\'\'+option[to.valueProp] | highlight: $select.search"></span>',
-                '</small>',
-                '</ui-select-choices>',
-                '</ui-select>'].join(""),
-            defaultOptions: {
-                templateOptions: {
-                    optionsAttr: 'bs-options',
-                    ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
-                    refresh: function refreshAddresses(input, field) {
-                        function loadData(success, fail) {
-                            var params = {};
-                            if (field.templateOptions.searchProp) {
-                                params[field.templateOptions.searchProp] = input;
-                            }
-                            params = angular.extend(field.templateOptions.datasourceParams || {}, params);
-                            nptResource.post(field.templateOptions.datasource,
-                                params,
-                                success, fail);
-                        }
-
-                        var promise;
-                        if (!field.templateOptions.datasource) {
-                            promise = $q.when(field.templateOptions.options);
-                        } else if (!field.templateOptions.options ||field.templateOptions.options.length===0 || field.templateOptions.searchProp) {
-                            var defered = $q.defer();
-                            promise = defered.promise;
-                            loadData(function (data) {
-                                defered.resolve(data);
-                            }, function (error) {
-                                defered.reject(error);
-                            });
-                        } else {
-                            promise = $q.when(field.templateOptions.options);
-                        }
-
-                        return promise.then(function (arr) {
-                            field.templateOptions.options = arr;
-                        });
-                    },
-                    refreshDelay: 0
-                }
-            }
-        });
-    });;/*!
- * mars
- * Copyright(c) 2015 huangbinglong
- * MIT Licensed
- */
-
-angular.module("ui.neptune.formly.wrapper-validation")
-.config(function(formlyConfigProvider) {
-        formlyConfigProvider.setWrapper({
-            name: 'showErrorMessage',
-            types: ['input', 'select', 'textarea'],
-            template: [
-                '<formly-transclude></formly-transclude>',
-                '<div ng-messages="fc.$error" ng-if="form.$submitted || options.formControl.$touched" class="error-messages">',
-                '<div ng-message="{{ ::name }}" ng-repeat="(name, message) in ::options.validation.messages" class="message">{{ message(fc.$viewValue, fc.$modelValue, this)}}</div>',
-                '</div>'
-            ].join("")
-        });
-    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/select-tree/select-tree.html']);
+;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
 
 angular.module("/template/datatable/datatable-edit.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/datatable/datatable-edit.html",
@@ -1337,7 +1252,12 @@ angular.module("/template/form/form.html", []).run(["$templateCache", function($
     "<div></div>");
 }]);
 
+angular.module("/template/select-tree/select-tree-modal.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/template/select-tree/select-tree-modal.html",
+    "<div><div class=\"modal-header\"><button type=\"button\" ng-click=\"vm.cancel()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-12\"><p ng-show=\"vm.loading\">正在加载数据,请稍后...</p><p ng-show=\"!vm.loading\">&nbsp</p></div></div><div class=\"row\"><div class=\"col-md-4\"><div ui-tree id=\"tree-root\" data-drag-enabled=\"false\"><ol ui-tree-nodes ng-model=\"vm.treeData.model\"><li ng-repeat=\"node in vm.treeData.model\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></div></div><div class=\"col-md-8\"><div ui-grid=\"vm.gridOptions\" ui-grid-selection class=\"grid\"></div></div></div></div><div class=\"modal-footer\"><button type=\"button\" ng-click=\"vm.ok()\" class=\"btn btn-primary\">确定</button><button type=\"button\" ng-click=\"vm.cancel()\" class=\"btn btn-warning\">取消</button></div><script type=\"text/ng-template\" id=\"org_nodes.html\"><div ui-tree-handle class=\"tree-node tree-node-content\"><a ng-if=\"node.nodes &amp;&amp; node.nodes.length &gt; 0\" ng-click=\"toggle(this)\" class=\"btn btn-success btn-xs\"><span ng-class=\"{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}\" class=\"glyphicon\"></span></a>&nbsp &nbsp<a ng-click=\"vm.onTreeClick(node)\" class=\"btn-link\">{{node.title}}</a></div><ol ui-tree-nodes=\"\" ng-model=\"node.nodes\" ng-class=\"{hidden:collapsed}\"><li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></script></div>");
+}]);
+
 angular.module("/template/select-tree/select-tree.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/select-tree/select-tree.html",
-    "<div><div id=\"treeSelect\" tabindex=\"-1\" role=\"dialog\" class=\"modal fade\"><div class=\"modal-dialog modal-lg\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" ng-click=\"close()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择用户</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-4\"><div ui-tree id=\"tree-root\" data-drag-enabled=\"false\"><ol ui-tree-nodes ng-model=\"treeData\"><li ng-repeat=\"node in treeData\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></div></div><div class=\"col-md-8\"><npt-datatable name=\"listSelect\" is-pagination=\"true\" items-per-page=\"5\" header=\"listHeader\" action=\"listAction\" data=\"listData\" is-index=\"true\" on-action=\"onListSelect(type,item,index)\"></npt-datatable></div></div></div><div class=\"modal-footer\"><button ng-click=\"close()\" class=\"btn btn-default\">关闭</button></div></div></div></div><script type=\"text/ng-template\" id=\"org_nodes.html\"><div ui-tree-handle class=\"tree-node tree-node-content\"><a ng-if=\"node.nodes &amp;&amp; node.nodes.length &gt; 0\" ng-click=\"toggle(this)\" class=\"btn btn-success btn-xs\"><span ng-class=\"{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}\" class=\"glyphicon\"></span></a>&nbsp &nbsp<a ng-click=\"onTreeClick(node)\" class=\"btn-link\">{{node.title}}</a></div><ol ui-tree-nodes=\"\" ng-model=\"node.nodes\" ng-class=\"{hidden:collapsed}\"><li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></script></div>");
+    "<div></div>");
 }]);

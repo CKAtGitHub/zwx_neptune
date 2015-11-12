@@ -49,5 +49,8 @@
     "karma-jasmine": "^0.3.6",
     "y9-mars-repository": "^1.0.2",
     "y9-mars-service": "^1.0.10"
+  },
+  "dependencies": {
+    "angular-ui-grid": "^3.0.7"
   }
 }

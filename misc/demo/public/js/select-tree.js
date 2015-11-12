@@ -3,9 +3,9 @@
  */
 
 angular.module("treeSelectDemo", ["ui.neptune"])
-    .config(function (SelectTreeConfigProvider) {
+    .config(function (SelectTreeProvider) {
 
-        SelectTreeConfigProvider.setListHandler("selectUser", function (nptResource, id, done) {
+        SelectTreeProvider.setListHandler("selectUser", function (nptResource, id, done) {
             //根据组织ID查询用户列表
             nptResource.post("queryUsersByOrgid", {
                 "orgid": id
@@ -18,7 +18,7 @@ angular.module("treeSelectDemo", ["ui.neptune"])
             });
         });
 
-        SelectTreeConfigProvider.setTreeHandler("selectUser", function (nptResource, done) {
+        SelectTreeProvider.setTreeHandler("selectUser", function (nptResource, done) {
             var org = {
                 builderOrgTreeNode: function (nodes, data) {
                     if (data) {
@@ -53,10 +53,13 @@ angular.module("treeSelectDemo", ["ui.neptune"])
     })
     .controller("treeSelectDemoController", function ($scope) {
         $scope.show = function () {
-            $scope.demoTreeSelect.open();
+            var result = $scope.demoTreeSelect.open();
+            result.then(function (data) {
+                $scope.item = data;
+            }, function () {
+                $scope.item = {
+                    msg: "用户取消选择"
+                }
+            })
         };
-
-        $scope.onSelect = function (type, item, index) {
-            $scope.item = item;
-        }
     });

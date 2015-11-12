@@ -1,0 +1,30 @@
+div
+    div.modal-header
+        button.close(type='button',ng-click="vm.cancel()",aria-label="关闭")
+            span &times
+        h4.modal-title 选择
+    div.modal-body
+        div.row
+            div.col-md-12
+                p(ng-show="vm.loading") 正在加载数据,请稍后...
+                p(ng-show="!vm.loading") &nbsp
+        div.row
+            div.col-md-4
+                div(ui-tree,id="tree-root",data-drag-enabled="false")
+                    ol(ui-tree-nodes ng-model="vm.treeData.model")
+                        li(ng-repeat="node in vm.treeData.model",ui-tree-node,ng-include="'org_nodes.html'")
+            div.col-md-8
+                div.grid(ui-grid="vm.gridOptions",ui-grid-selection)
+    div.modal-footer
+        button.btn.btn-primary(type="button",ng-click="vm.ok()") 确定
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") 取消
+
+
+    script(type="text/ng-template",id="org_nodes.html")
+        div.tree-node.tree-node-content(ui-tree-handle)
+            a.btn.btn-success.btn-xs(ng-if="node.nodes && node.nodes.length > 0",ng-click="toggle(this)")
+                span.glyphicon(ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}")
+            | &nbsp &nbsp
+            a.btn-link(ng-click="vm.onTreeClick(node)") {{node.title}}
+        ol(ui-tree-nodes="",ng-model="node.nodes",ng-class="{hidden:collapsed}")
+            li(ng-repeat="node in node.nodes",ui-tree-node,ng-include="'org_nodes.html'")

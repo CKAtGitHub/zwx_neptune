@@ -2,29 +2,10 @@
  * Created by leon on 15/11/5.
  */
 
-angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
-    .provider("SelectTreeConfig", function () {
+angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'ui.grid', 'ui.grid.selection'])
+    .provider("SelectTree", function () {
         this.treeHandler = {};
-
         this.listHandler = {};
-
-        this.defaultListHeader = [
-            {
-                name: "name",
-                label: "姓名"
-            }
-        ];
-
-        this.listHeader = {};
-
-        this.defaultListAction = [
-            {
-                name: "select",
-                label: "选择"
-            }
-        ];
-
-        this.listAction = {};
 
         this.setTreeHandler = function (type, handler) {
             if (type && handler) {
@@ -51,76 +32,102 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree'])
                     if (self.listHandler[type] && done) {
                         self.listHandler[type](nptResource, id, done);
                     }
-                },
-                listHeader: function (type) {
-                    if (self.listHeader[type]) {
-                        return self.listHeader[type];
-                    } else {
-                        return self.defaultListHeader;
-                    }
-                },
-                listAction: function (type) {
-                    if (self.listAction[type]) {
-                        return self.listAction[type];
-                    } else {
-                        return self.defaultListAction;
-                    }
                 }
             };
 
             return service;
         };
     })
-    .controller("SelectTreeController", ["$scope", "nptResource", function ($scope) {
-
-        this.init = function (element) {
-            $scope.element = element;
-            $scope.modalElement = $(element).find(".modal");
-        };
-
-        this.close = function () {
-            $scope.modalElement.modal('hide');
-        };
-
+    .controller("SelectTreeController", function ($scope, $uibModal, SelectTree) {
         this.open = function () {
-            $scope.modalElement.modal("show");
+            var result = $uibModal.open({
+                animation: true,
+                templateUrl: '/template/select-tree/select-tree-modal.html',
+                controller: 'SelectTreeModalController',
+                controllerAs: 'vm',
+                resolve: {
+                    treeData: function ($q) {
+                        var deferd = $q.defer();
+
+                        //检索tree
+                        SelectTree.treeData($scope.selectType, function (data) {
+                            var params = {
+                                model: data,
+                                selectType: $scope.selectType
+                            };
+                            deferd.resolve(params);
+                        });
+
+                        return deferd.promise;
+                    }
+                }
+            }).result;
+            return result;
         };
-    }])
-    .directive("nptSelectTree", ["$parse", "SelectTreeConfig", function ($parse, selectTreeConfig) {
+    })
+    .controller("SelectTreeModalController", function ($scope, treeData, SelectTree, $modalInstance) {
+        var vm = this;
+        // function assignment
+        vm.ok = ok;
+        vm.cancel = cancel;
+        vm.loading = false;
+
+        // variable assignment
+        vm.treeData = treeData;
+
+        // function definition
+        function ok() {
+            var selectData = $scope.gridApi.selection.getSelectedRows();
+            $modalInstance.close(selectData);
+        }
+
+        function cancel() {
+            $modalInstance.dismiss('cancel');
+        }
+
+        //tree点击
+        vm.onTreeClick = function (node) {
+            console.info("点击tree");
+            vm.loading = true;
+            SelectTree.listData(treeData.selectType, node.id, function (data) {
+                vm.gridOptions.data = data;
+                vm.loading = false;
+            }, function (error) {
+                vm.loading = false;
+            });
+        };
+
+        vm.gridOptions = {
+            enableRowSelection: true,
+            enableSelectAll: false,
+            enableFullRowSelection: true,
+            selectionRowHeaderWidth: 35,
+            rowHeight: 35,
+            showGridFooter: true,
+            multiSelect: false,
+            data: [],
+            onRegisterApi: function (gridApi) {
+                $scope.gridApi = gridApi;
+            },
+            columnDefs: [
+                {name: 'name', displayName: "名称"},
+            ]
+        };
+    })
+    .
+    directive("nptSelectTree", ["$parse", function ($parse) {
         return {
             restrict: "E",
-            controller: "SelectTreeController",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
+            controller: "SelectTreeController",
             templateUrl: function (element, attrs) {
                 return attrs.templateUrl || "/template/select-tree/select-tree.html";
             },
             scope: {
-                onSelect: "&",
                 selectType: "@"
             },
             link: function (scope, element, attrs, ctrl) {
-                //初始化
-                ctrl.init(element);
-
-                scope.close = ctrl.close;
-
-                scope.listHeader = selectTreeConfig.listHeader(scope.selectType);
-                scope.listAction = selectTreeConfig.listAction(scope.selectType);
-
-                selectTreeConfig.treeData(scope.selectType, function (data) {
-                    scope.treeData = data;
-                });
-
-
-                //tree点击
-                scope.onTreeClick = function (node) {
-                    console.info("点击tree");
-                    selectTreeConfig.listData(scope.selectType, node.id, function (data) {
-                        scope.listData = data;
-                    });
-                };
-
                 scope.onListSelect = function (type, item, index) {
                     console.info("点击list");
                     if (scope.onSelect) {
