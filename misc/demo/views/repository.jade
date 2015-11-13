@@ -1,0 +1,26 @@
+//
+   Created by leon on 15/10/29.
+extends layout/layout
+block content
+    script(src="/js/repository.js")
+    div(ng-app="repositoryDemo",ng-controller="RepositoryDemoController as vm")
+        div.page-header
+            h1 资源仓库
+        div.row
+            div.col-md-12
+                div(ng-if="vm.order.$$state.status === 0", style='margin:20px 0;font-size:2em')
+                    p 正在加载...
+                div(ng-if='vm.order.$$state.status !== 0')
+                    button.btn.btn-primary(type="button",ng-click="vm.post()") Post
+
+        div.row
+            div.col-md-12
+                p {{vm.order.$$state}}
+
+                pre {{data}}
+
+                pre {{cache}}
+
+
+
+

@@ -42,8 +42,7 @@ router.get("/formly-integration", function (req, res, next) {
     res.render("formly-integration");
 });
 
-router.get("/formly-integration/:to", function (req, res, next) {
-    res.render("formly/"+req.params['to']);
+router.get("/repository", function (req, res, next) {
+    res.render("repository");
 });
-
 module.exports = router;
