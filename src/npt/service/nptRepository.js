@@ -41,7 +41,8 @@ angular.module("ui.neptune.service.repository", [])
                 this._header = {};
                 this._baseURL = self.baseURL;
                 this._action = undefined;
-                this._interceptors = [];
+                this._responseInterceptors = [];
+                this._requestInterceptors = [];
             }
 
             Repository.prototype.params = function (key, value) {
@@ -56,24 +57,55 @@ angular.module("ui.neptune.service.repository", [])
 
             Repository.prototype.setAction = function (action) {
                 this._action = action;
+                return this;
             };
 
-            Repository.prototype.addInterceptor = function (interceptor) {
+            Repository.prototype.addResponseInterceptor = function (interceptor) {
                 if (angular.isFunction(interceptor)) {
-                    this._interceptors.push(interceptor);
+                    this._responseInterceptors.push(interceptor);
                 }
+                return this;
+            };
+
+            Repository.prototype.addRequestInterceptor = function (interceptor) {
+                if (angular.isFunction(interceptor)) {
+                    this._requestInterceptors.push(interceptor);
+                }
+                return this;
             };
 
             Repository.prototype.post = function (params) {
                 var runParams = {};
+                var selfRepository = this;
                 //自上而下合并查询参数
                 angular.extend(runParams, self.params || {});
                 angular.extend(runParams, this._params || {});
                 angular.extend(runParams, params || {});
-                //记录最后一次的查询参数
-                this._lastParams = runParams;
-                //执行查询
-                return post(runParams, this);
+
+                var request = {
+                    params: runParams || {}
+                };
+
+                //pre拦截器
+                var deferd = $q.defer();
+                var promise = deferd.promise;
+                deferd.resolve(request);
+
+                //写入实例请求拦截器
+                if (this._requestInterceptors) {
+                    angular.forEach(this._requestInterceptors, function (value) {
+                        promise = promise.then(value);
+                    });
+                }
+
+                return promise.then(function (request) {
+                    //记录最后一次的查询参数
+                    this._lastParams = request.params;
+                    return request;
+                }).then(function (request) {
+                    //执行查询
+                    return post(request, selfRepository);
+                });
             };
 
             Repository.prototype.refresh = function () {
@@ -82,11 +114,11 @@ angular.module("ui.neptune.service.repository", [])
                 }
             };
 
-            function post(params, scope) {
+            function post(request, scope) {
                 var postData = {};
                 postData[self.actionKey] = {
                     name: scope._action,
-                    params: params
+                    params: request.params
                 };
 
                 var result = $http.post(scope._baseURL, postData).then(function (response) {
@@ -97,12 +129,18 @@ angular.module("ui.neptune.service.repository", [])
                         return $q.reject(response.data.cause);
                     }
                 }, function (error) {
-                    return "服务器错误!";
+                    return error;
                 });
 
-                //将全局拦截器插入
+                //将全局响应拦截器插入
                 angular.forEach(self._interceptors, function (value) {
                     result = result.then(value);
+                });
+
+                //写入请求对象
+                result = result.then(function (response) {
+                    response.request = request;
+                    return response;
                 });
 
                 //记录Cache
@@ -111,8 +149,8 @@ angular.module("ui.neptune.service.repository", [])
                     return response;
                 });
 
-                //将实例拦截器插入
-                angular.forEach((scope._interceptors), function (value) {
+                //将实例拦响应截器插入
+                angular.forEach((scope._responseInterceptors), function (value) {
                     result = result.then(value);
                 });
 

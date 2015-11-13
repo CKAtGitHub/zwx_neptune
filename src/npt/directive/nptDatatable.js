@@ -72,7 +72,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                             var params = {
                                 action: action,
                                 index: index,
-                                data: data,
+                                data: data
                             };
 
                             var promisesArr = [];

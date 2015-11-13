@@ -4,9 +4,7 @@
 
 angular.module("repositoryDemo", ["ui.neptune"])
     .factory("Order", function (nptRepository) {
-        var repository = nptRepository("queryOrderList");
-
-        repository.params({
+        var repository = nptRepository("queryOrderList").params({
             "instid": "10000001468002",
             "userid": "10000001498059"
         });
@@ -17,10 +15,10 @@ angular.module("repositoryDemo", ["ui.neptune"])
         var vm = this;
         vm.post = function () {
             vm.order = Order.post().then(function (response) {
-                $scope.data = response.data;
-                $scope.cache = nptCache.get();
+                vm.data = response.data;
+                vm.cache = nptCache.get();
             }, function (error) {
-                $scope.data = error;
+                vm.data = error;
             });
         }
 

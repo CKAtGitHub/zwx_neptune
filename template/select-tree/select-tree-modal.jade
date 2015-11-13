@@ -6,13 +6,13 @@ div
     div.modal-body
         div.row
             div.col-md-12
-                p(ng-show="vm.loading") 正在加载数据,请稍后...
-                p(ng-show="!vm.loading") &nbsp
+                p(ng-show="vm.refresh.$$state.status === 0") 正在加载数据,请稍后...
+                p(ng-show="vm.refresh.$$state.status !== 0") &nbsp
         div.row
             div.col-md-4
                 div(ui-tree,id="tree-root",data-drag-enabled="false")
-                    ol(ui-tree-nodes ng-model="vm.treeData.model")
-                        li(ng-repeat="node in vm.treeData.model",ui-tree-node,ng-include="'org_nodes.html'")
+                    ol(ui-tree-nodes ng-model="vm.treeData")
+                        li(ng-repeat="node in vm.treeData",ui-tree-node,ng-include="'org_nodes.html'")
             div.col-md-8
                 div.grid(ui-grid="vm.gridOptions",ui-grid-selection)
     div.modal-footer
