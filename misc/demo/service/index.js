@@ -24,7 +24,10 @@ proxy.action("queryOrderList", {
 }).action("queryOrgTree", {
     proxy: "Y9",
     action: "com.yun9.sys.inst.serivce.QueryOrgTreeService"
-});;
+}).action("QueryMdCtrlcode", {
+    proxy: "Y9",
+    action: "com.yun9.sys.md.service.QueryMdCtrlcodeService"
+});
 
 module.exports = proxy;
 
