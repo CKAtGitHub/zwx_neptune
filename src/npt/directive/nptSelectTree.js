@@ -86,7 +86,6 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
 
         //tree点击
         vm.onTreeClick = function (node) {
-            console.info("点击tree");
             vm.refreshList(node);
         };
 
@@ -103,7 +102,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 $scope.gridApi = gridApi;
             },
             columnDefs: [
-                {name: 'name', displayName: "名称"},
+                {name: 'name', displayName: "名称"}
             ]
         };
 

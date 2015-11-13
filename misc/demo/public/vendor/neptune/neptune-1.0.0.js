@@ -4,7 +4,6 @@ angular.module("ui.neptune", [
     "ui.neptune.validator",
     "ui.neptune.filter",
     "ui.neptune.directive",
-    "ui.neptune.formly"
 ]);
 
 angular.module("ui.neptune.service", [
@@ -1413,7 +1412,6 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
 
         //tree点击
         vm.onTreeClick = function (node) {
-            console.info("点击tree");
             vm.refreshList(node);
         };
 
