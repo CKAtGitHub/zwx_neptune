@@ -2,8 +2,7 @@
  * Created by leon on 15/11/9.
  */
 
-angular.module('formlyExample', ['ui.neptune',
-    "ui.neptune.formly.ui-select"])
+angular.module('formlyExample', ['ui.neptune'])
     .controller("formlyExampleController", function ($scope) {
         var vm = this;
 

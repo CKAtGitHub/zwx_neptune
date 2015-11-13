@@ -3,7 +3,8 @@ angular.module("ui.neptune", [
     "ui.neptune.service",
     "ui.neptune.validator",
     "ui.neptune.filter",
-    "ui.neptune.directive"
+    "ui.neptune.directive",
+    "ui.neptune.formly"
 ]);
 
 angular.module("ui.neptune.service", [
