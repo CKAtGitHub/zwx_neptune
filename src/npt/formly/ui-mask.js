@@ -61,14 +61,10 @@ angular.module("ui.neptune.formly.ui-mask")
                 ngModelAttrs: {
                     dataMask: {
                         attribute: 'ui-date-mask'
-                    },
-                    timeMask: {
-                        attribute: 'ui-time-mask'
                     }
                 },
                 templateOptions: {
-                    dataMask: '',
-                    timeMask: ''
+                    dataMask: ''
                 }
             }
         });

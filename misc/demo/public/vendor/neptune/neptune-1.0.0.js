@@ -1468,7 +1468,7 @@ angular.module("ui.neptune.formly.ui-select",
     'ngAnimate',
     'ngMessages',"angular.filter"]);
 
-angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks',"ui.mask"]);
+angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks']);
 
 angular.module("ui.neptune.formly.wrapper-validation",[]);
 ;/*!
@@ -1533,7 +1533,7 @@ angular.module("ui.neptune.formly.ui-mask")
             defaultOptions: {
                 ngModelAttrs: {
                     dataMask: {
-                        attribute: 'ui-time-mask'
+                        attribute: 'ui-date-mask'
                     }
                 },
                 templateOptions: {
@@ -1572,8 +1572,10 @@ angular.module("ui.neptune.formly.ui-select")
                         if (field.templateOptions.searchProp && field.templateOptions.repository) {
                             //存在searchProp以及repository,表示按输入条件检索
                             //model[field.key];
+                            //此处会有一个暂时不好解决的问题.如果当前模型数据上有值,在首次刷新页面后,由于没有输入值,会导致此处不刷新后台数据,
+                            //从而导致界面显示空,但是实际有模型数据
                             if (!value) {
-                               
+
                             } else {
                                 //检查到输入内容,检索数据
                                 var params = field.templateOptions.repositoryParams || {};

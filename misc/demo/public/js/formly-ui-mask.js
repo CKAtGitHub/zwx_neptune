@@ -29,14 +29,6 @@ angular.module('formlyExample', ['ui.neptune'])
                 templateOptions: {
                     label: '使用dateInput 处理时间戳数据'
                 }
-            },
-            {
-                key: 'maskInput',
-                type: 'maskedInput',
-                templateOptions: {
-                    label: '使用maskedInput自定义输入格式 (MM/DD/YYYY)',
-                    mask: '99/99/9999'
-                }
             }
         ];
         vm.originalFields = angular.copy(vm.fields);
