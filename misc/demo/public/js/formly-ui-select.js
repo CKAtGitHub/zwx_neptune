@@ -22,6 +22,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     valueProp: 'id',
                     labelProp: 'name',
                     placeholder: '下拉框-下拉数据已知',
+                    required:true,
                     options: [
                         {"id":"1","name":"Option 1"},
                         {"id":"2","name":"Option 2"},
@@ -36,6 +37,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     valueProp: 'id',
                     labelProp: 'name',
                     placeholder: '异步数据下拉框-一次获取不再查询',
+                    required:true,
                     options: [],
                     datasource: "queryOrderList",
                     datasourceParams: {"userid": "10000001498059", "instid": "10000001463017"}
@@ -48,6 +50,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     valueProp: 'id',
                     labelProp: 'name',
                     placeholder: '异步数据下拉框-根据输入条件动态查询',
+                    required:true,
                     options: [],
                     searchProp: 'id',
                     datasource: "queryOrderList",
