@@ -8,7 +8,7 @@ angular.module("ui.neptune.formly.wrapper-validation")
 .config(function(formlyConfigProvider) {
         formlyConfigProvider.setWrapper({
             name: 'showErrorMessage',
-            types: ['input', 'select', 'textarea'],
+            types: ['input', 'select', 'textarea','radio','checkbox','multiCheckbox'],
             template: [
                 '<formly-transclude></formly-transclude>',
                 '<div ng-messages="fc.$error" ng-if="form.$submitted || options.formControl.$touched" class="error-messages">',

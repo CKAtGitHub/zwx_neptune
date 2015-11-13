@@ -24,7 +24,6 @@ angular.module("ui.neptune.formly.ui-select")
                     ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
                     refresh: function refreshAddresses(input, model,field) {
                         function loadData(success, fail) {
-                            console.log(angular.toJson(model));
                             var params = {};
                             if (field.templateOptions.searchProp) {
                                 params[field.templateOptions.searchProp] = input;
