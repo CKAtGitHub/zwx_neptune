@@ -3,17 +3,15 @@
 
 extends layout/layout
 block content
-    script(src="js/angular-filter.min.js")
-    script(src="js/formModule.js")
-    script(src="/js/formly-integration.js")
-    div(ng-app="formlyExample")
-      div.page-header
-            h1 Formly集成
-        div(ng-controller="formlyExampleController as vm")
-            div(ng-if='vm.loadingData.$$state.status === 0', style='margin:20px 0;font-size:2em')
-                strong 正在加载...
-            div(ng-if='vm.loadingData.$$status.state !== 0')
-                form(ng-submit="vm.onSubmit()",name="vm.form",novalidate)
-                    formly-form(model="vm.model",fields="vm.fields",options="vm.options",form="vm.form")
-                        button.btn.btn-primary(type="submit") 确定
-                        button.btn.btn-default(type="button",ng-click="vm.options.resetModel()") 重置
+    h1 Formly组件Demo
+    ul.list-group
+        li.list-group-item
+            a(href="/formly-integration/ui-select") 下拉框(UI-SELECT)
+        li.list-group-item
+            a(href="/formly-integration/ui-mask") 真实值-显示值(UI-MASK)
+        li.list-group-item
+            a(href="/formly-integration/validation") 字段校验(VALIDATION)
+        li.list-group-item
+            a(href="/formly-integration/choice-user") 选择用户(CHOISE-USER)
+        li.list-group-item
+            a(href="http://angular-formly.com/#/example") 官网样例
