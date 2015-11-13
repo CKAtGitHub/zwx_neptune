@@ -1413,7 +1413,6 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
 
         //tree点击
         vm.onTreeClick = function (node) {
-            console.info("点击tree");
             vm.refreshList(node);
         };
 
@@ -1430,7 +1429,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 $scope.gridApi = gridApi;
             },
             columnDefs: [
-                {name: 'name', displayName: "名称"},
+                {name: 'name', displayName: "名称"}
             ]
         };
 
@@ -1549,52 +1548,50 @@ angular.module("ui.neptune.formly.ui-mask")
  */
 
 angular.module("ui.neptune.formly.ui-select")
-    .run(function (formlyConfig,$q,nptResource) {
+    .run(function (formlyConfig, $q) {
         formlyConfig.setType({
             name: 'ui-select',
             extends: 'select',
-            template: ['<ui-select data-ng-model="model[options.key]" data-required="{{to.required}}" data-disabled="{{to.disabled}}" theme="bootstrap">',
-                '<ui-select-match placeholder="{{to.placeholder}}" data-allow-clear="true">{{$select.selected[to.labelProp]}}</ui-select-match>',
-                '<ui-select-choices data-repeat="{{to.ngOptions}}" data-refresh="to.refresh($select.search,model, options)" data-refresh-delay="{{to.refreshDelay}}">',
-                '<div ng-bind-html="option[to.labelProp] | highlight: $select.search"></div>',
-                '<small>',
-                '{{to.valueProp}}: <span ng-bind-html="\'\'+option[to.valueProp] | highlight: $select.search"></span>',
-                '</small>',
-                '</ui-select-choices>',
-                '</ui-select>'].join(""),
+            templateUrl: "/template/formly/ui-select.html",
             defaultOptions: {
                 templateOptions: {
                     optionsAttr: 'bs-options',
                     ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
-                    refresh: function refreshAddresses(input, model,field) {
-                        function loadData(success, fail) {
-                            var params = {};
-                            if (field.templateOptions.searchProp) {
-                                params[field.templateOptions.searchProp] = input;
+                    refresh: function refresh(value, model, field) {
+                        //刷新逻辑
+                        //1 如果存在searchProp和repository,表示根据输入内容动态检索
+                        //2 如果存在options,表示使用静态选择
+                        //3 如果存在repository,表示单次检索资源
+                        //4 其他情况返回空数据
+
+                        //默认空内容
+                        var promise = $q.when({
+                            data: []
+                        });
+
+                        if (field.templateOptions.searchProp && field.templateOptions.repository) {
+                            //存在searchProp以及repository,表示按输入条件检索
+                            //model[field.key];
+                            if (!value) {
+                               
+                            } else {
+                                //检查到输入内容,检索数据
+                                var params = field.templateOptions.repositoryParams || {};
+                                params[field.templateOptions.searchProp] = value;
+                                promise = field.templateOptions.repository.post(params);
                             }
-                            params = angular.extend(field.templateOptions.datasourceParams || {}, params);
-                            nptResource.post(field.templateOptions.datasource,
-                                params,
-                                success, fail);
-                        }
-
-                        var promise;
-                        if (!field.templateOptions.datasource) {
-                            promise = $q.when(field.templateOptions.options);
-                        } else if (!field.templateOptions.options ||field.templateOptions.options.length===0 || field.templateOptions.searchProp) {
-                            var defered = $q.defer();
-                            promise = defered.promise;
-                            loadData(function (data) {
-                                defered.resolve(data);
-                            }, function (error) {
-                                defered.reject(error);
+                        } else if (field.templateOptions.options && field.templateOptions.options.length > 0) {
+                            //存在options,使用静态选择
+                            promise = $q.when({
+                                data: field.templateOptions.options
                             });
-                        } else {
-                            promise = $q.when(field.templateOptions.options);
+                        } else if (field.templateOptions.repository) {
+                            //存在repository表示,检索资源作为待选列表,只在首次检索
+                            promise = field.templateOptions.repository.post(field.templateOptions.repositoryParams || {});
                         }
 
-                        return promise.then(function (arr) {
-                            field.templateOptions.options = arr;
+                        return promise.then(function (response) {
+                            field.templateOptions.options = response.data;
                         });
                     },
                     refreshDelay: 0
@@ -1619,7 +1616,7 @@ angular.module("ui.neptune.formly.wrapper-validation")
                 '</div>'
             ].join("")
         });
-    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
+    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/formly/ui-select.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
 
 angular.module("/template/datatable/datatable-edit.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/datatable/datatable-edit.html",
@@ -1634,6 +1631,11 @@ angular.module("/template/datatable/datatable.html", []).run(["$templateCache", 
 angular.module("/template/form/form.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/form/form.html",
     "<div></div>");
+}]);
+
+angular.module("/template/formly/ui-select.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/template/formly/ui-select.html",
+    "<ui-select data-ng-model=\"model[options.key]\" data-required=\"{{to.required}}\" data-disabled=\"{{to.disabled}}\" theme=\"bootstrap\"><ui-select-match placeholder=\"{{to.placeholder}}\" data-allow-clear=\"true\">{{$select.selected[to.labelProp]}}</ui-select-match><ui-select-choices data-repeat=\"{{to.ngOptions}}\" data-refresh=\"to.refresh($select.search,model, options)\" data-refresh-delay=\"{{to.refreshDelay}}\"><div ng-bind-html=\"option[to.labelProp] | highlight: $select.search\"></div><small><span ng-bind-html=\"''+option[to.smallLabelProp] | highlight: $select.search\"></span></small></ui-select-choices></ui-select>");
 }]);
 
 angular.module("/template/select-tree/select-tree-modal.html", []).run(["$templateCache", function($templateCache) {

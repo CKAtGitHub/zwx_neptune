@@ -3,7 +3,10 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope) {
+    .factory("QueryCtrlCode", function (nptRepository) {
+        return nptRepository("QueryMdCtrlcode");
+    })
+    .controller("formlyExampleController", function ($scope, QueryCtrlCode) {
         var vm = this;
 
         vm.onSubmit = function onSubmit() {
@@ -12,49 +15,62 @@ angular.module('formlyExample', ['ui.neptune'])
                 alert(JSON.stringify(vm.model), null, 2);
             }
         };
-        vm.model = {};
+        vm.model = {
+            "cycle1": "11111",
+            "cycle2": "117",
+            "cycle3": "117"
+        };
         vm.fields = [
             {
-                "key": "select",
+                "key": "cycle1",
                 "type": "ui-select",
                 templateOptions: {
-                    label: '下拉框-下拉数据已知',
+                    label: '服务周期(静态数据):',
                     valueProp: 'id',
                     labelProp: 'name',
-                    placeholder: '下拉框-下拉数据已知',
-                    required:true,
-                    options: [
-                        {"id":"1","name":"Option 1"},
-                        {"id":"2","name":"Option 2"},
-                        {"id":"3","name":"Option 3"}
-                    ]
+                    smallLabelProp: "defname",
+                    placeholder: '请选择服务周期',
+                    required: true,
+                    options: [{
+                        id: "11111",
+                        name: "测试1"
+                    }, {
+                        id: "2222",
+                        name: "测试2"
+                    }, {
+                        id: "3333",
+                        name: "测试3"
+                    }],
+                }
+            },
+            {
+                "key": "cycle2",
+                "type": "ui-select",
+                templateOptions: {
+                    label: '服务周期(指定数据源):',
+                    valueProp: 'id',
+                    labelProp: 'name',
+                    smallLabelProp: "defname",
+                    placeholder: '请选择服务周期',
+                    required: true,
+                    options: [],
+                    repository: QueryCtrlCode,
+                    repositoryParams: {"defno": "cycle"},
                 }
             }, {
-                "key": "selectAsync1",
+                "key": "cycle3",
                 "type": "ui-select",
                 templateOptions: {
-                    label: '异步数据下拉框-一次获取不再查询',
+                    label: '服务周期(输入内容搜索):',
                     valueProp: 'id',
                     labelProp: 'name',
-                    placeholder: '异步数据下拉框-一次获取不再查询',
-                    required:true,
+                    smallLabelProp: "defname",
+                    placeholder: '请选择服务周期',
+                    required: true,
                     options: [],
-                    datasource: "queryOrderList",
-                    datasourceParams: {"userid": "10000001498059", "instid": "10000001463017"}
-                }
-            }, {
-                "key": "selectAsync2",
-                "type": "ui-select",
-                templateOptions: {
-                    label: '异步数据下拉框-根据输入条件动态查询',
-                    valueProp: 'id',
-                    labelProp: 'name',
-                    placeholder: '异步数据下拉框-根据输入条件动态查询',
-                    required:true,
-                    options: [],
-                    searchProp: 'id',
-                    datasource: "queryOrderList",
-                    datasourceParams: {"userid": "10000001498059", "instid": "10000001463017"}
+                    repository: QueryCtrlCode,
+                    repositoryParams: {"defno": "cycle"},
+                    searchProp: "name"
                 }
             }];
         vm.originalFields = angular.copy(vm.fields);
