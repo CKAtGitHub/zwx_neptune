@@ -65,13 +65,6 @@ angular.module('formlyExample', ['ui.neptune', 'formModule',"ui.neptune.formly.w
     })
     .config(function (nptBizFilterProviderProvider, nptBizValidatorProviderProvider, formlyConfigProvider) {
 
-
-        formlyConfigProvider.setWrapper({
-            name: 'validation',
-            types: ['input', 'ipAddress', 'choiceAbleInput'],
-            templateUrl: 'error-messages.html'
-        });
-
         nptBizFilterProviderProvider.addConfig('orderFilterSnToName', {
             "bizName": "queryOrderList",
             "bizParams": {"instid": "10000001463017", "userid": "10000001498059"},
