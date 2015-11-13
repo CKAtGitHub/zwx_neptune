@@ -14,6 +14,6 @@ angular.module("ui.neptune.formly.ui-select",
     'ngAnimate',
     'ngMessages',"angular.filter"]);
 
-angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks']);
+angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks',"ui.mask"]);
 
 angular.module("ui.neptune.formly.wrapper-validation",[]);
