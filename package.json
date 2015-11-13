@@ -51,6 +51,7 @@
     "y9-mars-service": "^1.0.10"
   },
   "dependencies": {
+    "angular-input-masks": "^2.1.0",
     "angular-ui-grid": "^3.0.7"
   }
 }
