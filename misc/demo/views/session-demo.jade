@@ -1,0 +1,22 @@
+//
+   Created by leon on 15/10/29.
+extends layout/layout
+block content
+    script(src="/js/session-demo.js")
+    div(ng-app="sessionDemo")
+        div(ng-view)
+
+        script(type="text/ng-template",id="session-demo.html")
+            div
+                div.page-header
+                    h1 Session
+                div.row
+                    div.col-md-12
+                        p 来自服务器的Session内容
+                div.row
+                    div.col-md-12
+                        pre {{vm.session}}
+
+
+
+
