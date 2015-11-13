@@ -1468,7 +1468,7 @@ angular.module("ui.neptune.formly.ui-select",
     'ngAnimate',
     'ngMessages',"angular.filter"]);
 
-angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks']);
+angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks',"ui.mask"]);
 
 angular.module("ui.neptune.formly.wrapper-validation",[]);
 ;/*!
@@ -1478,7 +1478,7 @@ angular.module("ui.neptune.formly.wrapper-validation",[]);
  */
 
 angular.module("ui.neptune.formly.ui-mask")
-    .run(function (formlyConfig) {
+    .run(function (formlyConfig,uiMaskDateFactory) {
         /*使用UI-MASK插件，由使用者自定义值格式*/
         formlyConfig.setType({
             name: 'maskedInput',
@@ -1532,15 +1532,44 @@ angular.module("ui.neptune.formly.ui-mask")
             extends: 'input',
             defaultOptions: {
                 ngModelAttrs: {
-                    dataMask: {
-                        attribute: 'ui-date-mask'
+                    mask: {
+                        attribute: 'ui-mask'
+                    },
+                    maskPlaceholder: {
+                        attribute: 'ui-mask-placeholder'
+                    },
+                    maskPlaceholderChar: {
+                        attribute:'ui-mask-placeholder-char'
                     }
                 },
                 templateOptions: {
-                    dataMask: ''
-                }
+                    mask:'9999-99-99- 99:99:99',
+                    maskPlaceholder: ''
+                },
+                parsers:[uiMaskDateFactory.parseToDate],
+                formatters:[uiMaskDateFactory.formateToString]
             }
         });
+    }).factory('uiMaskDateFactory',function($filter) {
+        var factory = {};
+
+        factory.parseToDate = function(viewValue,modleValue,scope) {
+            if (!viewValue) {
+                return viewValue;
+            }
+            var date = new Date(scope.fc.$viewValue.replace(/-/,"/")).getTime();
+            return date||undefined;
+        };
+        factory.formateToString = function(viewValue,modleValue,scope) {
+            if (!modleValue) {
+                return modleValue;
+            }
+            if (angular.isNumber(modleValue)) {
+                var dateFilter = $filter('date');
+                return dateFilter(modleValue,'yyyyMMddhhmmss')||undefined;
+            }
+        };
+        return factory;
     });;/*!
  * mars
  * Copyright(c) 2015 huangbinglong

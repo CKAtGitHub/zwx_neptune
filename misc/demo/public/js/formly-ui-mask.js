@@ -12,7 +12,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 alert(JSON.stringify(vm.model), null, 2);
             }
         };
-        vm.model = {"dateInput":new Date()};
+        vm.model = {"dateInput":new Date().getTime()};
         vm.fields = [
             {
                 key: 'number1',
@@ -27,7 +27,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 key: 'dateInput',
                 type: 'dateInput',
                 templateOptions: {
-                    label: '使用dateInput 处理时间戳数据'
+                    label: '使用dateInput处理时间戳数据'
                 }
             }
         ];
