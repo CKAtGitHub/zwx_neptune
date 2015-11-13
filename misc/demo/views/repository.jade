@@ -8,18 +8,18 @@ block content
             h1 资源仓库
         div.row
             div.col-md-12
-                div(ng-if="vm.order.$$state.status === 0", style='margin:20px 0;font-size:2em')
+                div(ng-if="vm.order.$$state.status === 0")
                     p 正在加载...
                 div(ng-if='vm.order.$$state.status !== 0')
                     button.btn.btn-primary(type="button",ng-click="vm.post()") Post
 
         div.row
             div.col-md-12
-                p {{vm.order.$$state}}
+                pre {{vm.order.$$state}}
 
-                pre {{data}}
+                pre {{vm.data}}
 
-                pre {{cache}}
+                pre {{vm.cache}}
 
 
 

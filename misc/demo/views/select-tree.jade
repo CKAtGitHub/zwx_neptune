@@ -6,7 +6,7 @@ block content
     div(ng-app="treeSelectDemo")
         div.page-header
             h1 树形选择
-        div(ng-controller="treeSelectDemoController")
-            button.btn.btn-primary(type="button",ng-click="show()") 打开窗口
-            npt-select-tree(name="demoTreeSelect",select-type="selectUser")
+        div(ng-controller="treeSelectDemoController as vm")
+            button.btn.btn-primary(type="button",ng-click="vm.show()") 打开窗口
+            div(npt-select-tree="vm.selectTreeSetting")
             p 选择内容:{{item}}

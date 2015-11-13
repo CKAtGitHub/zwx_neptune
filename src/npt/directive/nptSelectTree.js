@@ -3,77 +3,60 @@
  */
 
 angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'ui.grid', 'ui.grid.selection'])
-    .provider("SelectTree", function () {
-        this.treeHandler = {};
-        this.listHandler = {};
+    .controller("SelectTreeController", function ($scope, $uibModal) {
+        var self = this;
 
-        this.setTreeHandler = function (type, handler) {
-            if (type && handler) {
-                this.treeHandler[type] = handler;
+        this.selectTreeApi = {
+            open: function () {
+                var selfApi = this;
+                var result = $uibModal.open({
+                    animation: true,
+                    templateUrl: '/template/select-tree/select-tree-modal.html',
+                    controller: 'SelectTreeModalController',
+                    controllerAs: 'vm',
+                    resolve: {
+                        selectTreeData: function ($q) {
+                            var deferd = $q.defer();
+                            if (selfApi.treeRepository && selfApi.listRepository) {
+                                var params = {
+                                    treeRepository: selfApi.treeRepository,
+                                    listRepository: selfApi.listRepository
+                                };
+                                deferd.resolve(params);
+                            } else {
+                                deferd.reject();
+                            }
+                            return deferd.promise;
+                        }
+                    }
+                }).result;
+                return result;
             }
         };
 
-        this.setListHandler = function (type, handler) {
-            if (type && handler) {
-                this.listHandler[type] = handler;
+        //初始化配置
+        if ($scope.nptSelectTree) {
+            //获取资源仓库
+            if ($scope.nptSelectTree.treeRepository) {
+                self.selectTreeApi.treeRepository = $scope.nptSelectTree.treeRepository;
             }
-        };
 
-        this.$get = function (nptResource) {
-            var self = this;
+            if ($scope.nptSelectTree.listRepository) {
+                self.selectTreeApi.listRepository = $scope.nptSelectTree.listRepository;
+            }
 
-            var service = {
-                treeData: function (type, done) {
-                    if (self.treeHandler[type] && done) {
-                        self.treeHandler[type](nptResource, done);
-                    }
-                },
-                listData: function (type, id, done) {
-                    if (self.listHandler[type] && done) {
-                        self.listHandler[type](nptResource, id, done);
-                    }
-                }
-            };
+            if ($scope.nptSelectTree.onRegisterApi) {
+                $scope.nptSelectTree.onRegisterApi(this.selectTreeApi);
+            }
+        }
 
-            return service;
-        };
+
     })
-    .controller("SelectTreeController", function ($scope, $uibModal, SelectTree) {
-        this.open = function () {
-            var result = $uibModal.open({
-                animation: true,
-                templateUrl: '/template/select-tree/select-tree-modal.html',
-                controller: 'SelectTreeModalController',
-                controllerAs: 'vm',
-                resolve: {
-                    treeData: function ($q) {
-                        var deferd = $q.defer();
-
-                        //检索tree
-                        SelectTree.treeData($scope.selectType, function (data) {
-                            var params = {
-                                model: data,
-                                selectType: $scope.selectType
-                            };
-                            deferd.resolve(params);
-                        });
-
-                        return deferd.promise;
-                    }
-                }
-            }).result;
-            return result;
-        };
-    })
-    .controller("SelectTreeModalController", function ($scope, treeData, SelectTree, $modalInstance) {
+    .controller("SelectTreeModalController", function ($scope, selectTreeData, $modalInstance) {
         var vm = this;
         // function assignment
         vm.ok = ok;
         vm.cancel = cancel;
-        vm.loading = false;
-
-        // variable assignment
-        vm.treeData = treeData;
 
         // function definition
         function ok() {
@@ -85,16 +68,26 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
             $modalInstance.dismiss('cancel');
         }
 
+        vm.refreshTree = function () {
+            if (selectTreeData.treeRepository) {
+                vm.refresh = selectTreeData.treeRepository.post().then(function (data) {
+                    vm.treeData = data;
+                });
+            }
+        };
+
+        vm.refreshList = function (node) {
+            if (selectTreeData.listRepository) {
+                vm.refresh = selectTreeData.listRepository.post(node).then(function (response) {
+                    vm.gridOptions.data = response.data;
+                });
+            }
+        };
+
         //tree点击
         vm.onTreeClick = function (node) {
             console.info("点击tree");
-            vm.loading = true;
-            SelectTree.listData(treeData.selectType, node.id, function (data) {
-                vm.gridOptions.data = data;
-                vm.loading = false;
-            }, function (error) {
-                vm.loading = false;
-            });
+            vm.refreshList(node);
         };
 
         vm.gridOptions = {
@@ -113,11 +106,13 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 {name: 'name', displayName: "名称"},
             ]
         };
-    })
-    .
-    directive("nptSelectTree", ["$parse", function ($parse) {
+
+        //初始刷新tree
+        vm.refreshTree();
+
+    }).directive("nptSelectTree", [function () {
         return {
-            restrict: "E",
+            restrict: "A",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
             controller: "SelectTreeController",
@@ -125,25 +120,9 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 return attrs.templateUrl || "/template/select-tree/select-tree.html";
             },
             scope: {
-                selectType: "@"
+                nptSelectTree: "="
             },
             link: function (scope, element, attrs, ctrl) {
-                scope.onListSelect = function (type, item, index) {
-                    console.info("点击list");
-                    if (scope.onSelect) {
-                        scope.onSelect({
-                            type: type,
-                            item: item,
-                            index: index
-                        });
-                    }
-                    ctrl.close();
-                };
-
-                if (attrs.name && scope.$parent) {
-                    var setter = $parse(attrs.name).assign;
-                    setter(scope.$parent, ctrl);
-                }
             }
         };
     }]);

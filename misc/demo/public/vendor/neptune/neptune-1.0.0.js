@@ -235,7 +235,8 @@ angular.module("ui.neptune.service.repository", [])
                 this._header = {};
                 this._baseURL = self.baseURL;
                 this._action = undefined;
-                this._interceptors = [];
+                this._responseInterceptors = [];
+                this._requestInterceptors = [];
             }
 
             Repository.prototype.params = function (key, value) {
@@ -250,24 +251,55 @@ angular.module("ui.neptune.service.repository", [])
 
             Repository.prototype.setAction = function (action) {
                 this._action = action;
+                return this;
             };
 
-            Repository.prototype.addInterceptor = function (interceptor) {
+            Repository.prototype.addResponseInterceptor = function (interceptor) {
                 if (angular.isFunction(interceptor)) {
-                    this._interceptors.push(interceptor);
+                    this._responseInterceptors.push(interceptor);
                 }
+                return this;
+            };
+
+            Repository.prototype.addRequestInterceptor = function (interceptor) {
+                if (angular.isFunction(interceptor)) {
+                    this._requestInterceptors.push(interceptor);
+                }
+                return this;
             };
 
             Repository.prototype.post = function (params) {
                 var runParams = {};
+                var selfRepository = this;
                 //自上而下合并查询参数
                 angular.extend(runParams, self.params || {});
                 angular.extend(runParams, this._params || {});
                 angular.extend(runParams, params || {});
-                //记录最后一次的查询参数
-                this._lastParams = runParams;
-                //执行查询
-                return post(runParams, this);
+
+                var request = {
+                    params: runParams || {}
+                };
+
+                //pre拦截器
+                var deferd = $q.defer();
+                var promise = deferd.promise;
+                deferd.resolve(request);
+
+                //写入实例请求拦截器
+                if (this._requestInterceptors) {
+                    angular.forEach(this._requestInterceptors, function (value) {
+                        promise = promise.then(value);
+                    });
+                }
+
+                return promise.then(function (request) {
+                    //记录最后一次的查询参数
+                    this._lastParams = request.params;
+                    return request;
+                }).then(function (request) {
+                    //执行查询
+                    return post(request, selfRepository);
+                });
             };
 
             Repository.prototype.refresh = function () {
@@ -276,11 +308,11 @@ angular.module("ui.neptune.service.repository", [])
                 }
             };
 
-            function post(params, scope) {
+            function post(request, scope) {
                 var postData = {};
                 postData[self.actionKey] = {
                     name: scope._action,
-                    params: params
+                    params: request.params
                 };
 
                 var result = $http.post(scope._baseURL, postData).then(function (response) {
@@ -291,12 +323,18 @@ angular.module("ui.neptune.service.repository", [])
                         return $q.reject(response.data.cause);
                     }
                 }, function (error) {
-                    return "服务器错误!";
+                    return error;
                 });
 
-                //将全局拦截器插入
+                //将全局响应拦截器插入
                 angular.forEach(self._interceptors, function (value) {
                     result = result.then(value);
+                });
+
+                //写入请求对象
+                result = result.then(function (response) {
+                    response.request = request;
+                    return response;
                 });
 
                 //记录Cache
@@ -305,8 +343,8 @@ angular.module("ui.neptune.service.repository", [])
                     return response;
                 });
 
-                //将实例拦截器插入
-                angular.forEach((scope._interceptors), function (value) {
+                //将实例拦响应截器插入
+                angular.forEach((scope._responseInterceptors), function (value) {
                     result = result.then(value);
                 });
 
@@ -910,7 +948,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                             var params = {
                                 action: action,
                                 index: index,
-                                data: data,
+                                data: data
                             };
 
                             var promisesArr = [];
@@ -1291,77 +1329,60 @@ angular.module("ui.neptune.directive.form", [])
  */
 
 angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'ui.grid', 'ui.grid.selection'])
-    .provider("SelectTree", function () {
-        this.treeHandler = {};
-        this.listHandler = {};
+    .controller("SelectTreeController", function ($scope, $uibModal) {
+        var self = this;
 
-        this.setTreeHandler = function (type, handler) {
-            if (type && handler) {
-                this.treeHandler[type] = handler;
+        this.selectTreeApi = {
+            open: function () {
+                var selfApi = this;
+                var result = $uibModal.open({
+                    animation: true,
+                    templateUrl: '/template/select-tree/select-tree-modal.html',
+                    controller: 'SelectTreeModalController',
+                    controllerAs: 'vm',
+                    resolve: {
+                        selectTreeData: function ($q) {
+                            var deferd = $q.defer();
+                            if (selfApi.treeRepository && selfApi.listRepository) {
+                                var params = {
+                                    treeRepository: selfApi.treeRepository,
+                                    listRepository: selfApi.listRepository
+                                };
+                                deferd.resolve(params);
+                            } else {
+                                deferd.reject();
+                            }
+                            return deferd.promise;
+                        }
+                    }
+                }).result;
+                return result;
             }
         };
 
-        this.setListHandler = function (type, handler) {
-            if (type && handler) {
-                this.listHandler[type] = handler;
+        //初始化配置
+        if ($scope.nptSelectTree) {
+            //获取资源仓库
+            if ($scope.nptSelectTree.treeRepository) {
+                self.selectTreeApi.treeRepository = $scope.nptSelectTree.treeRepository;
             }
-        };
 
-        this.$get = function (nptResource) {
-            var self = this;
+            if ($scope.nptSelectTree.listRepository) {
+                self.selectTreeApi.listRepository = $scope.nptSelectTree.listRepository;
+            }
 
-            var service = {
-                treeData: function (type, done) {
-                    if (self.treeHandler[type] && done) {
-                        self.treeHandler[type](nptResource, done);
-                    }
-                },
-                listData: function (type, id, done) {
-                    if (self.listHandler[type] && done) {
-                        self.listHandler[type](nptResource, id, done);
-                    }
-                }
-            };
+            if ($scope.nptSelectTree.onRegisterApi) {
+                $scope.nptSelectTree.onRegisterApi(this.selectTreeApi);
+            }
+        }
 
-            return service;
-        };
+
     })
-    .controller("SelectTreeController", function ($scope, $uibModal, SelectTree) {
-        this.open = function () {
-            var result = $uibModal.open({
-                animation: true,
-                templateUrl: '/template/select-tree/select-tree-modal.html',
-                controller: 'SelectTreeModalController',
-                controllerAs: 'vm',
-                resolve: {
-                    treeData: function ($q) {
-                        var deferd = $q.defer();
-
-                        //检索tree
-                        SelectTree.treeData($scope.selectType, function (data) {
-                            var params = {
-                                model: data,
-                                selectType: $scope.selectType
-                            };
-                            deferd.resolve(params);
-                        });
-
-                        return deferd.promise;
-                    }
-                }
-            }).result;
-            return result;
-        };
-    })
-    .controller("SelectTreeModalController", function ($scope, treeData, SelectTree, $modalInstance) {
+    .controller("SelectTreeModalController", function ($scope, selectTreeData, $modalInstance) {
         var vm = this;
         // function assignment
         vm.ok = ok;
         vm.cancel = cancel;
-        vm.loading = false;
-
-        // variable assignment
-        vm.treeData = treeData;
 
         // function definition
         function ok() {
@@ -1373,16 +1394,26 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
             $modalInstance.dismiss('cancel');
         }
 
+        vm.refreshTree = function () {
+            if (selectTreeData.treeRepository) {
+                vm.refresh = selectTreeData.treeRepository.post().then(function (data) {
+                    vm.treeData = data;
+                });
+            }
+        };
+
+        vm.refreshList = function (node) {
+            if (selectTreeData.listRepository) {
+                vm.refresh = selectTreeData.listRepository.post(node).then(function (response) {
+                    vm.gridOptions.data = response.data;
+                });
+            }
+        };
+
         //tree点击
         vm.onTreeClick = function (node) {
             console.info("点击tree");
-            vm.loading = true;
-            SelectTree.listData(treeData.selectType, node.id, function (data) {
-                vm.gridOptions.data = data;
-                vm.loading = false;
-            }, function (error) {
-                vm.loading = false;
-            });
+            vm.refreshList(node);
         };
 
         vm.gridOptions = {
@@ -1401,11 +1432,13 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 {name: 'name', displayName: "名称"},
             ]
         };
-    })
-    .
-    directive("nptSelectTree", ["$parse", function ($parse) {
+
+        //初始刷新tree
+        vm.refreshTree();
+
+    }).directive("nptSelectTree", [function () {
         return {
-            restrict: "E",
+            restrict: "A",
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
             controller: "SelectTreeController",
@@ -1413,25 +1446,9 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 return attrs.templateUrl || "/template/select-tree/select-tree.html";
             },
             scope: {
-                selectType: "@"
+                nptSelectTree: "="
             },
             link: function (scope, element, attrs, ctrl) {
-                scope.onListSelect = function (type, item, index) {
-                    console.info("点击list");
-                    if (scope.onSelect) {
-                        scope.onSelect({
-                            type: type,
-                            item: item,
-                            index: index
-                        });
-                    }
-                    ctrl.close();
-                };
-
-                if (attrs.name && scope.$parent) {
-                    var setter = $parse(attrs.name).assign;
-                    setter(scope.$parent, ctrl);
-                }
             }
         };
     }]);
@@ -1547,7 +1564,7 @@ angular.module("/template/form/form.html", []).run(["$templateCache", function($
 
 angular.module("/template/select-tree/select-tree-modal.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/select-tree/select-tree-modal.html",
-    "<div><div class=\"modal-header\"><button type=\"button\" ng-click=\"vm.cancel()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-12\"><p ng-show=\"vm.loading\">正在加载数据,请稍后...</p><p ng-show=\"!vm.loading\">&nbsp</p></div></div><div class=\"row\"><div class=\"col-md-4\"><div ui-tree id=\"tree-root\" data-drag-enabled=\"false\"><ol ui-tree-nodes ng-model=\"vm.treeData.model\"><li ng-repeat=\"node in vm.treeData.model\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></div></div><div class=\"col-md-8\"><div ui-grid=\"vm.gridOptions\" ui-grid-selection class=\"grid\"></div></div></div></div><div class=\"modal-footer\"><button type=\"button\" ng-click=\"vm.ok()\" class=\"btn btn-primary\">确定</button><button type=\"button\" ng-click=\"vm.cancel()\" class=\"btn btn-warning\">取消</button></div><script type=\"text/ng-template\" id=\"org_nodes.html\"><div ui-tree-handle class=\"tree-node tree-node-content\"><a ng-if=\"node.nodes &amp;&amp; node.nodes.length &gt; 0\" ng-click=\"toggle(this)\" class=\"btn btn-success btn-xs\"><span ng-class=\"{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}\" class=\"glyphicon\"></span></a>&nbsp &nbsp<a ng-click=\"vm.onTreeClick(node)\" class=\"btn-link\">{{node.title}}</a></div><ol ui-tree-nodes=\"\" ng-model=\"node.nodes\" ng-class=\"{hidden:collapsed}\"><li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></script></div>");
+    "<div><div class=\"modal-header\"><button type=\"button\" ng-click=\"vm.cancel()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-12\"><p ng-show=\"vm.refresh.$$state.status === 0\">正在加载数据,请稍后...</p><p ng-show=\"vm.refresh.$$state.status !== 0\">&nbsp</p></div></div><div class=\"row\"><div class=\"col-md-4\"><div ui-tree id=\"tree-root\" data-drag-enabled=\"false\"><ol ui-tree-nodes ng-model=\"vm.treeData\"><li ng-repeat=\"node in vm.treeData\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></div></div><div class=\"col-md-8\"><div ui-grid=\"vm.gridOptions\" ui-grid-selection class=\"grid\"></div></div></div></div><div class=\"modal-footer\"><button type=\"button\" ng-click=\"vm.ok()\" class=\"btn btn-primary\">确定</button><button type=\"button\" ng-click=\"vm.cancel()\" class=\"btn btn-warning\">取消</button></div><script type=\"text/ng-template\" id=\"org_nodes.html\"><div ui-tree-handle class=\"tree-node tree-node-content\"><a ng-if=\"node.nodes &amp;&amp; node.nodes.length &gt; 0\" ng-click=\"toggle(this)\" class=\"btn btn-success btn-xs\"><span ng-class=\"{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}\" class=\"glyphicon\"></span></a>&nbsp &nbsp<a ng-click=\"vm.onTreeClick(node)\" class=\"btn-link\">{{node.title}}</a></div><ol ui-tree-nodes=\"\" ng-model=\"node.nodes\" ng-class=\"{hidden:collapsed}\"><li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'org_nodes.html'\"></li></ol></script></div>");
 }]);
 
 angular.module("/template/select-tree/select-tree.html", []).run(["$templateCache", function($templateCache) {

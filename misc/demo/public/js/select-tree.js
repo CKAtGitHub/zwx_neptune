@@ -3,58 +3,57 @@
  */
 
 angular.module("treeSelectDemo", ["ui.neptune"])
-    .config(function (SelectTreeProvider) {
-
-        SelectTreeProvider.setListHandler("selectUser", function (nptResource, id, done) {
-            //根据组织ID查询用户列表
-            nptResource.post("queryUsersByOrgid", {
-                "orgid": id
-            }, function (data) {
-                if (done) {
-                    done(data);
+    .factory("OrgListBySelectTree", function (nptRepository) {
+        function builderOrgTreeNode(nodes, data) {
+            if (data) {
+                nodes.nodes = [];
+                for (var i = 0; i < data.length; i++) {
+                    var node = {
+                        id: data[i]["id"],
+                        title: data[i]["name"]
+                    };
+                    builderOrgTreeNode(node, data[i].children);
+                    nodes.nodes.push(node);
                 }
-            }, function (data) {
+            }
+        }
 
-            });
+        return nptRepository("queryOrgTree").params({
+            "instid": "10000001468002",
+            "dimtype": "hr"
+        }).addResponseInterceptor(function (response) {
+            var orgNodes = [{
+                id: response.data.id,
+                title: response.data.simplename
+            }];
+            builderOrgTreeNode(orgNodes[0], response.data.children);
+            return orgNodes;
         });
 
-        SelectTreeProvider.setTreeHandler("selectUser", function (nptResource, done) {
-            var org = {
-                builderOrgTreeNode: function (nodes, data) {
-                    if (data) {
-                        nodes.nodes = [];
-                        for (var i = 0; i < data.length; i++) {
-                            var node = {
-                                id: data[i]["id"],
-                                title: data[i]["name"]
-                            };
-                            org.builderOrgTreeNode(node, data[i].children);
-                            nodes.nodes.push(node);
-                        }
-                    }
-                }
-            };
-
-            nptResource.post("queryOrgTree", {
-                "instid": "10000001468002",
-                "dimtype": "hr"
-            }, function (data) {
-                var orgNodes = [{
-                    id: data.id,
-                    title: data.simplename
-                }];
-                org.builderOrgTreeNode(orgNodes[0], data.children);
-                if (done) {
-                    done(orgNodes);
-                }
-            }, function (data) {
-            });
+    })
+    .factory("UserListBySelectTree", function (nptRepository) {
+        return nptRepository("queryUsersByOrgid").addRequestInterceptor(function (request) {
+            if (request.params.id) {
+                request.params = {
+                    orgid: request.params.id
+                };
+            }
+            return request;
         });
     })
-    .controller("treeSelectDemoController", function ($scope) {
-        $scope.show = function () {
-            var result = $scope.demoTreeSelect.open();
-            result.then(function (data) {
+    .controller("treeSelectDemoController", function ($scope, UserListBySelectTree, OrgListBySelectTree) {
+        var vm = this;
+
+        this.selectTreeSetting = {
+            onRegisterApi: function (selectTreeApi) {
+                vm.selectTreeApi = selectTreeApi;
+            },
+            treeRepository: OrgListBySelectTree,
+            listRepository: UserListBySelectTree
+        };
+
+        this.show = function () {
+            vm.selectTreeApi.open().then(function (data) {
                 $scope.item = data;
             }, function () {
                 $scope.item = {
