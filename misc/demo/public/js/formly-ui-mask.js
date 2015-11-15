@@ -27,7 +27,27 @@ angular.module('formlyExample', ['ui.neptune'])
                 key: 'dateInput',
                 type: 'dateInput',
                 templateOptions: {
-                    label: '使用dateInput处理时间戳数据'
+                    formateType:"short",
+                    label: '使用dateInput处理时间戳数据-短格式',
+                    description:"formateType(short|long)可以不配，默认long;"
+                }
+            },
+            {
+                key: 'dateInput2',
+                type: 'dateInput',
+                templateOptions: {
+                    label: '使用dateInput处理时间戳数据-长格式',
+                    description:"formateType(short|long)可以不配，默认long;"
+                },
+                defaultValue:new Date().getTime()
+            },
+            {
+                key: 'maskedInput',
+                type: 'maskedInput',
+                templateOptions: {
+                    label: '自定义格式化显示数据',
+                    mask:'(9999)9999999',
+                    description:'使用可以参考https://github.com/angular-ui/ui-mask'
                 }
             }
         ];

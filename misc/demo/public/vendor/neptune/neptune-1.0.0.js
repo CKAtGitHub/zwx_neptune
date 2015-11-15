@@ -1543,8 +1543,10 @@ angular.module("ui.neptune.formly.ui-mask")
                     }
                 },
                 templateOptions: {
-                    mask:'9999-99-99- 99:99:99',
                     maskPlaceholder: ''
+                },
+                expressionProperties:{
+                    'templateOptions.mask':'to.formateType =="short"?"9999-99-99":"9999-99-99 99:99:99"'
                 },
                 parsers:[uiMaskDateFactory.parseToDate],
                 formatters:[uiMaskDateFactory.formateToString]
@@ -1566,7 +1568,10 @@ angular.module("ui.neptune.formly.ui-mask")
             }
             if (angular.isNumber(modleValue)) {
                 var dateFilter = $filter('date');
-                return dateFilter(modleValue,'yyyyMMddhhmmss')||undefined;
+                var formateString =
+                    scope.to.formateType=="short"?"yyyy-MM-dd":'yyyy-MM-dd hh:mm:ss';
+                var dateString = dateFilter(modleValue,formateString);
+                return dateString|| undefined;
             }
         };
         return factory;
