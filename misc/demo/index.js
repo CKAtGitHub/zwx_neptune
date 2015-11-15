@@ -5,6 +5,7 @@ var path = require("path");
 var express = require("express");
 var app = express();
 var router = require("./router");
+var session = require("./session");
 var service = require("./service");
 var repository = require("./repository");
 var bodyParser = require("body-parser");
@@ -34,6 +35,7 @@ app.use(repository());
 app.use("/model", repository.service());
 
 app.use("/", router);
+app.use("/session", session);
 
 
 //注册服务

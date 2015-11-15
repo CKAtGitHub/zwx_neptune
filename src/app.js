@@ -11,6 +11,7 @@ angular.module("ui.neptune.service", [
     "ui.neptune.service.resource",
     "ui.neptune.service.repository",
     "ui.neptune.service.cache",
+    "ui.neptune.service.session",
     "ui.neptune.service.datatableStore",
     "ui.neptune.service.formStore"
 ]);
