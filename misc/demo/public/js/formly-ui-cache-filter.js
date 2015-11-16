@@ -3,24 +3,12 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope) {
+    .controller("formlyExampleController", function ($scope,nptRepository) {
         var vm = this;
-        vm.onSubmit = function onSubmit() {
-            if (vm.form.$valid) {
-                vm.options.updateInitialValue();
-                alert(JSON.stringify(vm.model), null, 2);
-            }
-        };
-        vm.model = {};
-        vm.fields = [
-            {
-                key: 'url',
-                type: 'input',
-                templateOptions: {
-                    label: '验证URL',
-                    placeholder: 'http://m.yun9.com'
+        nptRepository("queryUsersByOrgid").post({"orgid":"10000001468035"})
+            .then(function(response) {
+                if (response.data && response.data.length > 0) {
+                    vm.ctrlCode = response.data[0].id;
                 }
-            }
-        ];
-        vm.originalFields = angular.copy(vm.fields);
+            });
     });

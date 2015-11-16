@@ -7,16 +7,24 @@ block content
       div.page-header
          h1 缓冲数据过滤器
       div(ng-controller="formlyExampleController as vm")
-         form(ng-submit="vm.onSubmit()",name="vm.form",novalidate)
-            formly-form(model="vm.model",fields="vm.fields",options="vm.options",form="vm.form")
-               button.btn.btn-primary(type="submit") 确定
-               button.btn.btn-default(type="button",ng-click="vm.options.resetModel()") 重置
+         form(novalidate)
+            div
+               label.control-label(for='vm.form_input_url_0')
+                | 原始值
+               input.form-control.ng-pristine.ng-valid.ng-touched(ng-model='vm.ctrlCode', id='vm.form_input_url_0', name='vm.form_input_url_0')
+            div
+               label.control-label(for='vm.form_input_url_0')
+                  | 使用cacheFilter过滤后的值（指定的缓存必须存在）
+               span.form-control.ng-pristine.ng-valid.ng-touched(ng-bind='vm.ctrlCode|cacheFilter:"user":"name":"id"')
+               p.help-block.ng-binding.ng-scope() 这里演示的是从缓存中获取指定ID的用户
          hr
-         h2 Model Value
+         hr
+         h2 cacheFilter的使用
          pre
-            | {{vm.model | json}}
-         h2
-            | Fields
-            small (note, functions are not shown)
-         pre
-            | {{vm.originalFields | json}}
+            | { {model | cacheFilter:"user":"name":"id"} }
+            | 或者:&nbsp;ng-bind='vm.ctrlCode|cacheFilter:"user":"name":"id"'
+            | &nbsp;
+            | 说明
+            | 第一个参数：key，缓存的类别，user|file|ctrlcode
+            | 第二个参数：labelProp，获取到缓存后应该提取的字段名称
+            | 第三个参数：valueProp,在获取指定缓存时，作为与当前值对比的字段名称，可以不填，默认缓存存储时的ID
