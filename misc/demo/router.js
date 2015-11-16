@@ -53,4 +53,9 @@ router.get("/repository", function (req, res, next) {
 router.get("/session-demo", function (req, res, next) {
     res.render("session-demo");
 });
+
+router.get("/select-image", function (req, res, next) {
+    res.render("select-image");
+});
+
 module.exports = router;

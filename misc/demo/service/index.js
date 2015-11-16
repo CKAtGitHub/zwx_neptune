@@ -30,6 +30,9 @@ proxy.action("queryOrderList", {
 }).action("QueryUserInfoById", {
     proxy: "Y9",
     action: "com.yun9.sys.user.service.QueryUserInfoByIdService"
+}).action("QueryFile", {
+    proxy: "Y9",
+    action: "com.yun9.sys.inst.serivce.QueryFileService"
 });
 
 module.exports = proxy;

@@ -28,7 +28,8 @@ angular.module("ui.neptune.filter", ['' +
 angular.module("ui.neptune.directive", [
     "ui.neptune.directive.datatable",
     "ui.neptune.directive.selectTree",
-    "ui.neptune.directive.form"
+    "ui.neptune.directive.form",
+    "ui.neptune.directive.selectImage",
 ]);
 ;/**
  * Created by leon on 15/11/12.
@@ -65,7 +66,7 @@ angular.module("ui.neptune.service.cache", [])
                     return self.data[key];
                 }
 
-                if (key && id && self.cache[key]) {
+                if (key && id && self.data[key]) {
                     return self.data[key][id];
                 }
             };
@@ -1379,6 +1380,112 @@ angular.module("ui.neptune.directive.form", [])
             }
         };
     }]);;/**
+ * Created by leon on 15/11/16.
+ */
+angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
+    .controller("SelectImageController", function ($scope, $uibModal) {
+        var self = this;
+        this.selectImageApi = {
+            open: function () {
+                var result = $uibModal.open({
+                    animation: true,
+                    templateUrl: '/template/select-image/select-image-modal.html',
+                    controller: 'SelectImageModalController',
+                    controllerAs: 'vm',
+                    resolve: {
+                        selectImageData: function ($q) {
+                            var deferd = $q.defer();
+                            if ($scope.nptSelectImage.imageRepository) {
+                                var params = {
+                                    options: $scope.nptSelectImage,
+                                };
+                                deferd.resolve(params);
+                            } else {
+                                deferd.reject();
+                            }
+                            return deferd.promise;
+                        }
+                    }
+                }).result;
+                return result;
+            }
+        };
+
+        //初始化配置
+        if ($scope.nptSelectImage) {
+            if ($scope.nptSelectImage.onRegisterApi) {
+                $scope.nptSelectImage.onRegisterApi(self.selectImageApi);
+            }
+        }
+    })
+    .controller("SelectImageModalController", function (selectImageData, $modalInstance, nptCache) {
+        var vm = this;
+
+        vm.ok = ok;
+        vm.cancel = cancel;
+        vm.refreshImage = refreshImage;
+
+        // function definition
+        function ok() {
+            $modalInstance.close({});
+        }
+
+        function cancel() {
+            $modalInstance.dismiss('cancel');
+        }
+
+        function refreshImage() {
+            if (selectImageData.options.imageRepository) {
+                vm.refresh = selectImageData.options.imageRepository.post().then(function (response) {
+
+                    vm.images = [];
+                    var rows = [];
+                    var index = 0;
+                    angular.forEach(response.data, function (value) {
+
+                        if (index >= 4) {
+                            vm.images.push(angular.copy(rows));
+                            index = 0;
+                            rows = [];
+                        }
+                        //查找cache中的url
+                        var file = nptCache.get("file", value.id);
+                        value.thumbnailUrl = file.thumbnailUrl;
+                        value.url = file.url;
+                        rows.push(value);
+                        index++;
+                    });
+
+                    if (rows) {
+                        vm.images.push(angular.copy(rows));
+                    }
+
+                    console.info("检索成功!");
+                }, function (error) {
+                    console.info("检索失败!");
+                });
+            }
+        }
+
+        //刷新图片
+        refreshImage();
+    })
+    .directive("nptSelectImage", function () {
+        return {
+            restrict: "EA",
+            transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
+            replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
+            controller: "SelectImageController",
+            templateUrl: function (element, attrs) {
+                return attrs.templateUrl || "/template/select-image/select-image.html";
+            },
+            scope: {
+                nptSelectImage: "="
+            },
+            link: function (scope, element, attrs, ctrl) {
+            }
+        };
+    });;/**
  * Created by leon on 15/11/5.
  */
 
@@ -1849,7 +1956,7 @@ angular.module("ui.neptune.formly.wrapper-validation")
                 '</div>'
             ].join("")
         });
-    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/formly/npt-select-tree-single.html', '/template/formly/ui-select.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
+    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/formly/npt-select-tree-single.html', '/template/formly/ui-select.html', '/template/select-image/select-image-modal.html', '/template/select-image/select-image.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
 
 angular.module("/template/datatable/datatable-edit.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/datatable/datatable-edit.html",
@@ -1874,6 +1981,16 @@ angular.module("/template/formly/npt-select-tree-single.html", []).run(["$templa
 angular.module("/template/formly/ui-select.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/formly/ui-select.html",
     "<ui-select data-ng-model=\"model[options.key]\" data-required=\"{{to.required}}\" data-disabled=\"{{to.disabled}}\" theme=\"bootstrap\"><ui-select-match placeholder=\"{{to.placeholder}}\" data-allow-clear=\"true\">{{$select.selected[to.labelProp]}}</ui-select-match><ui-select-choices data-repeat=\"{{to.ngOptions}}\" data-refresh=\"to.refresh($select.search,model, options)\" data-refresh-delay=\"{{to.refreshDelay}}\"><div ng-bind-html=\"option[to.labelProp] | highlight: $select.search\"></div><small><span ng-bind-html=\"''+option[to.smallLabelProp] | highlight: $select.search\"></span></small></ui-select-choices></ui-select>");
+}]);
+
+angular.module("/template/select-image/select-image-modal.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/template/select-image/select-image-modal.html",
+    "<div><div class=\"modal-header\"><button type=\"button\" ng-click=\"vm.cancel()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-12\"><p ng-show=\"vm.refresh.$$state.status === 0\">正在加载数据,请稍后...</p><p ng-show=\"vm.refresh.$$state.status !== 0\">&nbsp</p></div></div><div ng-repeat=\"rows in vm.images\" class=\"row\"><div ng-repeat=\"image in rows\" class=\"col-md-3\"><a href=\"\" class=\"thumbnail\"><img src=\"{{image.thumbnailUrl}}\"></a></div></div></div><div class=\"modal-footer\"><button type=\"button\" ng-click=\"vm.ok()\" class=\"btn btn-primary\">确定</button><button type=\"button\" ng-click=\"vm.cancel()\" class=\"btn btn-warning\">取消</button></div></div>");
+}]);
+
+angular.module("/template/select-image/select-image.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/template/select-image/select-image.html",
+    "<div></div>");
 }]);
 
 angular.module("/template/select-tree/select-tree-modal.html", []).run(["$templateCache", function($templateCache) {

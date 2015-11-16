@@ -33,7 +33,7 @@ angular.module("ui.neptune.service.cache", [])
                     return self.data[key];
                 }
 
-                if (key && id && self.cache[key]) {
+                if (key && id && self.data[key]) {
                     return self.data[key][id];
                 }
             };

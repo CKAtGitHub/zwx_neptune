@@ -28,5 +28,6 @@ angular.module("ui.neptune.filter", ['' +
 angular.module("ui.neptune.directive", [
     "ui.neptune.directive.datatable",
     "ui.neptune.directive.selectTree",
-    "ui.neptune.directive.form"
+    "ui.neptune.directive.form",
+    "ui.neptune.directive.selectImage",
 ]);
