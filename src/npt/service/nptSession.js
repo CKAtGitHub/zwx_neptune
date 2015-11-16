@@ -5,10 +5,17 @@
 angular.module("ui.neptune.service.session", [])
     .provider("nptSession", function () {
         this._baseURL = "/session";
+        this._userProp = "user";
 
         this.setBaseURL = function (baseURL) {
             if (baseURL) {
                 this._baseURL = baseURL;
+            }
+        };
+
+        this.setUserProp = function (userProp) {
+            if (userProp) {
+                this._userProp = userProp;
             }
         };
 
@@ -33,7 +40,7 @@ angular.module("ui.neptune.service.session", [])
                     //响应转换为Session
                     var session = new Session();
                     session._response = response;
-                    session._user = response.data.user;
+                    session._user = response.data[self._userProp];
 
                     return session;
                 });
