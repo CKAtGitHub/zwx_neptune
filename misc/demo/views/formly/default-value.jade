@@ -1,0 +1,33 @@
+//
+   Created by huangbinglong on 15/11/16.
+extends ../layout/layout
+block content
+   script(src="/js/formly-default-value.js")
+   div(ng-app="formlyExample")
+      div.page-header
+         h1 默认值
+      div(ng-controller="formlyExampleController as vm")
+         form(ng-submit="vm.onSubmit()",name="vm.form",novalidate)
+            formly-form(model="vm.model",fields="vm.fields",options="vm.options",form="vm.form")
+               button.btn.btn-primary(type="submit") 确定
+               button.btn.btn-default(type="button",ng-click="vm.options.resetModel()") 重置
+         hr
+         h2 异步获取数据然后设置model
+         pre
+            |QueryCtrlCode.post({defno:"cycle"})
+            |.then(function(response) {
+            |  var data = response.data;
+            |   if (data && data.length > 0) {
+            |      vm.model.defaultValue2 = data[0].id;
+            |   }
+            |},function(error) {
+            |});
+         hr
+         h2 Model Value
+         pre
+            | {{vm.model | json}}
+         h2
+            | Fields
+            small (note, functions are not shown)
+         pre
+            | {{vm.originalFields | json}}
