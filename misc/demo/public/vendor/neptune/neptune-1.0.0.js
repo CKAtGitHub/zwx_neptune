@@ -78,6 +78,25 @@ angular.module("ui.neptune.service.cache", [])
             return cacheFactory();
         };
 
+    }).filter('cacheFilter', function (nptCache) {
+        return function (input, key, labelProp, valueProp) {
+            if (!input || !key || !labelProp) { // 如果值为空，或者没有指定
+                return input;
+            }
+            var datas = nptCache.get(key);
+            if (datas && valueProp) {
+                var output;
+                angular.forEach(datas,function(data) {
+                    if (data[valueProp] == input) {
+                        output = data[labelProp];
+                    }
+                });
+                return output;
+            } else if (datas){
+                return datas[input][labelProp];
+            }
+            return input;
+        };
     });;/**
  * Created by leon on 15/11/9.
  */

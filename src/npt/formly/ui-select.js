@@ -49,7 +49,7 @@ angular.module("ui.neptune.formly.ui-select")
                         }
 
                         return promise.then(function (response) {
-                            field.templateOptions.options = response.data;
+                            field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
                         });
                     },
                     refreshDelay: 0
