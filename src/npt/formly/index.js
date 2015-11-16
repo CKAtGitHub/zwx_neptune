@@ -7,6 +7,7 @@
 angular.module("ui.neptune.formly", [
     "ui.neptune.formly.ui-select",
     "ui.neptune.formly.ui-mask",
+    "ui.neptune.formly.ui-validation",
     "ui.neptune.formly.wrapper-validation"]);
 
 angular.module("ui.neptune.formly.ui-select",
@@ -15,5 +16,7 @@ angular.module("ui.neptune.formly.ui-select",
     'ngMessages',"angular.filter"]);
 
 angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks',"ui.mask"]);
+
+angular.module("ui.neptune.formly.ui-validation",[]).constant('is', window.is);
 
 angular.module("ui.neptune.formly.wrapper-validation",[]);

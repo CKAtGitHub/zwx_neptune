@@ -474,10 +474,17 @@ angular.module("ui.neptune.service.resource", [])
 angular.module("ui.neptune.service.session", [])
     .provider("nptSession", function () {
         this._baseURL = "/session";
+        this._userProp = "user";
 
         this.setBaseURL = function (baseURL) {
             if (baseURL) {
                 this._baseURL = baseURL;
+            }
+        };
+
+        this.setUserProp = function (userProp) {
+            if (userProp) {
+                this._userProp = userProp;
             }
         };
 
@@ -502,7 +509,7 @@ angular.module("ui.neptune.service.session", [])
                     //响应转换为Session
                     var session = new Session();
                     session._response = response;
-                    session._user = response.data.user;
+                    session._user = response.data[self._userProp];
 
                     return session;
                 });
@@ -1505,6 +1512,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
 angular.module("ui.neptune.formly", [
     "ui.neptune.formly.ui-select",
     "ui.neptune.formly.ui-mask",
+    "ui.neptune.formly.ui-validation",
     "ui.neptune.formly.wrapper-validation"]);
 
 angular.module("ui.neptune.formly.ui-select",
@@ -1513,6 +1521,8 @@ angular.module("ui.neptune.formly.ui-select",
     'ngMessages',"angular.filter"]);
 
 angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks',"ui.mask"]);
+
+angular.module("ui.neptune.formly.ui-validation",[]).constant('is', window.is);
 
 angular.module("ui.neptune.formly.wrapper-validation",[]);
 ;/*!
@@ -1677,6 +1687,51 @@ angular.module("ui.neptune.formly.ui-select")
                 }
             }
         });
+    });;/*!
+ * mars
+ * Copyright(c) 2015 huangbinglong
+ * MIT Licensed
+ */
+
+angular.module("ui.neptune.formly.ui-validation")
+    .run(function (formlyConfig, is) {
+
+        addTypeForValidator('boolean');
+        addTypeForValidator('date');// Date
+        addTypeForValidator('nan');// NaN
+        addTypeForValidator('null');
+        addTypeForValidator('number');
+        addTypeForValidator('string');
+        addTypeForValidator('char');
+        addTypeForValidator('undefined');
+        addTypeForValidator('empty');
+        addTypeForValidator('existy');// not null,not undefinder
+        addTypeForValidator('truthy');// 有值
+        addTypeForValidator('space');
+        addTypeForValidator('url');
+        addTypeForValidator('email');
+        addTypeForValidator('creditCard');
+        addTypeForValidator('timeString');
+        addTypeForValidator('dateString');
+        addTypeForValidator('hexColor');
+        addTypeForValidator('ip');
+        addTypeForValidator('decimal');// 浮点数
+        addTypeForValidator('integer');
+
+
+        function addTypeForValidator(validatorName) {
+            var validators = {};
+            validators[validatorName] = {
+                expression: is[validatorName],
+                message: '"Invalid ' + validatorName + '"'
+            };
+            formlyConfig.setType({
+                name: validatorName,
+                defaultOptions: {
+                    validators: validators
+                }
+            });
+        }
     });;/*!
  * mars
  * Copyright(c) 2015 huangbinglong
