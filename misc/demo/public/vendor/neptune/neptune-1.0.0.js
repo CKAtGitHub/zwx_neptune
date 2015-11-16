@@ -317,7 +317,9 @@ angular.module("ui.neptune.service.repository", [])
                     params: request.params
                 };
 
-                var result = $http.post(scope._baseURL, postData).then(function (response) {
+                var result = $http.post(scope._baseURL, postData);
+
+                result = result.then(function (response) {
                     //处理逻辑code
                     if (response.data.code === "100") {
                         return response;
@@ -325,7 +327,7 @@ angular.module("ui.neptune.service.repository", [])
                         return $q.reject(response.data.cause);
                     }
                 }, function (error) {
-                    return error;
+                    return $q.reject(error);
                 });
 
                 //将全局响应拦截器插入
@@ -1534,16 +1536,44 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
         templateUrl: "/template/formly/npt-select-tree-single.html",
         extends: 'input',
         defaultOptions: {
+            controller: function ($scope, $log, $injector) {
+                var options = $scope.options;
+                var to = options.templateOptions;
+
+                //监听数据,如果发生变化重新检索远程显示值
+                $scope.$watch("model." + options.key, function (newValue, oldValue) {
+                    if (newValue && to.viewvalueRepository) {
+                        if (angular.isFunction(to.viewvalueRepository)) {
+                            to.viewvalue = $injector.invoke(to.viewvalueRepository);
+                        } else {
+                            var params = {};
+                            params[to.viewvalueQueryProp] = newValue;
+                            to.viewvalueRepository.post(params).then(function (response) {
+                                to.viewvalue = response.data[to.viewvalueProp];
+                            }, function (error) {
+                                //发生错误清空模型数据
+                                $scope.model[options.key] = undefined;
+                            });
+                        }
+                    }
+                });
+
+            },
             templateOptions: {
                 label: "请选择:",
                 placeholder: "请选择.",
-                selectProp: "id",
+                valueProp: 'id',
+                labelProp: 'name',
+                viewvalueQueryProp: "id",
+                viewvalueProp: "name",
+                viewvalue: undefined,
                 onClickSelect: function (modal, options) {
                     var self = this;
 
                     self.selectTreeApi.open().then(function (response) {
                         if (response && response.length > 0) {
-                            modal[options.key] = response[0][self.selectProp];
+                            modal[options.key] = response[0][self.valueProp];
+                            self.viewvalue = response[0][self.labelProp];
                         }
                     }, function () {
                     });
@@ -1552,7 +1582,8 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
                     this.selectTreeApi = selectTreeApi;
                 },
                 treeRepository: undefined,
-                listRepository: undefined
+                listRepository: undefined,
+                viewvalueRepository: undefined
             }
         }
     });
@@ -1755,7 +1786,7 @@ angular.module("/template/form/form.html", []).run(["$templateCache", function($
 
 angular.module("/template/formly/npt-select-tree-single.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/formly/npt-select-tree-single.html",
-    "<div><div npt-select-tree=\"to\"></div><div class=\"input-group\"><input placeholder=\"{{to.placeholder}}\" type=\"text\" ng-model=\"model[options.key]\" disabled class=\"form-control\"><span class=\"input-group-btn\"><button type=\"button\" ng-click=\"to.onClickSelect(model,options)\" class=\"btn btn-primary\">选择</button></span></div></div>");
+    "<div><div npt-select-tree=\"to\"></div><div class=\"input-group\"><input placeholder=\"{{to.placeholder}}\" type=\"text\" ng-model=\"to.viewvalue\" disabled class=\"form-control\"><input type=\"text\" ng-model=\"model[options.key]\" disabled ng-hide=\"true\" class=\"form-control\"><span class=\"input-group-btn\"><button type=\"button\" ng-click=\"to.onClickSelect(model,options)\" class=\"btn btn-primary\">选择</button></span></div></div>");
 }]);
 
 angular.module("/template/formly/ui-select.html", []).run(["$templateCache", function($templateCache) {

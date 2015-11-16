@@ -27,6 +27,9 @@ proxy.action("queryOrderList", {
 }).action("QueryMdCtrlcode", {
     proxy: "Y9",
     action: "com.yun9.sys.md.service.QueryMdCtrlcodeService"
+}).action("QueryUserInfoById", {
+    proxy: "Y9",
+    action: "com.yun9.sys.user.service.QueryUserInfoByIdService"
 });
 
 module.exports = proxy;
