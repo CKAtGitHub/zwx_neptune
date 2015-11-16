@@ -121,7 +121,9 @@ angular.module("ui.neptune.service.repository", [])
                     params: request.params
                 };
 
-                var result = $http.post(scope._baseURL, postData).then(function (response) {
+                var result = $http.post(scope._baseURL, postData);
+
+                result = result.then(function (response) {
                     //处理逻辑code
                     if (response.data.code === "100") {
                         return response;
@@ -129,7 +131,7 @@ angular.module("ui.neptune.service.repository", [])
                         return $q.reject(response.data.cause);
                     }
                 }, function (error) {
-                    return error;
+                    return $q.reject(error);
                 });
 
                 //将全局响应拦截器插入

@@ -41,7 +41,10 @@ angular.module("formly.npt.select.tree.demo", ["ui.neptune"])
             return request;
         });
     })
-    .controller("FormlyNptSelectTreeDemoController", function (UserListBySelectTree, OrgListBySelectTree) {
+    .factory("QueryUserInfoById", function (nptRepository) {
+        return nptRepository("QueryUserInfoById");
+    })
+    .controller("FormlyNptSelectTreeDemoController", function (UserListBySelectTree, OrgListBySelectTree, QueryUserInfoById) {
         var vm = this;
 
         vm.onSubmit = function () {
@@ -57,8 +60,10 @@ angular.module("formly.npt.select.tree.demo", ["ui.neptune"])
                 key: 'selectUser',
                 type: 'npt-select-tree',
                 templateOptions: {
+                    viewvalueQueryProp: "userid",
                     treeRepository: OrgListBySelectTree,
-                    listRepository: UserListBySelectTree
+                    listRepository: UserListBySelectTree,
+                    viewvalueRepository: QueryUserInfoById
                 }
             }
         ];
