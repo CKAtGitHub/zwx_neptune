@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "angular-input-masks": "^2.1.0",
-    "angular-ui-grid": "^3.0.7"
+    "angular-ui-grid": "^3.0.7",
+    "is_js": "^0.7.4"
   }
 }
