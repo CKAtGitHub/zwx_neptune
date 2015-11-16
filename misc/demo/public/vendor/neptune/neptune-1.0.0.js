@@ -1512,20 +1512,51 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
 angular.module("ui.neptune.formly", [
     "ui.neptune.formly.ui-select",
     "ui.neptune.formly.ui-mask",
-    "ui.neptune.formly.ui-validation",
-    "ui.neptune.formly.wrapper-validation"]);
+    "ui.neptune.formly.wrapper-validation",
+    "ui.neptune.formly.select-tree-single"]);
 
 angular.module("ui.neptune.formly.ui-select",
-    ["ui.neptune.service.resource",'ui.select', 'ngSanitize',
-    'ngAnimate',
-    'ngMessages',"angular.filter"]);
+    ["ui.neptune.service.resource", 'ui.select', 'ngSanitize',
+        'ngAnimate',
+        'ngMessages', "angular.filter"]);
 
-angular.module("ui.neptune.formly.ui-mask",['ui.utils.masks',"ui.mask"]);
+angular.module("ui.neptune.formly.ui-mask", ['ui.utils.masks', "ui.mask"]);
 
-angular.module("ui.neptune.formly.ui-validation",[]).constant('is', window.is);
+angular.module("ui.neptune.formly.wrapper-validation", []);
+;/**
+ * Created by leon on 15/11/16.
+ */
 
-angular.module("ui.neptune.formly.wrapper-validation",[]);
-;/*!
+
+angular.module("ui.neptune.formly.select-tree-single", [], function config(formlyConfigProvider) {
+    formlyConfigProvider.setType({
+        name: "npt-select-tree",
+        templateUrl: "/template/formly/npt-select-tree-single.html",
+        extends: 'input',
+        defaultOptions: {
+            templateOptions: {
+                label: "请选择:",
+                placeholder: "请选择.",
+                selectProp: "id",
+                onClickSelect: function (modal, options) {
+                    var self = this;
+
+                    self.selectTreeApi.open().then(function (response) {
+                        if (response && response.length > 0) {
+                            modal[options.key] = response[0][self.selectProp];
+                        }
+                    }, function () {
+                    });
+                },
+                onRegisterApi: function (selectTreeApi) {
+                    this.selectTreeApi = selectTreeApi;
+                },
+                treeRepository: undefined,
+                listRepository: undefined
+            }
+        }
+    });
+});;/*!
  * mars
  * Copyright(c) 2015 huangbinglong
  * MIT Licensed
@@ -1693,51 +1724,6 @@ angular.module("ui.neptune.formly.ui-select")
  * MIT Licensed
  */
 
-angular.module("ui.neptune.formly.ui-validation")
-    .run(function (formlyConfig, is) {
-
-        addTypeForValidator('boolean');
-        addTypeForValidator('date');// Date
-        addTypeForValidator('nan');// NaN
-        addTypeForValidator('null');
-        addTypeForValidator('number');
-        addTypeForValidator('string');
-        addTypeForValidator('char');
-        addTypeForValidator('undefined');
-        addTypeForValidator('empty');
-        addTypeForValidator('existy');// not null,not undefinder
-        addTypeForValidator('truthy');// 有值
-        addTypeForValidator('space');
-        addTypeForValidator('url');
-        addTypeForValidator('email');
-        addTypeForValidator('creditCard');
-        addTypeForValidator('timeString');
-        addTypeForValidator('dateString');
-        addTypeForValidator('hexColor');
-        addTypeForValidator('ip');
-        addTypeForValidator('decimal');// 浮点数
-        addTypeForValidator('integer');
-
-
-        function addTypeForValidator(validatorName) {
-            var validators = {};
-            validators[validatorName] = {
-                expression: is[validatorName],
-                message: '"Invalid ' + validatorName + '"'
-            };
-            formlyConfig.setType({
-                name: validatorName,
-                defaultOptions: {
-                    validators: validators
-                }
-            });
-        }
-    });;/*!
- * mars
- * Copyright(c) 2015 huangbinglong
- * MIT Licensed
- */
-
 angular.module("ui.neptune.formly.wrapper-validation")
 .config(function(formlyConfigProvider) {
         formlyConfigProvider.setWrapper({
@@ -1750,7 +1736,7 @@ angular.module("ui.neptune.formly.wrapper-validation")
                 '</div>'
             ].join("")
         });
-    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/formly/ui-select.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
+    });;angular.module('ui.neptune.tpls', ['/template/datatable/datatable-edit.html', '/template/datatable/datatable.html', '/template/form/form.html', '/template/formly/npt-select-tree-single.html', '/template/formly/ui-select.html', '/template/select-tree/select-tree-modal.html', '/template/select-tree/select-tree.html']);
 
 angular.module("/template/datatable/datatable-edit.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/datatable/datatable-edit.html",
@@ -1765,6 +1751,11 @@ angular.module("/template/datatable/datatable.html", []).run(["$templateCache", 
 angular.module("/template/form/form.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/form/form.html",
     "<div></div>");
+}]);
+
+angular.module("/template/formly/npt-select-tree-single.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/template/formly/npt-select-tree-single.html",
+    "<div><div npt-select-tree=\"to\"></div><div class=\"input-group\"><input placeholder=\"{{to.placeholder}}\" type=\"text\" ng-model=\"model[options.key]\" disabled class=\"form-control\"><span class=\"input-group-btn\"><button type=\"button\" ng-click=\"to.onClickSelect(model,options)\" class=\"btn btn-primary\">选择</button></span></div></div>");
 }]);
 
 angular.module("/template/formly/ui-select.html", []).run(["$templateCache", function($templateCache) {
