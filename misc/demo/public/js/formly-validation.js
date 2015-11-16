@@ -42,12 +42,22 @@ angular.module('formlyExample', ['ui.neptune'])
                 }
             },
             {
-                key: 'decimal',
+                key: 'creditCard',
                 type: 'input',
-                optionsTypes: ['decimal'],
+                optionsTypes: ['creditCard'],
                 templateOptions: {
-                    label: '验证浮点数',
-                    placeholder: '88.88'
+                    label: '验证信用卡号',
+                    placeholder: '378282246310005'
+                }
+            },
+            {
+                key: 'ctrlCode',
+                type: 'input',
+                optionsTypes: ['ctrlCode'],
+                templateOptions: {
+                    label: '异步验证控制编码',
+                    defNo:'cycle',
+                    placeholder: 'once'
                 }
             }
         ];

@@ -5,13 +5,14 @@
  */
 
 angular.module("ui.neptune.formly.ui-validation")
-    .run(function (formlyConfig, is) {
+    .run(function (formlyConfig, is,$q,QueryCtrlCode) {
+
+        // 集成IS框架
 
         addTypeForValidator('boolean');
         addTypeForValidator('date');// Date
         addTypeForValidator('nan');// NaN
         addTypeForValidator('null');
-        addTypeForValidator('number');
         addTypeForValidator('string');
         addTypeForValidator('char');
         addTypeForValidator('undefined');
@@ -26,9 +27,6 @@ angular.module("ui.neptune.formly.ui-validation")
         addTypeForValidator('dateString');
         addTypeForValidator('hexColor');
         addTypeForValidator('ip');
-        addTypeForValidator('decimal');// 浮点数
-        addTypeForValidator('integer');
-
 
         function addTypeForValidator(validatorName) {
             var validators = {};
@@ -43,4 +41,39 @@ angular.module("ui.neptune.formly.ui-validation")
                 }
             });
         }
+
+        // 验证控制编码
+        formlyConfig.setType({
+            name: "ctrlCode",
+            defaultOptions: {
+                asyncValidators: {
+                    ctrlCode:{
+                        expression: function (viewValue, modelValue,scope) {
+                            var defer = $q.defer();
+                            if (!scope.options.templateOptions.defNo) {
+                                defer.reject();
+                            } else {
+                                QueryCtrlCode.post({defno:scope.options.templateOptions.defNo,no:viewValue})
+                                    .then(function(response) {
+                                        if (!response.data || response.data.length === 0) {
+                                            defer.reject();
+                                        } else {
+                                            defer.resolve();
+                                        }
+                                    },function(error) {
+                                        defer.reject(error);
+                                    });
+                            }
+
+                            return defer.promise;
+                        },
+                        message: '"无效的控制编码"'
+                    }
+                },
+                modelOptions:{ updateOn: 'blur' }
+            }
+        });
+    })
+    .factory("QueryCtrlCode", function (nptRepository) {
+        return nptRepository("QueryMdCtrlcode");
     });

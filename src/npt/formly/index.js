@@ -8,7 +8,6 @@ angular.module("ui.neptune.formly", [
     "ui.neptune.formly.ui-select",
     "ui.neptune.formly.ui-mask",
     "ui.neptune.formly.ui-validation",
-    "ui.neptune.formly.wrapper-validation"]);
     "ui.neptune.formly.wrapper-validation",
     "ui.neptune.formly.select-tree-single"]);
 
