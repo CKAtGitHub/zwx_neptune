@@ -9,3 +9,7 @@ block content
         div(ng-controller="SelectImageDemoController as vm")
             button.btn.btn-primary(type="button",ng-click="vm.open()") 选择图片
             div(npt-select-image="vm.selectImageOptions")
+
+            h3 选择的图片
+            div
+                pre {{vm.selected | json}}

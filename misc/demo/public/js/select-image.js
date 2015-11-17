@@ -18,6 +18,8 @@ angular.module("SelectImageDemo", ["ui.neptune"])
 
         var vm = this;
 
+        vm.selected = [];
+
         vm.selectImageOptions = {
             imageRepository: QueryImageByUserLevel,
             onRegisterApi: function (selectImageApi) {
@@ -29,6 +31,7 @@ angular.module("SelectImageDemo", ["ui.neptune"])
             if (vm.selectImageApi) {
                 vm.selectImageApi.open().then(function (response) {
                     $log.info("用户选择了图片", response);
+                    vm.selected = response;
                 }, function (error) {
                     $log.info("取消选择", error);
                 });

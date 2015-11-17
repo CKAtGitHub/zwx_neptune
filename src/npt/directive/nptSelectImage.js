@@ -43,14 +43,42 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
         vm.ok = ok;
         vm.cancel = cancel;
         vm.refreshImage = refreshImage;
-
+        vm.selectImage = selectImage;
+        vm.refreshNum = refreshNum;
+        vm.selectNum = 0;
         // function definition
         function ok() {
-            $modalInstance.close({});
+            //检查已经选择的图片
+            $modalInstance.close(getSelectImages());
         }
 
         function cancel() {
             $modalInstance.dismiss('cancel');
+        }
+
+        function selectImage(item) {
+            if (item) {
+                item.selected = !item.selected;
+                refreshNum();
+            }
+        }
+
+        function refreshNum() {
+            vm.selectNum = getSelectImages().length;
+        }
+
+        function getSelectImages() {
+            var selectedImages = [];
+            if (vm.images) {
+                angular.forEach(vm.images, function (imageRows) {
+                    angular.forEach(imageRows, function (value) {
+                        if (value.selected) {
+                            selectedImages.push(value);
+                        }
+                    });
+                });
+            }
+            return selectedImages;
         }
 
         function refreshImage() {
@@ -69,9 +97,12 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
                         }
                         //查找cache中的url
                         var file = nptCache.get("file", value.id);
-                        value.thumbnailUrl = file.thumbnailUrl;
-                        value.url = file.url;
-                        rows.push(value);
+                        var imageWrapper = {
+                            file: file,
+                            data: value,
+                            selected: false
+                        };
+                        rows.push(imageWrapper);
                         index++;
                     });
 

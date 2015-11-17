@@ -1443,14 +1443,42 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
         vm.ok = ok;
         vm.cancel = cancel;
         vm.refreshImage = refreshImage;
-
+        vm.selectImage = selectImage;
+        vm.refreshNum = refreshNum;
+        vm.selectNum = 0;
         // function definition
         function ok() {
-            $modalInstance.close({});
+            //检查已经选择的图片
+            $modalInstance.close(getSelectImages());
         }
 
         function cancel() {
             $modalInstance.dismiss('cancel');
+        }
+
+        function selectImage(item) {
+            if (item) {
+                item.selected = !item.selected;
+                refreshNum();
+            }
+        }
+
+        function refreshNum() {
+            vm.selectNum = getSelectImages().length;
+        }
+
+        function getSelectImages() {
+            var selectedImages = [];
+            if (vm.images) {
+                angular.forEach(vm.images, function (imageRows) {
+                    angular.forEach(imageRows, function (value) {
+                        if (value.selected) {
+                            selectedImages.push(value);
+                        }
+                    });
+                });
+            }
+            return selectedImages;
         }
 
         function refreshImage() {
@@ -1469,9 +1497,12 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
                         }
                         //查找cache中的url
                         var file = nptCache.get("file", value.id);
-                        value.thumbnailUrl = file.thumbnailUrl;
-                        value.url = file.url;
-                        rows.push(value);
+                        var imageWrapper = {
+                            file: file,
+                            data: value,
+                            selected: false
+                        };
+                        rows.push(imageWrapper);
                         index++;
                     });
 
@@ -1872,7 +1903,7 @@ angular.module("ui.neptune.formly.ui-select")
                         }
 
                         return promise.then(function (response) {
-                            field.templateOptions.options = response.data;
+                            field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
                         });
                     },
                     refreshDelay: 0
@@ -2004,7 +2035,7 @@ angular.module("/template/formly/ui-select.html", []).run(["$templateCache", fun
 
 angular.module("/template/select-image/select-image-modal.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/template/select-image/select-image-modal.html",
-    "<div><div class=\"modal-header\"><button type=\"button\" ng-click=\"vm.cancel()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择</h4></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-12\"><p ng-show=\"vm.refresh.$$state.status === 0\">正在加载数据,请稍后...</p><p ng-show=\"vm.refresh.$$state.status !== 0\">&nbsp</p></div></div><div ng-repeat=\"rows in vm.images\" class=\"row\"><div ng-repeat=\"image in rows\" class=\"col-md-3\"><a href=\"\" class=\"thumbnail\"><img src=\"{{image.thumbnailUrl}}\"></a></div></div></div><div class=\"modal-footer\"><button type=\"button\" ng-click=\"vm.ok()\" class=\"btn btn-primary\">确定</button><button type=\"button\" ng-click=\"vm.cancel()\" class=\"btn btn-warning\">取消</button></div></div>");
+    "<div><div class=\"modal-header\"><button type=\"button\" ng-click=\"vm.cancel()\" aria-label=\"关闭\" class=\"close\"><span>&times</span></button><h4 class=\"modal-title\">选择</h4><p ng-show=\"vm.refresh.$$state.status === 0\">正在加载数据,请稍后...</p></div><div class=\"modal-body\"><div class=\"row\"><div class=\"col-md-12\"><p>已经选择了{{vm.selectNum}}张图片.</p></div></div><div ng-repeat=\"rows in vm.images\" class=\"row\"><div ng-repeat=\"image in rows\" class=\"col-md-3\"><input type=\"checkbox\" style=\"position:absolute;right:25px;top:5px;\" ng-model=\"image.selected\" ng-click=\"vm.refreshNum()\"><a href=\"\" ng-click=\"vm.selectImage(image)\" class=\"thumbnail\"><img src=\"{{image.file.thumbnailUrl}}\"></a></div></div></div><div class=\"modal-footer\"><button type=\"button\" ng-click=\"vm.ok()\" class=\"btn btn-primary\">确定</button><button type=\"button\" ng-click=\"vm.cancel()\" class=\"btn btn-warning\">取消</button></div></div>");
 }]);
 
 angular.module("/template/select-image/select-image.html", []).run(["$templateCache", function($templateCache) {
