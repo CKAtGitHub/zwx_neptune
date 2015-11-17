@@ -22,7 +22,8 @@ angular.module("ui.neptune.validator", [
 ]);
 
 angular.module("ui.neptune.filter", ['' +
-'ui.neptune.filter.bizFilter'
+'ui.neptune.filter.bizFilter',
+'ui.neptune.filter.commonFilter'
 ]);
 
 angular.module("ui.neptune.directive", [
@@ -510,7 +511,7 @@ angular.module("ui.neptune.service.session", [])
             }
         };
 
-        this.$get = function ($http) {
+        this.$get = function ($http, nptSessionManager) {
             var self = this;
 
             function Session() {
@@ -532,12 +533,25 @@ angular.module("ui.neptune.service.session", [])
                     var session = new Session();
                     session._response = response;
                     session._user = response.data[self._userProp];
-
+                    nptSessionManager.setSession(session);
                     return session;
                 });
             }
 
             return sessionFactory;
+        };
+    })
+    .factory("nptSessionManager", function () {
+        var self = this;
+        return {
+            setSession: function (session) {
+                if (session) {
+                    self._session = session;
+                }
+            },
+            getSession: function () {
+                return self._session;
+            }
         };
     });;/*!
  * mars
@@ -948,7 +962,25 @@ angular.module('ui.neptune.filter.bizFilter', ['ui.neptune.service.resource'])
         //    "bizParams": {"instid": "session.instid"},
         //    "chains":["limitTo: 5"]
         //});
-    });;/**
+    });;/*!
+ * mars
+ * Copyright(c) 2015 huangbinglong
+ * MIT Licensed
+ */
+
+angular.module('ui.neptune.filter.commonFilter', [])
+.filter('timestampFilter', function ($filter) {
+        /**过滤时间戳到指定格式显示*/
+        return function (input, formate) {
+            if (!input || !angular.isNumber(input)) {
+                return input;
+            }
+            var dateFilter = $filter('date');
+            formate = formate || "yyyy-MM-dd hh:mm:ss";
+            var dateString = dateFilter(input,formate);
+            return dateString || undefined;
+        };
+});;/**
  * Created by leon on 15/10/28.
  */
 
@@ -2002,7 +2034,7 @@ angular.module("ui.neptune.formly.ui-validation")
             var validators = {};
             validators[validatorName] = {
                 expression: is[validatorName],
-                message: '"Invalid ' + validatorName + '"'
+                message: '"无效的 ' + validatorName + '"'
             };
             formlyConfig.setType({
                 name: validatorName,
@@ -2012,20 +2044,30 @@ angular.module("ui.neptune.formly.ui-validation")
             });
         }
 
-        // 验证控制编码
+        // 异步资源验证器
         formlyConfig.setType({
-            name: "ctrlCode",
+            name: "bizValidator",
             defaultOptions: {
                 asyncValidators: {
                     ctrlCode:{
                         expression: function (viewValue, modelValue,scope) {
                             var defer = $q.defer();
-                            if (!scope.options.templateOptions.defNo) {
+                            var repository = scope.options.templateOptions.repository;
+                            var repositoryParams = scope.options.templateOptions.repositoryParams || {};
+                            if (!repository) {
                                 defer.reject();
                             } else {
-                                QueryCtrlCode.post({defno:scope.options.templateOptions.defNo,no:viewValue})
+                                var params = {};
+                                var reversal = scope.options.templateOptions.reversal;
+                                if (scope.options.templateOptions.searchProp) {
+                                    params[scope.options.templateOptions.searchProp] = viewValue;
+                                }
+                                params = angular.extend({},repositoryParams,params);
+                                repository.post(params)
                                     .then(function(response) {
-                                        if (!response.data || response.data.length === 0) {
+                                        var noExist = !response.data || response.data.length === 0;
+                                        noExist = reversal?!noExist:noExist;
+                                        if (noExist) {
                                             defer.reject();
                                         } else {
                                             defer.resolve();
@@ -2037,15 +2079,12 @@ angular.module("ui.neptune.formly.ui-validation")
 
                             return defer.promise;
                         },
-                        message: '"无效的控制编码"'
+                        message: '"无效的资源"+to.searchProp'
                     }
                 },
                 modelOptions:{ updateOn: 'blur' }
             }
         });
-    })
-    .factory("QueryCtrlCode", function (nptRepository) {
-        return nptRepository("QueryMdCtrlcode");
     });;/*!
  * mars
  * Copyright(c) 2015 huangbinglong
