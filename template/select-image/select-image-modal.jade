@@ -10,8 +10,8 @@ div
                 p 已经选择了{{vm.selectNum}}张图片.
         div.row(ng-repeat="rows in vm.images")
             div.col-md-3(ng-repeat="image in rows")
-                input(type="checkbox",style="position:absolute;right:25px;top:5px;",ng-model="image.selected",ng-click="vm.refreshNum()")
                 a.thumbnail(href="",ng-click="vm.selectImage(image)")
+                    span.glyphicon.glyphicon-ok.bg-primary(style="position:absolute;right:25px;top:5px;",ng-show="image.selected")
                     img(src="{{image.file.thumbnailUrl}}")
     div.modal-footer
         button.btn.btn-primary(type="button",ng-click="vm.ok()") 确定

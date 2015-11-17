@@ -24,7 +24,8 @@ angular.module("SelectImageDemo", ["ui.neptune"])
             imageRepository: QueryImageByUserLevel,
             onRegisterApi: function (selectImageApi) {
                 vm.selectImageApi = selectImageApi;
-            }
+            },
+            single: true
         }
 
         vm.open = function () {

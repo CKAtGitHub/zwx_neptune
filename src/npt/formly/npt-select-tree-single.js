@@ -5,7 +5,7 @@
 
 angular.module("ui.neptune.formly.select-tree-single", [], function config(formlyConfigProvider) {
     formlyConfigProvider.setType({
-        name: "npt-select-tree",
+        name: "npt-select-tree-single",
         templateUrl: "/template/formly/npt-select-tree-single.html",
         extends: 'input',
         defaultOptions: {

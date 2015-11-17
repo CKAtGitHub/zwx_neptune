@@ -3,8 +3,10 @@
  */
 angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
     .controller("SelectImageController", function ($scope, $uibModal) {
-        var self = this;
-        this.selectImageApi = {
+        var vm = this;
+        vm.options = $scope.nptSelectImage;
+
+        vm.selectImageApi = {
             open: function () {
                 var result = $uibModal.open({
                     animation: true,
@@ -14,11 +16,8 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
                     resolve: {
                         selectImageData: function ($q) {
                             var deferd = $q.defer();
-                            if ($scope.nptSelectImage.imageRepository) {
-                                var params = {
-                                    options: $scope.nptSelectImage,
-                                };
-                                deferd.resolve(params);
+                            if (vm.options.imageRepository) {
+                                deferd.resolve(vm.options);
                             } else {
                                 deferd.reject();
                             }
@@ -30,12 +29,13 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
             }
         };
 
-        //初始化配置
-        if ($scope.nptSelectImage) {
-            if ($scope.nptSelectImage.onRegisterApi) {
-                $scope.nptSelectImage.onRegisterApi(self.selectImageApi);
-            }
+        //回调设置API
+        if (vm.options.onRegisterApi) {
+            vm.options.onRegisterApi(vm.selectImageApi);
         }
+        //设置默认选择类型
+        vm.options.single = vm.options.single || false;
+
     })
     .controller("SelectImageModalController", function (selectImageData, $modalInstance, nptCache) {
         var vm = this;
@@ -46,6 +46,8 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
         vm.selectImage = selectImage;
         vm.refreshNum = refreshNum;
         vm.selectNum = 0;
+        vm.options = selectImageData;
+
         // function definition
         function ok() {
             //检查已经选择的图片
@@ -58,7 +60,13 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
 
         function selectImage(item) {
             if (item) {
-                item.selected = !item.selected;
+                if (vm.options.single) {
+                    //将所有设置为非选择
+                    setAllSelected(false);
+                    item.selected = true;
+                } else {
+                    item.selected = !item.selected;
+                }
                 refreshNum();
             }
         }
@@ -81,9 +89,19 @@ angular.module("ui.neptune.directive.selectImage", ['ui.bootstrap'])
             return selectedImages;
         }
 
+        function setAllSelected(state) {
+            if (vm.images) {
+                angular.forEach(vm.images, function (imageRows) {
+                    angular.forEach(imageRows, function (value) {
+                        value.selected = state;
+                    });
+                });
+            }
+        }
+
         function refreshImage() {
-            if (selectImageData.options.imageRepository) {
-                vm.refresh = selectImageData.options.imageRepository.post().then(function (response) {
+            if (vm.options.imageRepository) {
+                vm.refresh = vm.options.imageRepository.post().then(function (response) {
 
                     vm.images = [];
                     var rows = [];

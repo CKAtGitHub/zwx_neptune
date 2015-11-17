@@ -1,0 +1,10 @@
+div
+    div(npt-select-image="to")
+    div.row
+        div.col-md-12
+            button.btn.btn-primary(type="button",ng-click="to.onSelect(model, options)") 从相册选择
+    div.row
+        div.col-md-2(ng-repeat="image in to.selectedImages")
+            a.thumbnail(href="")
+                img(src="{{image.file.thumbnailUrl}}")
+
