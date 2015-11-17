@@ -1,0 +1,18 @@
+div
+    div.modal-header
+        button.close(type='button',ng-click="vm.cancel()",aria-label="关闭")
+            span &times
+        h4.modal-title 选择
+        p(ng-show="vm.refresh.$$state.status === 0") 正在加载数据,请稍后...
+    div.modal-body
+        div.row
+            div.col-md-12
+                p 已经选择了{{vm.selectNum}}张图片.
+        div.row(ng-repeat="rows in vm.images")
+            div.col-md-3(ng-repeat="image in rows")
+                a.thumbnail(href="",ng-click="vm.selectImage(image)")
+                    span.glyphicon.glyphicon-ok.bg-primary(style="position:absolute;right:25px;top:5px;",ng-show="image.selected")
+                    img(src="{{image.file.thumbnailUrl}}")
+    div.modal-footer
+        button.btn.btn-primary(type="button",ng-click="vm.ok()") 确定
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") 取消
