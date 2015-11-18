@@ -17,9 +17,8 @@ var workPath = path.resolve("");
 
 app.use(express.static(path.join(workPath, "misc/demo/public")));
 app.use(express.static(path.join(workPath, "src")));
-//app.use("/template", express.static(path.join(workPath, "template")));
-app.use("/bizmodule", express.static(path.join(workPath, "misc/demo/bizmodule")));
 app.use("/node_modules", express.static(path.join(workPath, "node_modules")));
+app.use("/dist", express.static(path.join(workPath, "dist")));
 
 
 app.use(bodyParser.json());
