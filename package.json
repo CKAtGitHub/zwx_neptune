@@ -1,6 +1,6 @@
 {
-  "name": "neptune",
-  "version": "1.0.0",
+  "name": "y9-neptune",
+  "version": "1.0.1",
   "description": "基于angularjs、bootstrap的适合用于企业级应用的ui组件",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hl198181/pluto.git"
+    "url": "git+https://github.com/hl198181/neptune.git"
   },
   "keywords": [
     "angularjs",
@@ -18,9 +18,9 @@
   "author": "Leon",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hl198181/pluto/issues"
+    "url": "https://github.com/hl198181/neptune/issues"
   },
-  "homepage": "https://github.com/hl198181/pluto#readme",
+  "homepage": "https://github.com/hl198181/neptune#readme",
   "devDependencies": {
     "angular": "^1.4.7",
     "angular-form-for": "^4.1.7",

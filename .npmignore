@@ -8,3 +8,5 @@ test
 .gitignore
 .npmignore
 build
+misc
+src
