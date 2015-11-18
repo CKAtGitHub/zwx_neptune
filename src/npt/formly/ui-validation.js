@@ -5,7 +5,7 @@
  */
 
 angular.module("ui.neptune.formly.ui-validation")
-    .run(function (formlyConfig, is,$q,QueryCtrlCode) {
+    .run(function (formlyConfig, is,$q) {
 
         // 集成IS框架
 
