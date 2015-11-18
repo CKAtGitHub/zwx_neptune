@@ -19,7 +19,7 @@ angular.module("ui.neptune.service.session", [])
             }
         };
 
-        this.$get = function ($http) {
+        this.$get = function ($http, nptSessionManager) {
             var self = this;
 
             function Session() {
@@ -41,11 +41,24 @@ angular.module("ui.neptune.service.session", [])
                     var session = new Session();
                     session._response = response;
                     session._user = response.data[self._userProp];
-
+                    nptSessionManager.setSession(session);
                     return session;
                 });
             }
 
             return sessionFactory;
+        };
+    })
+    .factory("nptSessionManager", function () {
+        var self = this;
+        return {
+            setSession: function (session) {
+                if (session) {
+                    self._session = session;
+                }
+            },
+            getSession: function () {
+                return self._session;
+            }
         };
     });

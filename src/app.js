@@ -22,7 +22,8 @@ angular.module("ui.neptune.validator", [
 ]);
 
 angular.module("ui.neptune.filter", ['' +
-'ui.neptune.filter.bizFilter'
+'ui.neptune.filter.bizFilter',
+'ui.neptune.filter.commonFilter'
 ]);
 
 angular.module("ui.neptune.directive", [

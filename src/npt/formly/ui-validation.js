@@ -5,7 +5,7 @@
  */
 
 angular.module("ui.neptune.formly.ui-validation")
-    .run(function (formlyConfig, is,$q,QueryCtrlCode) {
+    .run(function (formlyConfig, is,$q) {
 
         // 集成IS框架
 
@@ -32,7 +32,7 @@ angular.module("ui.neptune.formly.ui-validation")
             var validators = {};
             validators[validatorName] = {
                 expression: is[validatorName],
-                message: '"Invalid ' + validatorName + '"'
+                message: '"无效的 ' + validatorName + '"'
             };
             formlyConfig.setType({
                 name: validatorName,
@@ -42,20 +42,30 @@ angular.module("ui.neptune.formly.ui-validation")
             });
         }
 
-        // 验证控制编码
+        // 异步资源验证器
         formlyConfig.setType({
-            name: "ctrlCode",
+            name: "bizValidator",
             defaultOptions: {
                 asyncValidators: {
                     ctrlCode:{
                         expression: function (viewValue, modelValue,scope) {
                             var defer = $q.defer();
-                            if (!scope.options.templateOptions.defNo) {
+                            var repository = scope.options.templateOptions.repository;
+                            var repositoryParams = scope.options.templateOptions.repositoryParams || {};
+                            if (!repository) {
                                 defer.reject();
                             } else {
-                                QueryCtrlCode.post({defno:scope.options.templateOptions.defNo,no:viewValue})
+                                var params = {};
+                                var reversal = scope.options.templateOptions.reversal;
+                                if (scope.options.templateOptions.searchProp) {
+                                    params[scope.options.templateOptions.searchProp] = viewValue;
+                                }
+                                params = angular.extend({},repositoryParams,params);
+                                repository.post(params)
                                     .then(function(response) {
-                                        if (!response.data || response.data.length === 0) {
+                                        var noExist = !response.data || response.data.length === 0;
+                                        noExist = reversal?!noExist:noExist;
+                                        if (noExist) {
                                             defer.reject();
                                         } else {
                                             defer.resolve();
@@ -67,13 +77,10 @@ angular.module("ui.neptune.formly.ui-validation")
 
                             return defer.promise;
                         },
-                        message: '"无效的控制编码"'
+                        message: '"无效的资源"+to.searchProp'
                     }
                 },
                 modelOptions:{ updateOn: 'blur' }
             }
         });
-    })
-    .factory("QueryCtrlCode", function (nptRepository) {
-        return nptRepository("QueryMdCtrlcode");
     });

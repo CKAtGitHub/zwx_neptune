@@ -9,6 +9,7 @@ angular.module("sessionDemo", ["ui.neptune", "ngRoute"])
             templateUrl: "session-demo.html",
             resolve: {
                 sessionData: function (nptSession) {
+                    debugger;
                     return nptSession();
                 }
             }
@@ -17,7 +18,11 @@ angular.module("sessionDemo", ["ui.neptune", "ngRoute"])
         });
 
     })
-    .controller("SessionDemoController", function ($scope, sessionData) {
+    .factory("DemoFactory", function (nptSessionManager) {
+        var session = nptSessionManager.getSession();
+        return {};
+    })
+    .controller("SessionDemoController", function ($scope, sessionData, DemoFactory) {
         var vm = this;
         vm.session = {
             user: sessionData.getUser(),

@@ -3,7 +3,7 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope) {
+    .controller("formlyExampleController", function ($scope,QueryCtrlCode) {
         var vm = this;
         vm.onSubmit = function onSubmit() {
             if (vm.form.$valid) {
@@ -53,13 +53,19 @@ angular.module('formlyExample', ['ui.neptune'])
             {
                 key: 'ctrlCode',
                 type: 'input',
-                optionsTypes: ['ctrlCode'],
+                optionsTypes: ['bizValidator'],
                 templateOptions: {
                     label: '异步验证控制编码',
-                    defNo:'cycle',
-                    placeholder: 'once'
+                    placeholder: 'once',
+                    reversal: false,
+                    searchProp:"no",
+                    repository: QueryCtrlCode,
+                    repositoryParams: {"defno": "cycle"}
                 }
             }
         ];
         vm.originalFields = angular.copy(vm.fields);
+    })
+    .factory("QueryCtrlCode", function (nptRepository) {
+        return nptRepository("QueryMdCtrlcode");
     });

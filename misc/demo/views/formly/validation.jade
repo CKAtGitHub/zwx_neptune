@@ -32,7 +32,22 @@ block content
             | dateString
             | hexColor
             | ip
-            | ctrlCode //异步验证控制编码是否正确
+            | bizValidator //异步资源验证
+         h2 异步资源验证器的配置
+         pre
+            | {
+            |  key: 'ctrlCode',
+            |  type: 'input',
+            |  optionsTypes: ['bizValidator'],// 必须填写这个类型，bizValidator
+            |  templateOptions: {
+            |     label: '异步验证控制编码',
+            |     placeholder: 'once',
+            |     reversal: false,           // 是否反转，默认false，默认是查询得到结果返回true，反转后，将结果反转
+            |     searchProp:"no",           // 需要查询的字段名称
+            |     repository: QueryCtrlCode, // 资源Factory
+            |     repositoryParams: {"defno": "cycle"}   // 资源查询时固定参数
+            |  }
+            | }
          h2 Model Value
          pre
             | {{vm.model | json}}
