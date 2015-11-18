@@ -59,20 +59,20 @@ module.exports = function (grunt) {
                 }
             }
         },
-        copy: {
-            main: {
-                expand: true,
-                flatten: true,
-                src: ["<%= concat.dist.dest%>", "src/neptune-ui.css"],
-                dest: "misc/demo/public/vendor/neptune/"
-            },
-            css: {
-                expand: true,
-                flatten: true,
-                src: ["src/neptune-ui.css"],
-                dest: "dist/"
-            }
-        },
+        //copy: {
+        //    main: {
+        //        expand: true,
+        //        flatten: true,
+        //        src: ["<%= concat.dist.dest%>", "src/neptune-ui.css"],
+        //        dest: "misc/demo/public/vendor/neptune/"
+        //    },
+        //    css: {
+        //        expand: true,
+        //        flatten: true,
+        //        src: ["src/neptune-ui.css"],
+        //        dest: "dist/"
+        //    }
+        //},
         watch: {
             files: ["<%= jshint.files%>"],
             tasks: ["jshint", "html2js", "concat", "copy"]
@@ -92,5 +92,5 @@ module.exports = function (grunt) {
     grunt.registerTask("clean", ["clean"]);
     grunt.registerTask("test", ["jshint"]);
     grunt.registerTask("default", ["jshint", "html2js", "concat", "uglify"]);
-    grunt.registerTask("demo", ["jshint", "html2js", "concat", "copy", "uglify"]);
+    grunt.registerTask("demo", ["jshint", "html2js", "concat", "uglify"]);
 }
