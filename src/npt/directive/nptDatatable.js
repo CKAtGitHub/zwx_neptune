@@ -12,7 +12,8 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
             isPagination: false
         };
     })
-    .controller("datatableController", ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", "$q", "$injector", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal, $q, $injector) {
+    .controller("datatableController",
+    ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", "$q", "$injector","$parse", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal, $q, $injector,$parse) {
         var self = this;
 
         if ($scope.controller) {
@@ -205,7 +206,8 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                         for (var key in config) {
                             this.items.push({
                                 name: key,
-                                label: config[key].label
+                                label: config[key].label,
+                                filter:config[key].filter
                             });
                         }
                     }
@@ -278,6 +280,18 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
             }
         };
         $scope.datatable = this.$datatable;
+
+        $scope.dofilter = function(value,filter) {
+            if (angular.isUndefined(value)) {
+                return value;
+            }
+            if (filter) {
+                value = angular.isString(value)?"'"+value+"'":value;
+                return $parse(value+"|"+filter)($scope);
+            }
+
+            return value;
+        };
 
         this.$forms = {
             init: function () {

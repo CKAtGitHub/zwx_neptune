@@ -7,7 +7,8 @@ angular.module("datatableStoreDemo", ["ui.neptune"]).
         nptDatatableStore.putDatatable("demodt", {
             header: {
                 sn: {
-                    label: "订单编号"
+                    label: "订单编号",
+                    filter:"json"
                 },
                 state: {
                     label: "订单状态"
@@ -22,7 +23,8 @@ angular.module("datatableStoreDemo", ["ui.neptune"]).
                     label: "订单金额"
                 },
                 createdate: {
-                    label: "创建日期"
+                    label: "创建日期",
+                    filter:"timestampFilter|json"
                 },
                 remark: {
                     label: "备注"
