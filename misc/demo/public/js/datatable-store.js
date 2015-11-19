@@ -8,7 +8,7 @@ angular.module("datatableStoreDemo", ["ui.neptune"]).
             header: {
                 sn: {
                     label: "订单编号",
-                    filter:"json"
+                    filter:"ctrlCodeFilter:orderstatetype:name:no"
                 },
                 state: {
                     label: "订单状态"
