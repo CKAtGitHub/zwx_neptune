@@ -35,7 +35,7 @@ module.exports = function (grunt) {
                     "src/npt/formly/*.js",
                     "<%= html2js.main.dest%>"
                 ],
-                dest: "dist/<%= pkg.name %>-<%= pkg.version%>.js"
+                dest: "dist/<%= pkg.name %>.js"
             }
         },
         uglify: {
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    "dist/<%= pkg.name%>-<%= pkg.version%>.min.js": ["<%= concat.dist.dest%>"]
+                    "dist/<%= pkg.name%>.min.js": ["<%= concat.dist.dest%>"]
                 }
             }
         },

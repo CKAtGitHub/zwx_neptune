@@ -9,7 +9,6 @@ angular.module("sessionDemo", ["ui.neptune", "ngRoute"])
             templateUrl: "session-demo.html",
             resolve: {
                 sessionData: function (nptSession) {
-                    debugger;
                     return nptSession();
                 }
             }

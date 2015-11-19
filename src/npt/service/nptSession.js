@@ -4,7 +4,7 @@
 
 angular.module("ui.neptune.service.session", [])
     .provider("nptSession", function () {
-        this._baseURL = "/session";
+        this._baseURL = "/api/session";
         this._userProp = "user";
         this._instProp = "inst";
 
