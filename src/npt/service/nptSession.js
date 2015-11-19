@@ -6,6 +6,7 @@ angular.module("ui.neptune.service.session", [])
     .provider("nptSession", function () {
         this._baseURL = "/session";
         this._userProp = "user";
+        this._instProp = "inst";
 
         this.setBaseURL = function (baseURL) {
             if (baseURL) {
@@ -19,17 +20,28 @@ angular.module("ui.neptune.service.session", [])
             }
         };
 
+        this.setInstProp = function (instProp) {
+            if (instProp) {
+                this._instProp = instProp;
+            }
+        };
+
         this.$get = function ($http, nptSessionManager) {
             var self = this;
 
             function Session() {
                 this._response = undefined;
                 this._user = undefined;
+                this._inst = undefined;
             }
 
             Session.prototype.getUser = function () {
                 return this._user;
             };
+
+            Session.prototype.getInst = function () {
+                return this._inst;
+            }
 
             Session.prototype.getResponse = function () {
                 return this._response;
@@ -41,6 +53,7 @@ angular.module("ui.neptune.service.session", [])
                     var session = new Session();
                     session._response = response;
                     session._user = response.data[self._userProp];
+                    session._inst = response.data[self._instProp];
                     nptSessionManager.setSession(session);
                     return session;
                 });
