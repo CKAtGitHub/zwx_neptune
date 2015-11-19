@@ -34,7 +34,7 @@ app.use(repository());
 app.use("/model", repository.service());
 
 app.use("/", router);
-app.use("/session", session);
+app.use("/api/session", session);
 
 
 //注册服务
