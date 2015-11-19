@@ -41,7 +41,7 @@ angular.module("ui.neptune.service.session", [])
 
             Session.prototype.getInst = function () {
                 return this._inst;
-            }
+            };
 
             Session.prototype.getResponse = function () {
                 return this._response;
