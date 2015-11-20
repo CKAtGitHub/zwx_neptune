@@ -37,7 +37,7 @@ angular.module("ui.neptune.service.repository", [])
             //资源对象
             function Repository() {
                 this._params = {};
-                this._delayParamsFn; // 延迟加载参数，function，执行后返回参数
+                this._delayParamsFn = undefined; // 延迟加载参数，function，执行后返回参数
                 this._lastParams = undefined;
                 this._header = {};
                 this._baseURL = self.baseURL;
