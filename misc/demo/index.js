@@ -40,6 +40,6 @@ app.use("/api/session", session);
 //注册服务
 
 
-app.listen(3000, function () {
-    console.info("启动成功!监听端口3000.");
+app.listen(3030, function () {
+    console.info("启动成功!监听端口3030.");
 });
