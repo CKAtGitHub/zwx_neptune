@@ -30,8 +30,8 @@ angular.module("datatableDemo", ["ui.neptune", "datatableStoreDemo", "formStoreD
                 "state": "buy",
                 "clientid": "10000002315692",
                 "sales": "10000001498059",
-                "amount": 10938.88,
-                "createdate": 1444727302000,
+                "amount": 10938.88+i,
+                "createdate": (new Date().getTime() + 1000*i),
                 "remark": "测试数据表格配置"
             });
         }

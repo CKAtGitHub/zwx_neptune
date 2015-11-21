@@ -37,6 +37,7 @@ angular.module("ui.neptune.service.repository", [])
             //资源对象
             function Repository() {
                 this._params = {};
+                this._delayParamsFn = undefined; // 延迟加载参数，function，执行后返回参数
                 this._lastParams = undefined;
                 this._header = {};
                 this._baseURL = self.baseURL;
@@ -47,6 +48,14 @@ angular.module("ui.neptune.service.repository", [])
 
             Repository.prototype.params = function (key, value) {
                 putKeyValue(key, value, this._params);
+                return this;
+            };
+
+            Repository.prototype.delayParamsFn = function (delayParamsFn) {
+                if (!angular.isFunction(delayParamsFn)) {
+                    throw new Error("无效的delayParamsFn，delayParamsFn必须为一个函数");
+                }
+                this._delayParamsFn = delayParamsFn;
                 return this;
             };
 
@@ -79,6 +88,9 @@ angular.module("ui.neptune.service.repository", [])
                 var selfRepository = this;
                 //自上而下合并查询参数
                 angular.extend(runParams, self.params || {});
+                if (this._delayParamsFn) {
+                    angular.extend(runParams, this._delayParamsFn() || {});
+                }
                 angular.extend(runParams, this._params || {});
                 angular.extend(runParams, params || {});
 

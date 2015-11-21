@@ -20,6 +20,6 @@ div
                     tr(ng-repeat="item in datatable.page.data")
                         td.text-center(ng-if="datatable.page.isIndex")
                             | {{($index+1)+(datatable.page.currPage * datatable.page.itemsPerPage - datatable.page.itemsPerPage)}}
-                        td(ng-repeat="headerItem in datatable.header.items") {{item[headerItem.name]}}
+                        td(ng-repeat="headerItem in datatable.header.items") {{dofilter(item[headerItem.name],headerItem.filter)}}
                         td(ng-if="datatable.action.items.length>0")
                             a.btn.btn-primary.btn-xs(ng-repeat="actionItem in datatable.action.items", href="", ng-click="datatable.action.onClick(actionItem,item,datatable.page.currPage * datatable.page.itemsPerPage - datatable.page.itemsPerPage + $parent.$index)") {{actionItem.label}}

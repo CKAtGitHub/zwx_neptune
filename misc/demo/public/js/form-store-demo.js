@@ -53,7 +53,7 @@ angular.module("formStoreDemo", [])
                 },
                 {
                     key: 'createdate',
-                    type: 'input',
+                    type: 'dateInput',
                     templateOptions: {
                         required: true,
                         label: '创建日期:'
