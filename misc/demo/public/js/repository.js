@@ -13,13 +13,30 @@ angular.module("repositoryDemo", ["ui.neptune"])
     })
     .controller("RepositoryDemoController", function (Order, $scope, nptCache) {
         var vm = this;
+
         vm.post = function () {
             vm.order = Order.post().then(function (response) {
                 vm.data = response.data;
                 vm.cache = nptCache.get();
+                vm.currdata = response.data[0];
             }, function (error) {
                 vm.data = error;
             });
+        }
+
+        vm.next = function () {
+            var nextdata = Order.next(vm.currdata);
+            if (nextdata) {
+                vm.currdata = nextdata;
+            }
+
+        };
+
+        vm.previous = function () {
+            var previous = Order.previous(vm.currdata);
+            if (previous) {
+                vm.currdata = previous;
+            }
         }
 
     });

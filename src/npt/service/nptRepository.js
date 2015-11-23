@@ -74,6 +74,38 @@ angular.module("ui.neptune.service.repository", [])
                 return this;
             };
 
+            Repository.prototype.getData = function () {
+                return this.data;
+            };
+
+            Repository.prototype.next = function (currData) {
+                if (this.data && currData && angular.isArray(this.data)) {
+                    var id = currData.id;
+
+                    if (id && this.data.length > 0) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (id === this.data[i].id && i + 1 < this.data.length) {
+                                return this.data[i + 1];
+                            }
+                        }
+                    }
+                }
+            };
+
+            Repository.prototype.previous = function (currData) {
+                if (this.data && currData && angular.isArray(this.data)) {
+                    var id = currData.id;
+
+                    if (id && this.data.length > 0) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (id === this.data[i].id && i - 1 >= 0) {
+                                return this.data[i - 1];
+                            }
+                        }
+                    }
+                }
+            };
+
             Repository.prototype.post = function (params) {
                 var runParams = {};
                 var selfRepository = this;
@@ -151,6 +183,15 @@ angular.module("ui.neptune.service.repository", [])
                     return response;
                 });
 
+                //记录本次检索数据
+                result = result.then(function (response) {
+                    scope.data = response.data;
+                    return response;
+                }, function (error) {
+                    scope.data = undefined;
+                    return error;
+                });
+
                 //将实例拦响应截器插入
                 angular.forEach((scope._responseInterceptors), function (value) {
                     result = result.then(value);
@@ -188,5 +229,6 @@ angular.module("ui.neptune.service.repository", [])
 
             return repositoryFactory;
         };
-    })
+    }
+)
 ;

@@ -1,6 +1,6 @@
 {
   "name": "y9-neptune",
-  "version": "1.0.11",
+  "version": "1.0.16",
   "description": "基于angularjs、bootstrap的适合用于企业级应用的ui组件",
   "main": "index.js",
   "scripts": {
