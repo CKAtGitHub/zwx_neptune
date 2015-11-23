@@ -329,7 +329,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
         };
         $scope.forms = this.$forms;
     }])
-    .controller("editDatatableController", function ($modalInstance, formData) {
+    .controller("editDatatableController", function ($uibModalInstance, formData) {
         var vm = this;
         // function assignment
         vm.ok = ok;
@@ -341,11 +341,11 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
 
         // function definition
         function ok() {
-            $modalInstance.close(vm.formData.model);
+            $uibModalInstance.close(vm.formData.model);
         }
 
         function cancel() {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         }
     })
     .directive("nptDatatable", ['$parse', "nptDatatableStore", function ($parse, nptDatatableStore) {

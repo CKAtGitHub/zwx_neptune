@@ -92,6 +92,15 @@ angular.module("ui.neptune.service.repository", [])
                 }
             };
 
+            Repository.prototype.hasNext = function (currData) {
+                var next = this.next(currData);
+                if (next) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
             Repository.prototype.previous = function (currData) {
                 if (this.data && currData && angular.isArray(this.data)) {
                     var id = currData.id;
@@ -103,6 +112,23 @@ angular.module("ui.neptune.service.repository", [])
                             }
                         }
                     }
+                }
+            };
+
+            Repository.prototype.hasPrevious = function (currData) {
+                var previous = this.next(currData);
+                if (previous) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            Repository.prototype.loading = function () {
+                if (this.result && this.result.$$state.status === 0) {
+                    return true;
+                } else {
+                    return false;
                 }
             };
 
@@ -196,6 +222,9 @@ angular.module("ui.neptune.service.repository", [])
                 angular.forEach((scope._responseInterceptors), function (value) {
                     result = result.then(value);
                 });
+
+                //记录promise
+                scope.result = result;
 
                 return result;
             }

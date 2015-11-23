@@ -8,9 +8,9 @@ block content
             h1 资源仓库
         div.row
             div.col-md-12
-                div(ng-if="vm.order.$$state.status === 0")
+                div(ng-if="vm.order.loading()")
                     p 正在加载...
-                div(ng-if='vm.order.$$state.status !== 0')
+                div(ng-if='!vm.order.loading()')
                     button.btn.btn-primary(type="button",ng-click="vm.post()") Post
 
                     button.btn.btn-primary(type = "button",ng-click= "vm.next()") 下一个
