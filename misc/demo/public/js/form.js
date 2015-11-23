@@ -3,70 +3,93 @@
  */
 
 angular.module("formDemo", ["ui.neptune"])
-    .config(function (ModelConfigProvider) {
-        ModelConfigProvider.model("demoForm", {
-            header: [
-                {
-                    name: "clientno",
-                    label: "客户编号",
-                    type: "text"
-                }, {
-                    name: "clientname",
-                    label: "客户名称",
-                    type: "text"
-                }, {
-                    name: "clienttype",
-                    label: "客户类型",
-                    type: "text"
-                }, {
-                    name: "sales",
-                    label: "销售顾问",
-                    type: "text"
-                }, {
-                    name: "email",
-                    label: "电子邮件",
-                    type: "email"
-                }, {
-                    name: "regamount",
-                    label: "注册资金",
-                    type: "number"
-                }, {
-                    name: "homepage",
-                    label: "企业网站",
-                    type: "url"
-                }, {
-                    name: "phonenumber",
-                    label: "联系电话",
-                    type: "tel"
-                },
-                {
-                    name: "remark",
-                    label: "备注",
-                    type: "textarea"
+    .factory("OrderInfo", function (nptFormlyStore) {
+        return nptFormlyStore("OrderInfo", {
+            options: {
+                formState: {
+                    disabled: true
                 }
-            ],
-            action: [
+            },
+            fields: [
                 {
-                    name: "save",
-                    label: "查看组织"
+                    key: 'sn',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '订单编号:',
+                        placeholder: "请输入订单编号"
+                    }
                 },
                 {
-                    name: "reset",
-                    label: "查看附件"
+                    key: 'state',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '订单状态:',
+                        placeholder: "请输入订单编号"
+                    }
+                },
+                {
+                    key: 'clientid',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '客户编号:',
+                        placeholder: "请输入客户编号"
+                    }
+                },
+                {
+                    key: 'sales',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '销售顾问:',
+                        placeholder: "请输入销售顾问"
+                    }
+                },
+                {
+                    key: 'amount',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '订单金额:'
+                    }
+                },
+                {
+                    key: 'createdate',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '创建日期:'
+                    }
+                },
+                {
+                    key: 'remark',
+                    type: 'input',
+                    templateOptions: {
+                        label: '备注:'
+                    }
                 }
             ]
-        })
+        });
     })
-    .controller("FormDemoController", function ($scope) {
-        $scope.data = {
-            clientno: "DJKJ",
-            clientname: "深圳市顶聚科技有限公司",
-            clienttype: "A",
-            sales: "186",
-            remark: "测试客户资料"
+    .controller("FormDemoController", function ($scope, OrderInfo) {
+        var vm = this;
+        vm.model = {};
+        vm.disabled = false;
+        vm.setDisabled = function () {
+            vm.nptFormApi.disabled(vm.disabled);
+            vm.disabled = !vm.disabled;
+        };
+        vm.options = {
+            store: OrderInfo,
+            buttons: {
+                ok: true,
+                reset: true
+            },
+            onRegisterApi: function (nptFormApi) {
+                vm.nptFormApi = nptFormApi;
+            }
         }
 
-        $scope.onClickForm = function (item) {
-            console.info(item.label + item.name);
-        }
     });

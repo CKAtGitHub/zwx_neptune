@@ -8,7 +8,7 @@ block content
     div(ng-app="formDemo")
         div.page-header
             h1 表单
-
         div.row
-            div.col-md-12(ng-controller="FormDemoController")
-                npt-form(name="demoForm",data="data", on-click-action="onClickForm(item)")
+            div.col-md-12(ng-controller="FormDemoController as vm")
+                button.btn.btn-default(ng-click="vm.setDisabled()",type="button") 禁用表单
+                div(npt-form="vm.options",model="vm.model")
