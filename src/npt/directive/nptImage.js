@@ -64,6 +64,7 @@ angular.module("ui.neptune.directive.nptImage", ['ui.bootstrap'])
             transclude: true, //将元素的内容替换到模板中标记了ng-transclude属性的对象上
             replace: true, //使用template的内容完全替换y9ui-datatable(自定义指令标签在编译后的html中将会不存在)
             controller: "NptImageController",
+            controllerAs: "vm",
             templateUrl: function (element, attrs) {
                 return attrs.templateUrl || "/template/image/npt-image.html";
             },

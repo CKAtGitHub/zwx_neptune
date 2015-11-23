@@ -42,6 +42,7 @@ angular.module("SelectImageDemo", ["ui.neptune"])
             }),
             searchProp:"id",
             labelProp:"thumbnailUrl",
+            class:"col-md-2 thumbnail",
             emptyImage:"https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150",
             errorImage:"https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/logo_white_fe6da1ec.png"
         };
