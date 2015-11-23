@@ -13,7 +13,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
         };
     })
     .controller("datatableController",
-    ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", "$q", "$injector","$parse", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal, $q, $injector,$parse) {
+    ["$scope", "$attrs", "DatatableConfig", "nptFormStore", "$uibModal", "$q", "$injector", "$parse", function ($scope, $attrs, datatableConfig, nptFormStore, $uibModal, $q, $injector, $parse) {
         var self = this;
 
         if ($scope.controller) {
@@ -207,7 +207,7 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                             this.items.push({
                                 name: key,
                                 label: config[key].label,
-                                filter:config[key].filter
+                                filter: config[key].filter
                             });
                         }
                     }
@@ -281,13 +281,13 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
         };
         $scope.datatable = this.$datatable;
 
-        $scope.dofilter = function(value,filter) {
+        $scope.dofilter = function (value, filter) {
             if (angular.isUndefined(value)) {
                 return value;
             }
             if (filter) {
-                value = angular.isString(value)?"'"+value+"'":value;
-                return $parse(value+"|"+filter)($scope);
+                value = angular.isString(value) ? "'" + value + "'" : value;
+                return $parse(value + "|" + filter)($scope);
             }
 
             return value;
@@ -298,8 +298,6 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
             },
             open: function (name, data) {
                 this.originData = data;
-                var formData = {};
-                angular.copy(data, formData);
 
                 var result = $uibModal.open({
                     animation: true,
@@ -311,9 +309,9 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                             var deferd = $q.defer();
                             nptFormStore.form(name, function (config) {
                                 deferd.resolve({
-                                    fields: config.fields,
-                                    model: formData,
-                                    options: config.options
+                                    fields: angular.copy(config.fields), //拷贝新版本,防止修改原始配置
+                                    model: angular.copy(data), //拷贝新版本,防止修改原始配置
+                                    options: angular.copy(config.options) //拷贝新版本,防止修改原始配置
                                 });
                             });
                             return deferd.promise;
