@@ -31,4 +31,5 @@ angular.module("ui.neptune.directive", [
     "ui.neptune.directive.selectTree",
     "ui.neptune.directive.form",
     "ui.neptune.directive.selectImage",
+    "ui.neptune.directive.nptImage"
 ]);

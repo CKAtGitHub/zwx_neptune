@@ -14,7 +14,7 @@ angular.module("SelectImageDemo", ["ui.neptune"])
             return request;
         });
     })
-    .controller("SelectImageDemoController", function ($log, QueryImageByUserLevel) {
+    .controller("SelectImageDemoController", function ($log, QueryImageByUserLevel,nptCache) {
 
         var vm = this;
 
@@ -26,7 +26,26 @@ angular.module("SelectImageDemo", ["ui.neptune"])
                 vm.selectImageApi = selectImageApi;
             },
             single: true
-        }
+        };
+
+        vm.imageOptions = {
+            repository:QueryImageByUserLevel.addResponseInterceptor(function(response) {
+                if (response.data) {
+                    response.data.forEach(function(item) {
+                        var file = nptCache.get("file", item.id);
+                        if (file) {
+                            item.thumbnailUrl = file.thumbnailUrl;
+                        }
+                    });
+                }
+                return response;
+            }),
+            searchProp:"id",
+            labelProp:"thumbnailUrl",
+            class:"col-md-2 thumbnail",
+            emptyImage:"https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150",
+            errorImage:"https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/logo_white_fe6da1ec.png"
+        };
 
         vm.open = function () {
             if (vm.selectImageApi) {

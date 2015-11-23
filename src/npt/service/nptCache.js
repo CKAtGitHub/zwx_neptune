@@ -62,7 +62,6 @@ angular.module("ui.neptune.service.cache", [])
             } else if (datas){
                 return datas[input][labelProp];
             }
-            return input;
         };
     }).filter('ctrlCodeFilter', function (nptCache) {
         return function (input, key, labelProp, valueProp) {
@@ -71,7 +70,7 @@ angular.module("ui.neptune.service.cache", [])
             }
             var ctrlCodeData = nptCache.get("ctrlcode");
             if (!ctrlCodeData) {
-                return input;
+                return;
             }
             var datas = ctrlCodeData[key];
             if (datas) {
@@ -83,6 +82,5 @@ angular.module("ui.neptune.service.cache", [])
                 });
                 return output;
             }
-            return input;
         };
     });
