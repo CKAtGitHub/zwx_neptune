@@ -13,6 +13,12 @@ block content
                 div(ng-if='vm.order.$$state.status !== 0')
                     button.btn.btn-primary(type="button",ng-click="vm.post()") Post
 
+                    button.btn.btn-primary(type = "button",ng-click= "vm.next()") 下一个
+
+                    button.btn.btn-primary(type = "button",ng-click= "vm.previous()") 上一个
+
+                    pre {{vm.currdata.id}}
+
         div.row
             div.col-md-12
                 pre {{vm.order.$$state}}
