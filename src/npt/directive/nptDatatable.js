@@ -233,6 +233,8 @@ angular.module("ui.neptune.directive.datatable", ['ui.bootstrap', "formly", "for
                 onClick: function (action, item, index) {
                     if (self.$datatable.handler[action.type]) {
                         self.$datatable.handler[action.type](action, item, index);
+                    } else {
+                        self.$datatable.handler.none(action, item, index);
                     }
                 }
             },

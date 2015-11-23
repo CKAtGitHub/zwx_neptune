@@ -74,7 +74,7 @@ angular.module("ui.neptune.service.repository", [])
                 return this;
             };
 
-            Repository.prototype.data = function () {
+            Repository.prototype.getData = function () {
                 return this.data;
             };
 
