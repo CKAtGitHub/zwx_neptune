@@ -18,7 +18,7 @@ angular.module('formlyExample', ['ui.neptune'])
         vm.model = {
             "cycle1": "11111",
             "cycle2": "117",
-            "cycle3": "117"
+            "cycle3": "once"
         };
         vm.fields = [
             {
@@ -48,6 +48,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 "key": "cycle2",
                 "type": "ui-select",
                 templateOptions: {
+                    optionsAttr: 'bs-options',
                     label: '服务周期(指定数据源):',
                     valueProp: 'id',
                     labelProp: 'name',
@@ -64,7 +65,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 templateOptions: {
                     optionsAttr: 'bs-options',
                     label: '服务周期(输入内容搜索):',
-                    valueProp: 'id',
+                    valueProp: 'no',
                     labelProp: 'name',
                     smallLabelProp: "defname",
                     placeholder: '请选择服务周期',
@@ -72,7 +73,8 @@ angular.module('formlyExample', ['ui.neptune'])
                     options: [],
                     repository: QueryCtrlCode,
                     repositoryParams: {"defno": "cycle"},
-                    searchProp: "name"
+                    search: ['name'],
+                    allowClear:false
                 }
             }];
         vm.originalFields = angular.copy(vm.fields);
