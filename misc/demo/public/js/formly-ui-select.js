@@ -25,6 +25,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 "key": "cycle1",
                 "type": "ui-select",
                 templateOptions: {
+                    optionsAttr: 'bs-options',
                     label: '服务周期(静态数据):',
                     valueProp: 'id',
                     labelProp: 'name',
@@ -61,6 +62,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 "key": "cycle3",
                 "type": "ui-select",
                 templateOptions: {
+                    optionsAttr: 'bs-options',
                     label: '服务周期(输入内容搜索):',
                     valueProp: 'id',
                     labelProp: 'name',
