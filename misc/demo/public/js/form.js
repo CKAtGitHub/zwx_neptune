@@ -70,25 +70,63 @@ angular.module("formDemo", ["ui.neptune"])
                         label: '备注:'
                     }
                 }
-            ]
-        });
-    })
-    .controller("FormDemoController", function ($scope, OrderInfo) {
-        var vm = this;
-        vm.model = {};
-        vm.disabled = false;
-        vm.setDisabled = function () {
-            vm.nptFormApi.disabled(vm.disabled);
-            vm.disabled = !vm.disabled;
-        };
-        vm.options = {
-            store: OrderInfo,
+            ],
             buttons: {
                 ok: true,
                 reset: true
             },
+            actions: [
+                {
+                    label: "禁用表单",
+                    type: "disable"
+                }
+            ],
+            onSubmitListens: [
+                function (model, $timeout, $q) {
+                    var deferd = $q.defer();
+
+                    $timeout(function () {
+                        deferd.resolve();
+                    }, 1000);
+
+                    return deferd.promise;
+                }
+            ]
+        });
+    })
+    .controller("FormDemoController", function ($scope, OrderInfo, $timeout, $q) {
+        var vm = this;
+        vm.model = {
+            sn: "DD213234",
+            state: "buy",
+            clientid: "1111",
+            sales: "123213",
+            amount: 123123.01,
+            createdate: 12312312312321,
+            remark: "测试"
+
+        };
+        vm.disabled = false;
+
+        vm.options = {
+            store: OrderInfo,
             onRegisterApi: function (nptFormApi) {
                 vm.nptFormApi = nptFormApi;
+                vm.nptFormApi.addOnSubmitListen(function (model) {
+                    var deferd = $q.defer();
+
+                    $timeout(function () {
+                        deferd.resolve(model);
+                    }, 500);
+                    return deferd.promise;
+                }).addOnSubmitListen(function (model) {
+                    return {
+                        demo: model
+                    }
+                }).setOnActionListen(function (model, action) {
+                    vm.nptFormApi.disabled(vm.disabled);
+                    vm.disabled = !vm.disabled;
+                });
             }
         }
 
