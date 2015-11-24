@@ -96,17 +96,21 @@ angular.module("formDemo", ["ui.neptune"])
     })
     .controller("FormDemoController", function ($scope, OrderInfo, $timeout, $q) {
         var vm = this;
-        vm.model = {
-            sn: "DD213234",
-            state: "buy",
-            clientid: "1111",
-            sales: "123213",
-            amount: 123123.01,
-            createdate: 12312312312321,
-            remark: "测试"
-
-        };
+        vm.model = {};
         vm.disabled = false;
+
+        $timeout(function () {
+            vm.model = {
+                sn: "DD213234",
+                state: "buy",
+                clientid: "1111",
+                sales: "123213",
+                amount: 123123.01,
+                createdate: 12312312312321,
+                remark: "测试"
+
+            }
+        }, 1000);
 
         vm.options = {
             store: OrderInfo,

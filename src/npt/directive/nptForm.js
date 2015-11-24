@@ -69,8 +69,6 @@ angular.module("ui.neptune.directive.form", [])
     })
     .controller("FormControllect", function ($scope, $q, $injector) {
         var vm = this;
-        //记录表单数据模型
-        vm.model = $scope.model;
         vm.onSubmit = onSubmit;
         vm.onAction = onAction;
 
@@ -83,11 +81,11 @@ angular.module("ui.neptune.directive.form", [])
 
             //初始化表单配置
             if (nptForm.store) {
-                this._config.options = angular.copy(nptForm.store.getOptions()) || {};
-                this._config.fields = angular.copy(nptForm.store.getFields()) || {};
+                this._config.options = nptForm.store.getOptions() || {};
+                this._config.fields = nptForm.store.getFields() || {};
                 this._config.originalFields = angular.copy(nptForm.store.getFields()) || {};
-                this._config.buttons = angular.copy(nptForm.store.getButtons()) || {};
-                this._config.actions = angular.copy(nptForm.store.getActions()) || {};
+                this._config.buttons = nptForm.store.getButtons() || {};
+                this._config.actions = nptForm.store.getActions() || {};
 
                 //注册配置中得监听器
                 angular.forEach(nptForm.store.getOnSubmitListens(), function (value) {
@@ -205,7 +203,7 @@ angular.module("ui.neptune.directive.form", [])
         function onAction(action) {
             if (vm.nptFormApi.getOnActionListen()) {
                 $injector.invoke(vm.nptFormApi.getOnActionListen(), this, {
-                    model: vm.model,
+                    model: $scope.model,
                     action: action
                 });
             }
@@ -216,7 +214,7 @@ angular.module("ui.neptune.directive.form", [])
 
             angular.forEach(vm.nptFormApi.getOnSubmitListens(), function (listen) {
                 promises.push($q.when($injector.invoke(listen, this, {
-                    model: vm.model
+                    model: $scope.model
                 })));
             });
 

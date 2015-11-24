@@ -1,6 +1,6 @@
 div
     form(ng-submit="vm.onSubmit()",name="vm.form",novalidate)
-        formly-form(model="vm.model",fields="vm.fields",options="vm.options",form="vm.form")
+        formly-form(model="model",fields="vm.fields",options="vm.options",form="vm.form")
             button.btn.btn-primary.submit-button(type="submit",ng-disabled="vm.form.$invalid || vm.nptFormApi.loading()",ng-show="vm.buttons.ok") 确定
             | &nbsp
             button.btn.btn-danger(type="button",ng-click="vm.options.resetModel()",ng-show="vm.buttons.reset",ng-disabled="vm.nptFormApi.loading()") 重置
