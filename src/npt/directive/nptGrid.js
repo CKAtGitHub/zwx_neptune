@@ -80,7 +80,7 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     displayName: "操作",
                     width: 100,
                     cellTemplate: '<div class="ui-grid-cell-contents">' +
-                    '       <a class="btn btn-default btn-sm" context-menu="grid.api.selection.selectRow(row.entity)" target="nptGridContextMenu" onclick="debugger;">测试</a>' +
+                    '       <a class="btn btn-default btn-sm" context-menu="grid.api.selection.selectRow(row.entity)" target="nptGridContextMenu" onclick="event.preventDefault();event.stopPropagation();var ne = $.Event(\'contextmenu\');ne.pageX=event.pageX;ne.pageY=event.pageY;$(this).trigger(ne);">测试</a>' +
                     '</div>'
                 });
 
