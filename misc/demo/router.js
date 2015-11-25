@@ -58,4 +58,8 @@ router.get("/select-image", function (req, res, next) {
     res.render("select-image");
 });
 
+router.get("/npt-grid", function (req, res, next) {
+    res.render("npt-grid");
+});
+
 module.exports = router;

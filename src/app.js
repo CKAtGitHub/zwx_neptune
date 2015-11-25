@@ -21,13 +21,14 @@ angular.module("ui.neptune.validator", [
     'ui.neptune.validator.bizValidator'
 ]);
 
-angular.module("ui.neptune.filter", ['' +
-'ui.neptune.filter.bizFilter',
-'ui.neptune.filter.commonFilter'
+angular.module("ui.neptune.filter", [
+    'ui.neptune.filter.bizFilter',
+    'ui.neptune.filter.commonFilter'
 ]);
 
 angular.module("ui.neptune.directive", [
     "ui.neptune.directive.datatable",
+    "ui.neptune.directive.grid",
     "ui.neptune.directive.selectTree",
     "ui.neptune.directive.form",
     "ui.neptune.directive.selectImage",
