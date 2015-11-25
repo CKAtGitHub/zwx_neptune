@@ -33,10 +33,15 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     rowTemplate: "/template/grid/npt-grid-row-template.html",
                 };
                 this._gridOptions = angular.extend(setting.gridOptions, this._gridOptions);
+                this._action = setting.action;
             };
 
             NptGridStore.prototype.gridOptions = function () {
                 return this._gridOptions;
+            };
+
+            NptGridStore.prototype.action = function () {
+                return this._action;
             };
 
             function nptGridStoreFactory(name, setting) {
@@ -63,6 +68,7 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
             this._config = {};
             if (nptGridOptions.store) {
                 this._config.gridOptions = nptGridOptions.store.gridOptions() || {};
+                this._config.action = nptGridOptions.store.action() || {};
                 //设置注册Api回调,如果用户在配置中设置会被替换
                 this._config.gridOptions.onRegisterApi = function (uiGridApi) {
                     self.uiGridApi = uiGridApi;
@@ -101,10 +107,15 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
             return this._config.gridOptions;
         };
 
+        NptGridApi.prototype.action = function () {
+            return this._config.action;
+        };
+
         vm.init = function (nptGrid) {
             //创建API
             vm.nptGridApi = new NptGridApi(nptGrid);
             vm.gridOptions = vm.nptGridApi.gridOptions();
+            vm.action = vm.nptGridApi.action();
 
             //观察data变化计算行号
             $scope.$watch("vm.gridOptions.data", function (newValue) {
@@ -115,6 +126,10 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     });
                 }
             });
+        };
+
+        vm.menuAction = function(key) {
+            console.log(this.action[key]);
         };
 
         if ($scope.nptGrid) {
