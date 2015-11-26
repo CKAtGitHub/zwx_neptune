@@ -30,7 +30,7 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     enableFullRowSelection: true,
                     selectionRowHeaderWidth: 35,
                     rowHeight: 35,
-                    rowTemplate: "/template/grid/npt-grid-row-template.html",
+                    rowTemplate: "/template/grid/npt-grid-row.html"
                 };
                 this._gridOptions = angular.extend(setting.gridOptions, this._gridOptions);
                 this._action = setting.action;
@@ -85,9 +85,7 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     field: 'actionScope',
                     displayName: "操作",
                     width: 100,
-                    cellTemplate: '<div class="ui-grid-cell-contents">' +
-                    '       <a class="btn btn-default btn-sm" context-menu="grid.api.selection.selectRow(row.entity)" target="nptGridContextMenu" onclick="event.preventDefault();event.stopPropagation();var ne = $.Event(\'contextmenu\');ne.pageX=event.pageX;ne.pageY=event.pageY;$(this).trigger(ne);">测试</a>' +
-                    '</div>'
+                    cellTemplate: "/template/grid/npt-grid-row-cell.html"
                 });
 
                 //添加序号区域,
@@ -128,7 +126,7 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
             });
         };
 
-        vm.menuAction = function(key) {
+        vm.menuAction = function (key) {
             console.log(this.action[key]);
         };
 
