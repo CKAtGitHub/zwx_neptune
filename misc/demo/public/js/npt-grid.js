@@ -183,7 +183,7 @@ angular.module("nptGridApp", ["ui.neptune"])
 
         $timeout(function () {
             var tempDatas = [];
-            for (var i = 0; i < 10000; i++) {
+            for (var i = 0; i < 100; i++) {
                 tempDatas.push({
                     "sn": "DD20150101000" + i,
                     "state": "buy",
