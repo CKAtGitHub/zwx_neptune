@@ -107,8 +107,9 @@ angular.module("nptGridApp", ["ui.neptune"])
         vm.model = [];
 
         $timeout(function () {
+            var tempDatas = [];
             for (var i = 0; i < 10000; i++) {
-                vm.model.push({
+                tempDatas.push({
                     "sn": "DD20150101000" + i,
                     "state": "buy",
                     "clientid": "10000002315692",
@@ -118,6 +119,8 @@ angular.module("nptGridApp", ["ui.neptune"])
                     "remark": "测试数据表格配置"
                 });
             }
+
+            vm.model = tempDatas;
         }, 500);
 
 

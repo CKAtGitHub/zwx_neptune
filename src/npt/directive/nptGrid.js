@@ -111,9 +111,11 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
             vm.nptGridApi = new NptGridApi(nptGrid);
             vm.gridOptions = vm.nptGridApi.gridOptions();
             vm.action = vm.nptGridApi.action();
+            //绑定数据
+            vm.gridOptions.data = "model";
 
             //观察data变化计算行号
-            $scope.$watch("vm.gridOptions.data", function (newValue) {
+            $scope.$watch("model", function (newValue) {
                 if (newValue) {
                     var index = 1;
                     angular.forEach(newValue, function (value) {
@@ -121,8 +123,6 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     });
                 }
             });
-            //绑定数据
-            vm.gridOptions.data = $scope.model;
         };
 
         vm.menuAction = function (key) {
