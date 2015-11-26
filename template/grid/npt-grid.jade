@@ -3,4 +3,4 @@ div
     div.dropdown.position-fixed(id="nptGridContextMenu")
         ul.dropdown-menu(role="menu")
             li(ng-repeat='(key,menu) in vm.action')
-                a(role="menuitem",tabindex=1,ng-click="vm.menuAction(key)") {{menu.label}}
+                a(role="menuitem",tabindex=1,ng-click="vm.menuAction(menu)") {{menu.label}}

@@ -3,7 +3,82 @@
  */
 
 angular.module("nptGridApp", ["ui.neptune"])
-    .factory("DemoNptGrid", function (nptGridStore, uiGridConstants) {
+    .factory("DemoNptGrid", function (nptGridStore, uiGridConstants, nptFormStore) {
+        nptFormStore.put("order", {
+            options: {},
+            fields: [
+                {
+                    key: 'sn',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '订单编号:',
+                        placeholder: "请输入订单编号"
+                    }
+                },
+                {
+                    key: 'state',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '订单状态:',
+                        placeholder: "请输入订单编号"
+                    }
+                },
+                {
+                    key: 'clientid',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '客户编号:',
+                        placeholder: "请输入客户编号"
+                    }
+                },
+                {
+                    key: 'sales',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '销售顾问:',
+                        placeholder: "请输入销售顾问"
+                    }
+                },
+                {
+                    key: 'amount',
+                    type: 'input',
+                    templateOptions: {
+                        required: true,
+                        label: '订单金额:'
+                    }
+                },
+                {
+                    key: 'createdate',
+                    type: 'dateInput',
+                    templateOptions: {
+                        required: true,
+                        label: '创建日期:'
+                    }
+                },
+                {
+                    key: 'remark',
+                    type: 'input',
+                    templateOptions: {
+                        label: '备注:'
+                    }
+                }
+            ]
+        }).put("demo", {
+            fields: [
+                {
+                    key: 'lastName',
+                    type: 'input',
+                    templateOptions: {
+                        label: 'Last Name'
+                    }
+                }
+            ]
+        });
+
         return nptGridStore("DemoNptGrid", {
             gridOptions: {
                 columnDefs: [
@@ -34,7 +109,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                 add: {
                     label: "添加",
                     type: "add",
-                    target: "demo",
+                    target: "order",
                     listens: [function ($q, $timeout) {
                         var deferd = $q.defer();
                         console.info("添加方法,在Store中配置");
@@ -105,7 +180,7 @@ angular.module("nptGridApp", ["ui.neptune"])
             }
         };
 
-        for (var i = 0; i < 10000; i++) {
+        for (var i = 0; i < 100; i++) {
             vm.nptGridOptions.data.push({
                 "sn": "DD20150101000" + i,
                 "state": "buy",
