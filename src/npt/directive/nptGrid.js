@@ -95,9 +95,6 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     enableSorting: true,
                     width: 60
                 });
-
-                //设置数据
-                this._config.gridOptions.data = nptGridOptions.data || [];
             }
         }
 
@@ -124,6 +121,8 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                     });
                 }
             });
+            //绑定数据
+            vm.gridOptions.data = $scope.model;
         };
 
         vm.menuAction = function (key) {
@@ -143,7 +142,8 @@ angular.module("ui.neptune.directive.grid", ['ui.grid', "ui.grid.pagination", 'u
                 return attrs.templateUrl || "/template/grid/npt-grid.html";
             },
             scope: {
-                nptGrid: "="
+                nptGrid: "=",
+                model: "="
             }
         };
     });

@@ -94,26 +94,31 @@ angular.module("nptGridApp", ["ui.neptune"])
             }
         })
     })
-    .controller("nptGridDemoController", function (DemoNptGrid, $scope) {
+    .controller("nptGridDemoController", function (DemoNptGrid, $scope, $timeout) {
         var vm = this;
 
         vm.nptGridOptions = {
             store: DemoNptGrid,
-            data: [],
             onRegisterApi: function (nptGridApi) {
                 vm.nptGridApi = nptGridApi;
             }
         };
 
-        for (var i = 0; i < 10000; i++) {
-            vm.nptGridOptions.data.push({
-                "sn": "DD20150101000" + i,
-                "state": "buy",
-                "clientid": "10000002315692",
-                "sales": "10000001498059",
-                "amount": 10938.88 + i,
-                "createdate": (new Date().getTime() + 1000 * i),
-                "remark": "测试数据表格配置"
-            });
-        }
+        vm.model = [];
+
+        $timeout(function () {
+            for (var i = 0; i < 10000; i++) {
+                vm.model.push({
+                    "sn": "DD20150101000" + i,
+                    "state": "buy",
+                    "clientid": "10000002315692",
+                    "sales": "10000001498059",
+                    "amount": 10938.88 + i,
+                    "createdate": (new Date().getTime() + 1000 * i),
+                    "remark": "测试数据表格配置"
+                });
+            }
+        }, 500);
+
+
     });
