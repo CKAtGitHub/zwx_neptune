@@ -113,12 +113,14 @@ angular.module("ui.neptune.directive.grid",
                 };
 
                 //添加操作区域
-                this._config.gridOptions.columnDefs.push({
-                    field: 'actionScope',
-                    displayName: "操作",
-                    width: 100,
-                    cellTemplate: "/template/grid/npt-grid-row-cell.html"
-                });
+                if (this._config.action) {
+                    this._config.gridOptions.columnDefs.push({
+                        field: 'actionScope',
+                        displayName: "操作",
+                        width: 100,
+                        cellTemplate: "/template/grid/npt-grid-row-cell.html"
+                    });
+                }
 
                 //添加序号区域,
                 this._config.gridOptions.columnDefs.unshift({
