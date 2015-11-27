@@ -69,7 +69,7 @@ angular.module("ui.neptune.directive.grid",
 
                 var result = $uibModal.open({
                     animation: true,
-                    templateUrl: '/template/datatable/datatable-edit.html',
+                    templateUrl: '/template/grid/grid-edit.html',
                     controller: 'editGridController',
                     controllerAs: 'vm',
                     resolve: {
@@ -131,13 +131,16 @@ angular.module("ui.neptune.directive.grid",
                 // 增加菜单动作
                 this.action = {};
                 if (this._config.action) {
-                    angular.forEach(this._config.action, function (value, key) {
+                    angular.forEach(this._config.action, function (action, key) {
                         self.action[key] = function () {
-                            return self.triggerAction(value);
+                            return self.triggerAction(action);
                         };
 
                         self.action[key].addListener = function (listener) {
-
+                            action.listens = action.listens || [];
+                            if (listener) {
+                                action.listens.push(listener);
+                            }
                         };
                     });
                 }
@@ -148,8 +151,22 @@ angular.module("ui.neptune.directive.grid",
 
             // 定义框架支持的菜单操作
             this._handler = {
+                fireListener:function(action, params) {
+                    var deferd = $q.defer();
+                    var promise = deferd.promise;
+                    deferd.resolve(params);
+                    var promisesArr = [promise];
+                    //配置中的listen
+                    angular.forEach(action.listens, function (listen) {
+                        promisesArr.push($q.when($injector.invoke(listen, this, {
+                            "params": params
+                        })));
+                    });
+                    return $q.all(promisesArr);
+                },
                 add: function (action, item, index) {
-                    var result = vm.$forms.open(action.target, {});
+                    var _handlerSelf = this;
+                    var result = vm.forms.open(action.target, {});
                     if (result) {
                         result = result.then(function (data) {
                             var params = {
@@ -158,23 +175,7 @@ angular.module("ui.neptune.directive.grid",
                                 data: data
                             };
 
-                            var promisesArr = [];
-                            angular.forEach(self.onAddListens, function (value) {
-                                if (angular.isFunction(value)) {
-                                    promisesArr.push($q.when($injector.invoke(value, this, {
-                                        "params": params
-                                    })));
-                                }
-                            });
-
-                            //配置中的listen
-                            angular.forEach(action.listens, function (value) {
-                                promisesArr.push($q.when($injector.invoke(value, this, {
-                                    "params": params
-                                })));
-                            });
-
-                            $q.all(promisesArr).then(function () {
+                            _handlerSelf.fireListener(action,params).then(function () {
                                 //执行成功,将数据添加到表格
                                 $scope.model.unshift(params.data);
                                 console.info("添加执行成功.");
@@ -189,40 +190,12 @@ angular.module("ui.neptune.directive.grid",
                     }
                 },
                 del: function (action, item, index) {
-                    var deferd = $q.defer();
-                    var promise = deferd.promise;
-
                     var params = {
                         action: action,
                         item: item,
                         index: index
                     };
-
-                    deferd.resolve(params);
-
-                    promise.then(function (data) {
-                        console.info("开始删除数据");
-                    }, function (error) {
-                        console.info("删除数据错误!" + error);
-                    });
-
-                    var promisesArr = [promise];
-                    angular.forEach(self.onDelListens, function (value) {
-                        if (angular.isFunction(value)) {
-                            promisesArr.push($q.when($injector.invoke(value, this, {
-                                "params": params
-                            })));
-                        }
-                    });
-
-                    //配置中的listen
-                    angular.forEach(action.listens, function (value) {
-                        promisesArr.push($q.when($injector.invoke(value, this, {
-                            "params": params
-                        })));
-                    });
-
-                    var result = $q.all(promisesArr).then(function () {
+                    var result = this.fireListener(action,params).then(function () {
                         $scope.model.splice(params.index, 1);
                     }, function (error) {
                         console.info("删除失败!" + error);
@@ -231,7 +204,8 @@ angular.module("ui.neptune.directive.grid",
                     return result;
                 },
                 edit: function (action, item, index) {
-                    var result = vm.$forms.open(action.target, item);
+                    var _handlerSelf = this;
+                    var result = vm.forms.open(action.target, item);
                     if (result) {
                         result.then(function (data) {
                             //重新组织参数
@@ -241,23 +215,8 @@ angular.module("ui.neptune.directive.grid",
                                 data: data,
                                 item: angular.copy(item) //防止修改
                             };
-                            var promisesArr = [];
-                            angular.forEach(self.onEditListens, function (value) {
-                                if (angular.isFunction(value)) {
-                                    promisesArr.push($q.when($injector.invoke(value, this, {
-                                        "params": params
-                                    })));
-                                }
-                            });
 
-                            //配置中的listen
-                            angular.forEach(action.listens, function (value) {
-                                promisesArr.push($q.when($injector.invoke(value, this, {
-                                    "params": params
-                                })));
-                            });
-
-                            $q.all(promisesArr).then(function (data) {
+                            _handlerSelf.fireListener(action,params).then(function (data) {
                                 console.info("编辑操作成功!");
                                 //将新数据更新到表格
                                 angular.extend(item, params.data);
@@ -278,22 +237,7 @@ angular.module("ui.neptune.directive.grid",
                         item: angular.copy(item),
                         index: index
                     };
-                    var promisesArr = [];
-                    angular.forEach(self.onNoneAction, function (value) {
-                        if (angular.isFunction(value)) {
-                            promisesArr.push($q.when($injector.invoke(value, this, {
-                                "params": params
-                            })));
-                        }
-                    });
-                    //配置中的listen
-                    angular.forEach(action.listens, function (value) {
-                        promisesArr.push($q.when($injector.invoke(value, this, {
-                            "params": params
-                        })));
-                    });
-
-                    $q.all(promisesArr).then(function (data) {
+                    this.fireListener(action,params).then(function (data) {
                         console.info("操作成功!");
                     }, function (error) {
                         console.info("操作失败!");
