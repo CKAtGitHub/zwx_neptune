@@ -61,7 +61,7 @@ angular.module("ui.neptune.directive.grid",
         //设置中文
         i18nService.setCurrentLang('zh-cn');
 
-        this.$forms = {
+        vm.forms = {
             init: function () {
             },
             open: function (name, data) {
@@ -93,14 +93,9 @@ angular.module("ui.neptune.directive.grid",
                 $uibModal.close();
             }
         };
-        $scope.forms = this.$forms;
 
         function NptGridApi(nptGridOptions) {
             var self = this;
-            this.onAddListens = [];
-            this.onDelListens = [];
-            this.onEditListens = [];
-            this.onNoneAction = [];
             this._options = nptGridOptions;
             this._config = {};
             if (nptGridOptions.store) {
@@ -136,46 +131,19 @@ angular.module("ui.neptune.directive.grid",
                 // 增加菜单动作
                 this.action = {};
                 if (this._config.action) {
-                    angular.forEach(this._config.action,function(value,key) {
+                    angular.forEach(this._config.action, function (value, key) {
                         self.action[key] = function () {
-                            return self.menuAction(value);
+                            return self.triggerAction(value);
+                        };
+
+                        self.action[key].addListener = function (listener) {
+
                         };
                     });
                 }
 
                 //设置数据
                 this._config.gridOptions.data = "model";
-            }
-            // 获取html中配置的监听器
-            if ($scope.onAddListens) {
-                angular.forEach($scope.onAddListens,function(listener) {
-                    if (angular.isFunction(listener)) {
-                        self.onAddListens.push(listener);
-                    }
-                });
-            }
-
-            if ($scope.onDelListens) {
-                angular.forEach($scope.onDelListens,function(listener) {
-                    if (angular.isFunction(listener)) {
-                        self.onDelListens.push(listener);
-                    }
-                });
-            }
-
-            if ($scope.onEditListens) {
-                angular.forEach($scope.onEditListens,function(listener) {
-                    if (angular.isFunction(listener)) {
-                        self.onEditListens.push(listener);
-                    }
-                });
-            }
-            if ($scope.onNoneAction) {
-                angular.forEach($scope.onNoneAction,function(listener) {
-                    if (angular.isFunction(listener)) {
-                        self.onNoneAction.push(listener);
-                    }
-                });
             }
 
             // 定义框架支持的菜单操作
@@ -338,19 +306,19 @@ angular.module("ui.neptune.directive.grid",
             return this._config.gridOptions;
         };
 
-        NptGridApi.prototype.getMenus = function () {
+        NptGridApi.prototype.getActions = function () {
             return this._config.action;
         };
 
-        NptGridApi.prototype.menuAction = function (menu) {
+        NptGridApi.prototype.triggerAction = function (action) {
             var selectedData = this.uiGridApi.selection.getSelectedRows();
             if (selectedData.length === 0) {
                 return;
             }
-            if (this._handler[menu.type]) {
-                this._handler[menu.type](menu, selectedData[0],selectedData[0].$index - 1);
+            if (this._handler[action.type]) {
+                this._handler[action.type](action, selectedData[0], selectedData[0].$index - 1);
             } else {
-                this._handler.none(menu, selectedData);
+                this._handler.none(action, selectedData);
             }
         };
 
@@ -359,7 +327,7 @@ angular.module("ui.neptune.directive.grid",
             //创建API
             vm.nptGridApi = new NptGridApi(nptGrid);
             vm.gridOptions = vm.nptGridApi.gridOptions();
-            vm.action = vm.nptGridApi.getMenus();
+            vm.action = vm.nptGridApi.getActions();
 
             //观察data变化计算行号
             $scope.$watch("model", function (newValue) {
@@ -369,11 +337,11 @@ angular.module("ui.neptune.directive.grid",
                         value.$index = index++;
                     });
                 }
-            },true);
+            }, true);
         };
 
-        vm.menuAction = function (menu) {
-            vm.nptGridApi.menuAction(menu);
+        vm.triggerAction = function (menu) {
+            vm.nptGridApi.triggerAction(menu);
         };
 
         if ($scope.nptGrid) {
@@ -409,10 +377,6 @@ angular.module("ui.neptune.directive.grid",
             },
             scope: {
                 nptGrid: "=",
-                onNoneAction: "=",
-                onAddListens: "=",
-                onEditListens: "=",
-                onDelListens: "=",
                 model: "="
             }
         };
