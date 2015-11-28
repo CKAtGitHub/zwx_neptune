@@ -1,5 +1,5 @@
 ui-select(data-ng-model='model[options.key]', data-required='{{to.required}}', data-disabled='{{to.disabled}}', theme='bootstrap')
-    ui-select-match(placeholder='{{to.placeholder}}', data-allow-clear='true') {{$select.selected[to.labelProp]}}
+    ui-select-match(placeholder='{{to.placeholder}}', data-allow-clear='{{to.allowClear}}') {{$select.selected[to.labelProp]}}
     ui-select-choices(data-repeat='{{to.ngOptions}}', data-refresh='to.refresh($select.search,model, options)', data-refresh-delay='{{to.refreshDelay}}')
         div(ng-bind-html='option[to.labelProp] | highlight: $select.search')
         small

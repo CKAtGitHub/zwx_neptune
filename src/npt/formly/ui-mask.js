@@ -96,7 +96,7 @@ angular.module("ui.neptune.formly.ui-mask")
             if (angular.isNumber(modleValue)) {
                 var dateFilter = $filter('date');
                 var formateString =
-                    scope.to.formateType=="short"?"yyyy-MM-dd":'yyyy-MM-dd hh:mm:ss';
+                    scope.to.formateType=="short"?"yyyy-MM-dd":'yyyy-MM-dd HH:mm:ss';
                 var dateString = dateFilter(modleValue,formateString);
                 return dateString|| undefined;
             }

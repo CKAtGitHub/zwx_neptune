@@ -1,0 +1,4 @@
+div.ui-grid-cell-contents
+    a.btn.btn-default.btn-sm(context-menu="grid.api.selection.selectRow(row.entity)",target="nptGridContextMenu",onclick="event.preventDefault();event.stopPropagation();var ne = $.Event(\'contextmenu\');ne.pageX=event.pageX;ne.pageY=event.pageY;$(this).trigger(ne);") 操作
+        | &nbsp
+        span.caret

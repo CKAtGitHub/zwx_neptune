@@ -30,6 +30,7 @@ angular.module("datatableStoreDemo", ["ui.neptune"]).
                     label: "备注"
                 }
             },
+
             action: {
                 view: {
                     label: "查看",

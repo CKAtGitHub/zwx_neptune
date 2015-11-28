@@ -168,7 +168,10 @@ angular.module("ui.neptune.service.repository", [])
 
             Repository.prototype.refresh = function () {
                 if (this._lastParams) {
-                    return post(this._lastParams, this);
+                    var request = {
+                        params: this._lastParams || {}
+                    };
+                    return post(request, this);
                 }
             };
 
@@ -186,7 +189,7 @@ angular.module("ui.neptune.service.repository", [])
                     if (response.data.code === "100") {
                         return response;
                     } else {
-                        return $q.reject(response.data.cause);
+                        return $q.reject(response);
                     }
                 }, function (error) {
                     return $q.reject(error);
@@ -214,8 +217,9 @@ angular.module("ui.neptune.service.repository", [])
                     scope.data = response.data;
                     return response;
                 }, function (error) {
+                    //如果处理错误方法,必须将驳回继续返回
                     scope.data = undefined;
-                    return error;
+                    return $q.reject(error);
                 });
 
                 //将实例拦响应截器插入
