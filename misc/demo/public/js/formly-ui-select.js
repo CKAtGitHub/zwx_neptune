@@ -40,7 +40,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     }, {
                         id: "3333",
                         name: "测试3"
-                    }],
+                    }]
                 }
             },
             {
@@ -55,7 +55,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     required: true,
                     options: [],
                     repository: QueryCtrlCode,
-                    repositoryParams: {"defno": "cycle"},
+                    repositoryParams: {"defno": "cycle"}
                 }
             }, {
                 "key": "cycle3",
