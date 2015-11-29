@@ -64,7 +64,7 @@ angular.module("ui.neptune.directive.grid",
         vm.forms = {
             init: function () {
             },
-            open: function (name, data) {
+            open: function (formlyStore, data) {
                 this.originData = data;
 
                 var result = $uibModal.open({
@@ -75,12 +75,10 @@ angular.module("ui.neptune.directive.grid",
                     resolve: {
                         formData: function ($q) {
                             var deferd = $q.defer();
-                            nptFormStore.form(name, function (config) {
-                                deferd.resolve({
-                                    fields: angular.copy(config.fields), //拷贝新版本,防止修改原始配置
-                                    model: angular.copy(data), //拷贝新版本,防止修改原始配置
-                                    options: angular.copy(config.options) //拷贝新版本,防止修改原始配置
-                                });
+                            deferd.resolve({
+                                fields: angular.copy(formlyStore.getFields()), //拷贝新版本,防止修改原始配置
+                                model: angular.copy(data), //拷贝新版本,防止修改原始配置
+                                options: angular.copy(formlyStore.getOptions()) //拷贝新版本,防止修改原始配置
                             });
                             return deferd.promise;
                         }
@@ -98,6 +96,7 @@ angular.module("ui.neptune.directive.grid",
             var self = this;
             this._options = nptGridOptions;
             this._config = {};
+            this._config.formlyStore = nptGridOptions.formlyStore || {};
             if (nptGridOptions.store) {
                 this._config.gridOptions = nptGridOptions.store.gridOptions() || {};
                 this._config.action = nptGridOptions.store.action();
@@ -153,7 +152,7 @@ angular.module("ui.neptune.directive.grid",
 
             // 定义框架支持的菜单操作
             this._handler = {
-                fireListener:function(action, params) {
+                fireListener: function (action, params) {
                     var deferd = $q.defer();
                     var promise = deferd.promise;
                     deferd.resolve(params);
@@ -168,7 +167,7 @@ angular.module("ui.neptune.directive.grid",
                 },
                 add: function (action, item, index) {
                     var _handlerSelf = this;
-                    var result = vm.forms.open(action.target, {});
+                    var result = vm.forms.open(self._config.formlyStore[action.target], {});
                     if (result) {
                         result = result.then(function (data) {
                             var params = {
@@ -177,7 +176,7 @@ angular.module("ui.neptune.directive.grid",
                                 data: data
                             };
 
-                            _handlerSelf.fireListener(action,params).then(function () {
+                            _handlerSelf.fireListener(action, params).then(function () {
                                 //执行成功,将数据添加到表格
                                 $scope.model.unshift(params.data);
                                 console.info("添加执行成功.");
@@ -197,7 +196,7 @@ angular.module("ui.neptune.directive.grid",
                         item: item,
                         index: index
                     };
-                    var result = this.fireListener(action,params).then(function () {
+                    var result = this.fireListener(action, params).then(function () {
                         $scope.model.splice(params.index, 1);
                     }, function (error) {
                         console.info("删除失败!" + error);
@@ -207,7 +206,7 @@ angular.module("ui.neptune.directive.grid",
                 },
                 edit: function (action, item, index) {
                     var _handlerSelf = this;
-                    var result = vm.forms.open(action.target, item);
+                    var result = vm.forms.open(self._config.formlyStore[action.target], item);
                     if (result) {
                         result.then(function (data) {
                             //重新组织参数
@@ -218,7 +217,7 @@ angular.module("ui.neptune.directive.grid",
                                 item: angular.copy(item) //防止修改
                             };
 
-                            _handlerSelf.fireListener(action,params).then(function (data) {
+                            _handlerSelf.fireListener(action, params).then(function (data) {
                                 console.info("编辑操作成功!");
                                 //将新数据更新到表格
                                 angular.extend(item, params.data);
@@ -239,7 +238,7 @@ angular.module("ui.neptune.directive.grid",
                         item: angular.copy(item),
                         index: index
                     };
-                    this.fireListener(action,params).then(function (data) {
+                    this.fireListener(action, params).then(function (data) {
                         console.info("操作成功!");
                     }, function (error) {
                         console.info("操作失败!");
