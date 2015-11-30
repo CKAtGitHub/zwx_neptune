@@ -1,0 +1,15 @@
+//
+   Created by huangbinglong on 15/11/30.
+extends layout/layout
+block content
+   script(type='text/javascript', src='/vendor/crypto1/crypto/crypto.js')
+   script(type='text/javascript', src='/vendor/crypto1/hmac/hmac.js')
+   script(type='text/javascript', src='/vendor/crypto1/sha1/sha1.js')
+   script(type='text/javascript', src='/vendor/base64.js')
+   script(src="/vendor/plupload-2.1.2/js/plupload.full.min.js")
+   script(src="/js/npt-upload.js")
+   div(ng-app="nptUploadApp")
+      div.page-header
+         h1 NPT Upload
+      div(ng-controller="nptUploadDemoController as vm")
+         div(npt-upload="vm.uploadOptions")

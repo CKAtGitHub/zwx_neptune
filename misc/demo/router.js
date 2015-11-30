@@ -62,4 +62,8 @@ router.get("/npt-grid", function (req, res, next) {
     res.render("npt-grid");
 });
 
+router.get("/npt-upload", function (req, res, next) {
+    res.render("npt-upload");
+});
+
 module.exports = router;
