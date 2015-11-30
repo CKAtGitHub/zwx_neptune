@@ -24,13 +24,14 @@ angular.module("formly.npt.select.image.demo", ["ui.neptune"])
             }
         };
         vm.options = {};
-        vm.model = {};
+        vm.model = {selectImage:["10000001549030","10000001526186"]};
         vm.fields = [
             {
                 key: 'selectImage',
                 type: 'npt-select-image',
                 templateOptions: {
                     label: "选择图片",
+                    single:true,
                     imageRepository: QueryImageByUserLevel
                 }
             }

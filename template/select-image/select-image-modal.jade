@@ -12,7 +12,7 @@ div
             div.col-md-3(ng-repeat="image in rows")
                 a.thumbnail(href="",ng-click="vm.selectImage(image)")
                     span.glyphicon.glyphicon-ok.bg-primary(style="position:absolute;right:25px;top:5px;",ng-show="image.selected")
-                    img(src="{{image.file.thumbnailUrl}}")
+                    img(npt-image="image.file.id")
     div.modal-footer
         button.btn.btn-primary(type="button",ng-click="vm.ok()") 确定
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") 取消
