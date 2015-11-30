@@ -31,12 +31,14 @@ angular.module("ui.neptune.directive.grid",
                     enableSelectAll: false,
                     multiSelect: false,
                     enableFullRowSelection: true,
+                    enableGridMenu: true,
                     selectionRowHeaderWidth: 35,
                     rowHeight: 35,
                     rowTemplate: "/template/grid/npt-grid-row.html"
                 };
                 this._gridOptions = angular.extend(setting.gridOptions, this._gridOptions);
                 this._action = setting.action;
+                this._gridStyle = setting.gridStyle;
             };
 
             NptGridStore.prototype.gridOptions = function () {
@@ -47,6 +49,10 @@ angular.module("ui.neptune.directive.grid",
                 return this._action;
             };
 
+            NptGridStore.prototype.getGridStyle = function () {
+                return this._gridStyle;
+            };
+
             function nptGridStoreFactory(name, setting) {
                 return new NptGridStore(name, setting);
             }
@@ -55,7 +61,7 @@ angular.module("ui.neptune.directive.grid",
         };
 
     })
-    .controller("GridController", function ($scope, i18nService, $q, $injector, $uibModal, nptFormStore) {
+    .controller("GridController", function ($scope, i18nService, $q, $injector, $uibModal) {
         var vm = this;
 
         //设置中文
@@ -64,7 +70,7 @@ angular.module("ui.neptune.directive.grid",
         vm.forms = {
             init: function () {
             },
-            open: function (name, data) {
+            open: function (formlyStore, data) {
                 this.originData = data;
 
                 var result = $uibModal.open({
@@ -75,12 +81,9 @@ angular.module("ui.neptune.directive.grid",
                     resolve: {
                         formData: function ($q) {
                             var deferd = $q.defer();
-                            nptFormStore.form(name, function (config) {
-                                deferd.resolve({
-                                    fields: angular.copy(config.fields), //拷贝新版本,防止修改原始配置
-                                    model: angular.copy(data), //拷贝新版本,防止修改原始配置
-                                    options: angular.copy(config.options) //拷贝新版本,防止修改原始配置
-                                });
+                            deferd.resolve({
+                                model: data,
+                                store: formlyStore
                             });
                             return deferd.promise;
                         }
@@ -99,12 +102,12 @@ angular.module("ui.neptune.directive.grid",
             this._options = nptGridOptions;
             this._config = {};
             if (nptGridOptions.store) {
-                this._config.gridOptions = nptGridOptions.store.gridOptions() || {};
-                this._config.action = nptGridOptions.store.action();
+                this._config.gridOptions = angular.copy(nptGridOptions.store.gridOptions()) || {};
+                this._config.action = angular.copy(nptGridOptions.store.action());
+                this._config.gridStyle = angular.copy(nptGridOptions.store.getGridStyle());
                 //设置注册Api回调,如果用户在配置中设置会被替换
                 this._config.gridOptions.onRegisterApi = function (uiGridApi) {
                     self.uiGridApi = uiGridApi;
-
 
                     //如果存在注册Api回调则执行
                     if (self._options.onRegisterApi) {
@@ -113,12 +116,14 @@ angular.module("ui.neptune.directive.grid",
                 };
 
                 //添加操作区域
-                this._config.gridOptions.columnDefs.push({
-                    field: 'actionScope',
-                    displayName: "操作",
-                    width: 100,
-                    cellTemplate: "/template/grid/npt-grid-row-cell.html"
-                });
+                if (this._config.action) {
+                    this._config.gridOptions.columnDefs.push({
+                        field: 'actionScope',
+                        displayName: "操作",
+                        width: 100,
+                        cellTemplate: "/template/grid/npt-grid-row-cell.html"
+                    });
+                }
 
                 //添加序号区域,
                 this._config.gridOptions.columnDefs.unshift({
@@ -151,7 +156,7 @@ angular.module("ui.neptune.directive.grid",
 
             // 定义框架支持的菜单操作
             this._handler = {
-                fireListener:function(action, params) {
+                fireListener: function (action, params) {
                     var deferd = $q.defer();
                     var promise = deferd.promise;
                     deferd.resolve(params);
@@ -175,7 +180,7 @@ angular.module("ui.neptune.directive.grid",
                                 data: data
                             };
 
-                            _handlerSelf.fireListener(action,params).then(function () {
+                            _handlerSelf.fireListener(action, params).then(function () {
                                 //执行成功,将数据添加到表格
                                 $scope.model.unshift(params.data);
                                 console.info("添加执行成功.");
@@ -195,7 +200,7 @@ angular.module("ui.neptune.directive.grid",
                         item: item,
                         index: index
                     };
-                    var result = this.fireListener(action,params).then(function () {
+                    var result = this.fireListener(action, params).then(function () {
                         $scope.model.splice(params.index, 1);
                     }, function (error) {
                         console.info("删除失败!" + error);
@@ -216,7 +221,7 @@ angular.module("ui.neptune.directive.grid",
                                 item: angular.copy(item) //防止修改
                             };
 
-                            _handlerSelf.fireListener(action,params).then(function (data) {
+                            _handlerSelf.fireListener(action, params).then(function (data) {
                                 console.info("编辑操作成功!");
                                 //将新数据更新到表格
                                 angular.extend(item, params.data);
@@ -237,10 +242,10 @@ angular.module("ui.neptune.directive.grid",
                         item: angular.copy(item),
                         index: index
                     };
-                    this.fireListener(action,params).then(function (data) {
-                        console.info("操作成功!");
+                    this.fireListener(action, params).then(function (data) {
+                        console.info("操作成功!", data);
                     }, function (error) {
-                        console.info("操作失败!");
+                        console.info("操作失败!", error);
                     });
                 }
             };
@@ -252,6 +257,9 @@ angular.module("ui.neptune.directive.grid",
 
         NptGridApi.prototype.getActions = function () {
             return this._config.action;
+        };
+        NptGridApi.prototype.getGridStyle = function () {
+            return this._config.gridStyle;
         };
 
         NptGridApi.prototype.triggerAction = function (action) {
@@ -272,6 +280,7 @@ angular.module("ui.neptune.directive.grid",
             vm.nptGridApi = new NptGridApi(nptGrid);
             vm.gridOptions = vm.nptGridApi.gridOptions();
             vm.action = vm.nptGridApi.getActions();
+            vm.gridStyle = vm.nptGridApi.getGridStyle();
 
             //观察data变化计算行号
             $scope.$watch("model", function (newValue) {
@@ -300,11 +309,14 @@ angular.module("ui.neptune.directive.grid",
 
         // variable assignment
         vm.formData = formData;
-        vm.originalFields = angular.copy(vm.formData.fields);
+        vm.fields = angular.copy(formData.store.getFields());
+        vm.options = angular.copy(formData.store.getOptions());
+        vm.originalFields = angular.copy(vm.fields);
+        vm.model = angular.copy(formData.model);
 
         // function definition
         function ok() {
-            $uibModalInstance.close(vm.formData.model);
+            $uibModalInstance.close(vm.model);
         }
 
         function cancel() {

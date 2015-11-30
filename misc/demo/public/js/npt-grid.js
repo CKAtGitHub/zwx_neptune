@@ -3,83 +3,9 @@
  */
 
 angular.module("nptGridApp", ["ui.neptune"])
-    .factory("DemoNptGrid", function (nptGridStore, uiGridConstants, nptFormStore) {
-        nptFormStore.put("order", {
-            options: {},
-            fields: [
-                {
-                    key: 'sn',
-                    type: 'input',
-                    templateOptions: {
-                        required: true,
-                        label: '订单编号:',
-                        placeholder: "请输入订单编号"
-                    }
-                },
-                {
-                    key: 'state',
-                    type: 'input',
-                    templateOptions: {
-                        required: true,
-                        label: '订单状态:',
-                        placeholder: "请输入订单编号"
-                    }
-                },
-                {
-                    key: 'clientid',
-                    type: 'input',
-                    templateOptions: {
-                        required: true,
-                        label: '客户编号:',
-                        placeholder: "请输入客户编号"
-                    }
-                },
-                {
-                    key: 'sales',
-                    type: 'input',
-                    templateOptions: {
-                        required: true,
-                        label: '销售顾问:',
-                        placeholder: "请输入销售顾问"
-                    }
-                },
-                {
-                    key: 'amount',
-                    type: 'input',
-                    templateOptions: {
-                        required: true,
-                        label: '订单金额:'
-                    }
-                },
-                {
-                    key: 'createdate',
-                    type: 'dateInput',
-                    templateOptions: {
-                        required: true,
-                        label: '创建日期:'
-                    }
-                },
-                {
-                    key: 'remark',
-                    type: 'input',
-                    templateOptions: {
-                        label: '备注:'
-                    }
-                }
-            ]
-        }).put("demo", {
-            fields: [
-                {
-                    key: 'lastName',
-                    type: 'input',
-                    templateOptions: {
-                        label: 'Last Name'
-                    }
-                }
-            ]
-        });
-
+    .factory("DemoNptGrid", function (nptGridStore, uiGridConstants, OrderForm) {
         return nptGridStore("DemoNptGrid", {
+            gridStyle: "height:600px;",
             gridOptions: {
                 columnDefs: [
                     {field: 'sn', displayName: "订单编号", width: 150},
@@ -90,6 +16,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                     {field: 'createdate', displayName: "创建日期"},
                     {field: 'remark', displayName: "备注"}
                 ],
+                gridHeight: 600,
                 enableGridMenu: true,
                 gridMenuCustomItems: [
                     {
@@ -109,7 +36,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                 add: {
                     label: "添加",
                     type: "add",
-                    target: "order",
+                    target: OrderForm,
                     listens: [function ($q, $timeout) {
                         var deferd = $q.defer();
                         console.info("添加方法,在Store中配置");
@@ -145,7 +72,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                 edit: {
                     label: "编辑",
                     type: "edit",
-                    target: "order",
+                    target: OrderForm,
                     listens: [
                         function (params, $timeout, $q) {
                             var deferd = $q.defer();
@@ -199,4 +126,90 @@ angular.module("nptGridApp", ["ui.neptune"])
         }, 500);
 
 
+    }).factory("OrderForm", function (nptFormlyStore, QueryCtrlCode) {
+        return nptFormlyStore("OrderForm", {
+            options: {},
+            fields: [
+                {
+                    key: 'sn',
+                    type: 'input',
+                    templateOptions: {
+                        label: '订单编号:',
+                        disabled: true,
+                        required: true
+                    }
+                },
+                {
+                    key: 'clientid',
+                    type: 'input',
+                    templateOptions: {
+                        label: '客户ID:',
+                        required: true
+                    }
+                },
+                {
+                    key: 'state',
+                    type: 'ui-select',
+                    templateOptions: {
+                        required: true,
+                        optionsAttr: "bs-options",
+                        label: '订单状态:',
+                        valueProp: 'no',
+                        labelProp: 'name',
+                        repository: QueryCtrlCode,
+                        repositoryParams: {"defno": "orderstatetype"},
+                        options: [],
+                        allowClear: false
+                    }
+                },
+                {
+                    key: 'sales',
+                    type: 'input',
+                    templateOptions: {
+                        label: '销量:',
+                        required: true
+                    }
+                },
+                {
+                    key: 'amount',
+                    type: 'input',
+                    templateOptions: {
+                        label: '金额:',
+                        required: true
+                    }
+                },
+                {
+                    key: 'createdate',
+                    type: 'dateInput',
+                    templateOptions: {
+                        label: '创建时间:',
+                        required: true
+                    }
+                },
+                {
+                    key: 'remark',
+                    type: 'textarea',
+                    templateOptions: {
+                        label: '备注:'
+                    }
+                }
+            ],
+            buttons: {
+                ok: false,
+                reset: false
+            },
+            onSubmitListens: [
+                function (model, $timeout, $q) {
+                    var deferd = $q.defer();
+
+                    $timeout(function () {
+                        deferd.resolve();
+                    }, 1000);
+
+                    return deferd.promise;
+                }
+            ]
+        });
+    }).factory("QueryCtrlCode", function (nptRepository) {
+        return nptRepository("QueryMdCtrlcode");
     });

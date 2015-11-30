@@ -4,7 +4,8 @@ div
             span &times
         h4.modal-title 编辑
     div.modal-body
-        formly-form(model="vm.formData.model",fields="vm.formData.fields",form="vm.form")
+        formly-form(model="vm.model",fields="vm.fields",options="vm.options",form="vm.form")
     div.modal-footer
-        button.btn.btn-primary(type="button",ng-click="vm.ok()") 确定
+        button.btn.btn-primary(type="button",ng-disabled="vm.form.$invalid",ng-click="vm.ok()") 确定
+        button.btn.btn-danger(type="button",ng-click="vm.options.resetModel()") 重置
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") 取消
