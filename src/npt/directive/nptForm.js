@@ -28,8 +28,8 @@ angular.module("ui.neptune.directive.form", [])
                 this._onSubmitListens = setting.onSubmitListens || [];
                 this._actions = setting.actions || [];
                 this._buttons = setting.buttons || {
-                        ok: true,
-                        reset: true
+                        ok: false,
+                        reset: false
                     };
             };
 
@@ -167,6 +167,17 @@ angular.module("ui.neptune.directive.form", [])
             }
         };
 
+        NptFormApi.prototype.reset = function () {
+            var options = this.options();
+            if (options) {
+                options.resetModel();
+            }
+        };
+
+        NptFormApi.prototype.getForm = function () {
+            return this.form;
+        };
+
 
         vm.init = function (nptForm) {
             //初始化API
@@ -210,20 +221,22 @@ angular.module("ui.neptune.directive.form", [])
         }
 
         function onSubmit() {
-            var promises = [];
+            if (!vm.nptFormApi.form.$invalid) {
+                var promises = [];
 
-            angular.forEach(vm.nptFormApi.getOnSubmitListens(), function (listen) {
-                promises.push($q.when($injector.invoke(listen, this, {
-                    model: $scope.model
-                })));
-            });
+                angular.forEach(vm.nptFormApi.getOnSubmitListens(), function (listen) {
+                    promises.push($q.when($injector.invoke(listen, this, {
+                        model: $scope.model
+                    })));
+                });
 
-            var promise = $q.all(promises).then(function (response) {
-                return response;
-            }, function (error) {
-                return error;
-            });
-            vm.nptFormApi.promise(promise);
+                var promise = $q.all(promises).then(function (response) {
+                    return response;
+                }, function (error) {
+                    return error;
+                });
+                vm.nptFormApi.promise(promise);
+            }
         }
     })
     .directive("nptForm", [function () {
