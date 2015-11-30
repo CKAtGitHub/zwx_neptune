@@ -3,8 +3,9 @@
  */
 
 angular.module("nptGridApp", ["ui.neptune"])
-    .factory("DemoNptGrid", function (nptGridStore, uiGridConstants) {
+    .factory("DemoNptGrid", function (nptGridStore, uiGridConstants, OrderForm) {
         return nptGridStore("DemoNptGrid", {
+            gridStyle: "height:600px;",
             gridOptions: {
                 columnDefs: [
                     {field: 'sn', displayName: "订单编号", width: 150},
@@ -15,6 +16,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                     {field: 'createdate', displayName: "创建日期"},
                     {field: 'remark', displayName: "备注"}
                 ],
+                gridHeight: 600,
                 enableGridMenu: true,
                 gridMenuCustomItems: [
                     {
@@ -34,7 +36,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                 add: {
                     label: "添加",
                     type: "add",
-                    target: "OrderForm",
+                    target: OrderForm,
                     listens: [function ($q, $timeout) {
                         var deferd = $q.defer();
                         console.info("添加方法,在Store中配置");
@@ -70,7 +72,7 @@ angular.module("nptGridApp", ["ui.neptune"])
                 edit: {
                     label: "编辑",
                     type: "edit",
-                    target: "OrderForm",
+                    target: OrderForm,
                     listens: [
                         function (params, $timeout, $q) {
                             var deferd = $q.defer();
@@ -94,14 +96,11 @@ angular.module("nptGridApp", ["ui.neptune"])
             }
         })
     })
-    .controller("nptGridDemoController", function (DemoNptGrid, $scope, $timeout,OrderForm) {
+    .controller("nptGridDemoController", function (DemoNptGrid, $scope, $timeout) {
         var vm = this;
 
         vm.nptGridOptions = {
             store: DemoNptGrid,
-            formlyStore:{
-                OrderForm:OrderForm
-            },
             onRegisterApi: function (nptGridApi) {
                 vm.nptGridApi = nptGridApi;
             }
@@ -129,29 +128,30 @@ angular.module("nptGridApp", ["ui.neptune"])
 
     }).factory("OrderForm", function (nptFormlyStore, QueryCtrlCode) {
         return nptFormlyStore("OrderForm", {
-            options: {
-
-            },
+            options: {},
             fields: [
                 {
                     key: 'sn',
                     type: 'input',
                     templateOptions: {
                         label: '订单编号:',
-                        disabled:true
+                        disabled: true,
+                        required: true
                     }
                 },
                 {
                     key: 'clientid',
                     type: 'input',
                     templateOptions: {
-                        label: '客户ID:'
+                        label: '客户ID:',
+                        required: true
                     }
                 },
                 {
                     key: 'state',
                     type: 'ui-select',
                     templateOptions: {
+                        required: true,
                         optionsAttr: "bs-options",
                         label: '订单状态:',
                         valueProp: 'no',
@@ -159,28 +159,31 @@ angular.module("nptGridApp", ["ui.neptune"])
                         repository: QueryCtrlCode,
                         repositoryParams: {"defno": "orderstatetype"},
                         options: [],
-                        allowClear:false
+                        allowClear: false
                     }
                 },
                 {
                     key: 'sales',
                     type: 'input',
                     templateOptions: {
-                        label: '销量:'
+                        label: '销量:',
+                        required: true
                     }
                 },
                 {
                     key: 'amount',
                     type: 'input',
                     templateOptions: {
-                        label: '金额:'
+                        label: '金额:',
+                        required: true
                     }
                 },
                 {
                     key: 'createdate',
                     type: 'dateInput',
                     templateOptions: {
-                        label: '创建时间:'
+                        label: '创建时间:',
+                        required: true
                     }
                 },
                 {
