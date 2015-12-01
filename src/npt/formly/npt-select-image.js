@@ -34,6 +34,40 @@ angular.module("ui.neptune.formly.select-image", [])
                     imageRepository: undefined,
                     single: false,
                     valueProp: 'id'
+                },
+                expressionProperties: {
+                    "templateOptions.selectedImages": function (viewValue, modelValue, field) {
+                        var to = field.to;
+                        if (to.selectedImages) {
+                            return to.selectedImages;
+                        }
+                        if (modelValue) {
+                            var selectedImages = [];
+                            modelValue = angular.isArray(modelValue) ? modelValue : [modelValue];
+                            angular.forEach(modelValue, function (id) {
+                                selectedImages.push({
+                                    file: {
+                                        id: id
+                                    }
+                                });
+                            });
+                            return selectedImages;
+                        }
+                    },
+                    "templateOptions.imageOptions":function(viewValue, modelValue, field) {
+                        var to = field.to;
+                        if (to.imageOptions) {
+                            return to.imageOptions;
+                        }
+
+                        if (to.imageRepository) {
+                            return {
+                                repository: to.imageRepository,
+                                searchProp: "id",
+                                labelProp: "thumbnailUrl"
+                            };
+                        }
+                    }
                 }
             }
         });

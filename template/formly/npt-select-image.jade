@@ -6,5 +6,5 @@ div
     div.row
         div.col-md-2(ng-repeat="image in to.selectedImages")
             a.thumbnail(href="")
-                img(src="{{image.file.thumbnailUrl}}")
+                img(npt-image="image.file.id",npt-image-options="to.imageOptions")
 
