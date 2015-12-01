@@ -189,7 +189,13 @@ angular.module("ui.neptune.directive.form", [])
 
             angular.forEach(vm.fields, function (field) {
                 field.expressionProperties = field.expressionProperties || {};
-                field.expressionProperties['templateOptions.disabled'] = 'formState.disabled';
+                field.expressionProperties['templateOptions.disabled'] = function(viewValue,modelValue,field) {
+                    var to = field.to;
+                    if (angular.isDefined(to.disabled)) {
+                        return to.disabled;
+                    }
+                    return field.formState.disabled;
+                };
             });
 
             $scope.$watch('vm.options.formState', function () {

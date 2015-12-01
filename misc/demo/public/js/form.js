@@ -7,7 +7,7 @@ angular.module("formDemo", ["ui.neptune"])
         return nptFormlyStore("OrderInfo", {
             options: {
                 formState: {
-                    disabled: true
+                    disabled: false
                 }
             },
             fields: [
@@ -17,6 +17,7 @@ angular.module("formDemo", ["ui.neptune"])
                     templateOptions: {
                         required: true,
                         label: '订单编号:',
+                        disabled:true,
                         placeholder: "请输入订单编号"
                     }
                 },
