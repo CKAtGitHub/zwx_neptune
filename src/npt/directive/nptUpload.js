@@ -16,7 +16,7 @@ angular.module("ui.neptune.directive.upload", [])
 
         vm.startUpload = function() {
 
-        }
+        };
 
     }).factory("uploadFactory",function() {
         var policyText = {
