@@ -1,7 +1,13 @@
 div
-   div(id="ossfile")
+   div(ng-repeat="file in vm.filesInfo",id="{{file.id}}")
+      | {{file.name}} ({{file.formateSize}})
+      b
+         span(ng-if="file.percent > 0 && file.percent !==100") {{file.percent}}%
+         span(ng-if="file.uploadState") {{file.uploadState}}
+      div.progress
+         div.progress-bar(style="width:{{2 * file.percent}}px",{{'aria-valuenow'}})
    br
-   div(id="container")
-      button(id="selectfiles",type="button",class="btn btn-primary") 选择文件
+   div#container
+      button#selectfiles(type="button",class="btn btn-primary") 选择文件
       |&nbsp;
-      button(id="postfiles",type="button",class="btn btn-primary") 开始上传
+      button(type="button",class="btn btn-primary",ng-click="vm.startUpload()") 开始上传

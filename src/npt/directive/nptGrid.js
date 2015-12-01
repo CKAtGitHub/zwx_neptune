@@ -264,11 +264,12 @@ angular.module("ui.neptune.directive.grid",
 
         NptGridApi.prototype.triggerAction = function (action) {
             var selectedData = this.uiGridApi.selection.getSelectedRows();
-            if (selectedData.length === 0) {
-                return;
+            var oneData;
+            if (selectedData.length > 0) {
+                oneData = selectedData[0];
             }
             if (this._handler[action.type]) {
-                this._handler[action.type](action, selectedData[0], selectedData[0].$index - 1);
+                this._handler[action.type](action,oneData , oneData.$index - 1);
             } else {
                 this._handler.none(action, selectedData);
             }

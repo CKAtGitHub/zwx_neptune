@@ -5,118 +5,109 @@
  */
 
 angular.module("ui.neptune.directive.upload", [])
-    .controller("UploadControllect",function($scope,uploadFactory) {
+    .controller("UploadControllect", function ($scope, $http, $q) {
         var vm = this;
-        vm.nptUpload = $scope.nptUpload;
-        vm.model = $scope.model;
+        vm.options = $scope.nptUpload;
 
-        vm.browse = function() {
-
+        vm.filesInfo = [];
+        vm.startUpload = function () {
+            set_upload_param(uploader).then(function () {
+                uploader.start();
+            }, function (err) {
+                console.error(err);
+            });
         };
 
-        vm.startUpload = function() {
-
-        };
-
-    }).factory("uploadFactory",function() {
-        var policyText = {
-            "expiration": "2020-01-01T12:00:00.000Z", //设置该Policy的失效时间，超过这个失效时间之后，就没有办法通过这个policy上传文件了
-            "conditions": [
-                ["content-length-range", 0, 1048576000] // 设置上传文件的大小限制
-            ]
-        };
-
-        var accessid= '6MKOqxGiGU4AUk44';
-        var accesskey= 'ufu7nS8kS59awNihtjSonMETLI0KLy';
-        var host = 'http://post-test.oss-cn-hangzhou.aliyuncs.com';
-
-
-        var policyBase64 = Base64.encode(JSON.stringify(policyText));
-        var message = policyBase64;
-        var bytes = Crypto.HMAC(Crypto.SHA1, message, accesskey, { asBytes: true }) ;
-        var signature = Crypto.util.bytesToBase64(bytes);
-
-        function set_upload_param(up)
-        {
-            var ret = true;//get_signature();通过服务器获取上传配置
-            if (ret === true)
-            {
-                new_multipart_params = {
-                    'Filename': '${filename}',
-                    'key' : '${filename}',
-                    'policy': policyBase64,
-                    'OSSAccessKeyId': accessid,
-                    'success_action_status' : '200', //让服务端返回200,不然，默认会返回204
-                    'signature': signature,
-                };
-
-                up.setOption({
-                    'url': host,
-                    'multipart_params': new_multipart_params
-                });
+        var expire = 0;
+        // 从服务器获取签名信息
+        function get_signature() {
+            //可以判断当前expire是否超过了当前时间,如果超过了当前时间,就重新取一下.3s 做为缓冲
+            var now = Date.parse(new Date()) / 1000;
+            console.log('get_signature ...');
+            console.log('expire:' + expire.toString());
+            console.log('now:', +now.toString());
+            if (expire < now + 3) {
+                return $http.get("/api/aliuploadAuth");
             }
+            return false;
+        }
+
+        function set_upload_param(up) {
+            var deffer = $q.defer();
+            var ret = get_signature();//通过服务器获取上传配置
+            if (ret) {
+                ret.then(function (response) {
+                    var data = response.data;
+                    expire = parseInt(data.expire);
+                    new_multipart_params = {
+                        'Filename': '${filename}',
+                        'key': data.dir + '${filename}',
+                        'policy': data.policy,
+                        'OSSAccessKeyId': data.accessid,
+                        'success_action_status': '200', //让服务端返回200,不然，默认会返回204
+                        'signature': data.signature
+                    };
+
+                    up.setOption({
+                        'url': data.host,
+                        'multipart_params': new_multipart_params
+                    });
+                    deffer.resolve(data);
+                }, function (err) {
+                    deffer.reject(err);
+                });
+            } else {
+                deffer.resolve();
+            }
+            return deffer.promise;
         }
 
         var uploader = new plupload.Uploader({
-            runtimes : 'html5,flash,silverlight,html4',
-            browse_button : 'selectfiles',
+            runtimes: 'html5,flash,silverlight,html4',
+            browse_button: 'selectfiles',
             container: document.getElementById('container'),
-            flash_swf_url : '/vendor/plupload-2.1.2/js/Moxie.swf',
-            silverlight_xap_url : '/vendor/plupload-2.1.2/js/Moxie.xap',
-
-            url : host,
+            flash_swf_url: '/vendor/plupload-2.1.2/js/Moxie.swf',
+            silverlight_xap_url: '/vendor/plupload-2.1.2/js/Moxie.xap',
+            url:'http://oss.aliyuncs.com',
 
             init: {
-                PostInit: function() {
-                    document.getElementById('ossfile').innerHTML = '';
-                    document.getElementById('postfiles').onclick = function() {
-                        set_upload_param(uploader);
-                        uploader.start();
-                        return false;
-                    };
+                PostInit: function () {
+                    //document.getElementById('ossfile').innerHTML = '';
                 },
 
-                FilesAdded: function(up, files) {
-                    plupload.each(files, function(file) {
-                        document.getElementById('ossfile').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>' +
-                            '<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>' +
-                            '</div>';
+                FilesAdded: function (up, files) {
+                    plupload.each(files, function (file) {
+                        file.formateSize = plupload.formatSize(file.size);
+                        vm.filesInfo.push(file);
                     });
+                    $scope.$apply();
                 },
 
-                UploadProgress: function(up, file) {
-                    var d = document.getElementById(file.id);
-                    d.getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
-
-                    var prog = d.getElementsByTagName('div')[0];
-                    var progBar = prog.getElementsByTagName('div')[0];
-                    progBar.style.width= 2*file.percent+'px';
-                    progBar.setAttribute('aria-valuenow', file.percent);
+                UploadProgress: function (up, file) {
+                    $scope.$apply();
                 },
 
-                FileUploaded: function(up, file, info) {
+                FileUploaded: function (up, file, info) {
                     console.log('uploaded');
                     console.log(info.status);
                     set_upload_param(up);
-                    if (info.status >= 200 || info.status < 200)
-                    {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = 'success';
+                    if (info.status >= 200 || info.status < 200) {
+                        file.uploadState = "success";
                     }
-                    else
-                    {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = info.response;
+                    else {
+                        file.uploadState = info.response;
                     }
+                    $scope.$apply();
                 },
 
-                Error: function(up, err) {
+                Error: function (up, err) {
                     set_upload_param(up);
-                    document.getElementById('console').appendChild(document.createTextNode("\nError xml:" + err.response));
+                    console.error(err);
                 }
             }
         });
-
         uploader.init();
-        return uploader;
+
     })
     .directive("nptUpload", [function () {
         return {
@@ -127,8 +118,7 @@ angular.module("ui.neptune.directive.upload", [])
                 return attrs.templateUrl || "/template/upload/upload.html";
             },
             scope: {
-                nptUpload: "=",
-                model: "="
+                nptUpload: "="
             },
             link: function () {
             }

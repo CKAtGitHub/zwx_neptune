@@ -66,4 +66,6 @@ router.get("/npt-upload", function (req, res, next) {
     res.render("npt-upload");
 });
 
+router.get("/api/aliuploadAuth",require("./api/aliuploadAuth")());
+
 module.exports = router;
