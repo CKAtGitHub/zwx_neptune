@@ -99,6 +99,16 @@ angular.module("formDemo", ["ui.neptune"])
         vm.model = {};
         vm.disabled = false;
 
+        vm.reset = function () {
+            vm.nptFormApi.reset();
+        };
+
+        vm.submit = function () {
+            if (!vm.nptFormApi.form.$invalid) {
+                console.info(vm.model);
+            }
+        };
+
         $timeout(function () {
             vm.model = {
                 sn: "DD213234",

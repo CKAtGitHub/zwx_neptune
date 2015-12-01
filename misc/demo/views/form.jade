@@ -10,4 +10,7 @@ block content
             h1 表单
         div.row
             div.col-md-12(ng-controller="FormDemoController as vm")
+                a.btn.btn-primary(href="",ng-click="vm.submit()",ng-disabled="vm.nptFormApi.form.$invalid || vm.nptFormApi.loading()") 提交表单
+                a.btn.btn-primary(href="",ng-click="vm.reset()") 重置表单
+
                 div(npt-form="vm.options",model="vm.model")
