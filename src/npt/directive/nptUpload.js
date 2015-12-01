@@ -7,9 +7,10 @@
 angular.module("ui.neptune.directive.upload", [])
     .controller("UploadControllect", function ($scope, $http, $q) {
         var vm = this;
-        vm.options = $scope.nptUpload;
+        vm.options = $scope.nptUpload || {};
 
         vm.filesInfo = [];
+        vm.errors = [];
         vm.startUpload = function () {
             set_upload_param(uploader).then(function () {
                 uploader.start();
@@ -19,6 +20,7 @@ angular.module("ui.neptune.directive.upload", [])
         };
 
         var expire = 0;
+        var dir = "";
         // 从服务器获取签名信息
         function get_signature() {
             //可以判断当前expire是否超过了当前时间,如果超过了当前时间,就重新取一下.3s 做为缓冲
@@ -35,18 +37,20 @@ angular.module("ui.neptune.directive.upload", [])
         function set_upload_param(up) {
             var deffer = $q.defer();
             var ret = get_signature();//通过服务器获取上传配置
+            var new_multipart_params = {};
+            new_multipart_params.key = guid();
+            console.log("key:"+new_multipart_params.key);
             if (ret) {
                 ret.then(function (response) {
                     var data = response.data;
                     expire = parseInt(data.expire);
-                    new_multipart_params = {
-                        'Filename': '${filename}',
-                        'key': data.dir + '${filename}',
-                        'policy': data.policy,
-                        'OSSAccessKeyId': data.accessid,
-                        'success_action_status': '200', //让服务端返回200,不然，默认会返回204
-                        'signature': data.signature
-                    };
+                    dir = data.dir;
+                    new_multipart_params.Filename = "${filename}";
+                    new_multipart_params.key = dir + new_multipart_params.key;
+                    new_multipart_params.policy = data.policy;
+                    new_multipart_params.OSSAccessKeyId = data.accessid;
+                    new_multipart_params.success_action_status = '200';//让服务端返回200,不然，默认会返回204
+                    new_multipart_params.signature = data.signature;
 
                     up.setOption({
                         'url': data.host,
@@ -57,22 +61,30 @@ angular.module("ui.neptune.directive.upload", [])
                     deffer.reject(err);
                 });
             } else {
+                up.getOption().multipart_params.key = dir + new_multipart_params.key;
                 deffer.resolve();
             }
             return deffer.promise;
         }
 
-        var uploader = new plupload.Uploader({
+        function guid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+        }
+
+        var uploadOptions = {
             runtimes: 'html5,flash,silverlight,html4',
             browse_button: 'selectfiles',
             container: document.getElementById('container'),
             flash_swf_url: '/vendor/plupload-2.1.2/js/Moxie.swf',
             silverlight_xap_url: '/vendor/plupload-2.1.2/js/Moxie.xap',
-            url:'http://oss.aliyuncs.com',
+            url:'http://oss-cn-shenzhen.aliyuncs.com',
+            prevent_duplicates:true,
 
             init: {
                 PostInit: function () {
-                    //document.getElementById('ossfile').innerHTML = '';
                 },
 
                 FilesAdded: function (up, files) {
@@ -88,8 +100,16 @@ angular.module("ui.neptune.directive.upload", [])
                 },
 
                 FileUploaded: function (up, file, info) {
+                    var key = up.getOption().multipart_params.key;
                     console.log('uploaded');
                     console.log(info.status);
+                    console.log("完成上传："+key);
+                    if (key.indexOf("/") > 0) {
+                        var path = key.split("/");
+                        key = path[path.length - 1];
+                    }
+                    file.UUID = key;
+                    console.log("file.UUID:"+file.UUID);
                     set_upload_param(up);
                     if (info.status >= 200 || info.status < 200) {
                         file.uploadState = "success";
@@ -99,13 +119,19 @@ angular.module("ui.neptune.directive.upload", [])
                     }
                     $scope.$apply();
                 },
+                Browse:function(up,file) {
+                    vm.errors = [];
+                },
 
                 Error: function (up, err) {
                     set_upload_param(up);
-                    console.error(err);
+                    vm.errors.push(err);
+                    $scope.$apply();
                 }
             }
-        });
+        };
+        uploadOptions = angular.extend(uploadOptions,vm.options.up || {});
+        var uploader = new plupload.Uploader(uploadOptions);
         uploader.init();
 
     })
