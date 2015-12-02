@@ -21,7 +21,8 @@ angular.module('formlyExample', ['ui.neptune'])
                 type: 'input',
                 templateOptions: {
                     label: '使用defaultValue属性设置默认值',
-                    required:true
+                    required:true,
+                    maxlength:8
                 },
                 defaultValue:'hello world'
             },

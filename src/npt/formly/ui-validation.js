@@ -5,7 +5,11 @@
  */
 
 angular.module("ui.neptune.formly.ui-validation")
-    .run(function (formlyConfig, is,$q) {
+    .run(function (formlyConfig, is,$q,formlyValidationMessages) {
+
+        formlyValidationMessages.addTemplateOptionValueMessage('maxlength', 'maxlength', '长度过长', '', '长度过长');
+        formlyValidationMessages.addTemplateOptionValueMessage('minlength', 'minlength', '长度太短', '', '长度太短');
+        formlyValidationMessages.messages.required = 'to.label + " 为必填项"';
 
         // 集成IS框架
 
