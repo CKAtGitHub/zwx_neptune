@@ -16,4 +16,11 @@ angular.module('ui.neptune.filter.commonFilter', [])
             var dateString = dateFilter(input,formate);
             return dateString || undefined;
         };
-});
+}).filter('yesOrNo', function () {
+        return function (input, yes,no) {
+            if (input) {
+                return yes || "是";
+            }
+            return no || "否";
+        };
+    });
