@@ -28,6 +28,8 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
                                 $scope.model[options.key] = undefined;
                             });
                         }
+                    } else {
+                        to.viewvalue = newValue;
                     }
                 });
 
