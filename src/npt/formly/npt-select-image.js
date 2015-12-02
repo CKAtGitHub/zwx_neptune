@@ -37,10 +37,6 @@ angular.module("ui.neptune.formly.select-image", [])
                 },
                 expressionProperties: {
                     "templateOptions.selectedImages": function (viewValue, modelValue, field) {
-                        var to = field.to;
-                        if (to.selectedImages) {
-                            return to.selectedImages;
-                        }
                         if (modelValue) {
                             var selectedImages = [];
                             modelValue = angular.isArray(modelValue) ? modelValue : [modelValue];
