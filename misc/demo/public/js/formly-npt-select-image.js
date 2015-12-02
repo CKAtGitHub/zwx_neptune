@@ -31,7 +31,7 @@ angular.module("formly.npt.select.image.demo", ["ui.neptune"])
                 type: 'npt-select-image',
                 templateOptions: {
                     label: "选择图片",
-                    single:true,
+                    single:false,
                     imageRepository: QueryImageByUserLevel
                 }
             }

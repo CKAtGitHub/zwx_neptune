@@ -13,7 +13,6 @@ angular.module("ui.neptune.formly.select-image", [])
                     onSelect: function (model, options) {
                         var self = this;
                         self.selectImageApi.open().then(function (response) {
-                            self.selectedImages = response;
                             //如果是单选,则将第一行设置为数据, 如果是多选则提取所有数据的id
                             if (self.single && response && response.length > 0) {
                                 model[options.key] = response[0].data[self.valueProp];
@@ -34,6 +33,9 @@ angular.module("ui.neptune.formly.select-image", [])
                     imageRepository: undefined,
                     single: false,
                     valueProp: 'id'
+                },
+                controller:function($scope) {
+                    $scope.to.selectedImages = []; // 初始化时，置空已选图片
                 },
                 expressionProperties: {
                     "templateOptions.selectedImages": function (viewValue, modelValue, field) {
