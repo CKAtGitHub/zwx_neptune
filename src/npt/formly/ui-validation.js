@@ -27,6 +27,8 @@ angular.module("ui.neptune.formly.ui-validation")
         addTypeForValidator('dateString');
         addTypeForValidator('hexColor');
         addTypeForValidator('ip');
+        is.setRegexp(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i,'nanpPhone');
+        addTypeForValidator('nanpPhone'); // 电话号码
 
         function addTypeForValidator(validatorName) {
             var validators = {};
@@ -83,4 +85,12 @@ angular.module("ui.neptune.formly.ui-validation")
                 modelOptions:{ updateOn: 'blur' }
             }
         });
+    }).factory("RegExpValidatorFactory",function() {
+        var RegExpValidatorFactory = {};
+        RegExpValidatorFactory.createRegExpValidator = function(regexp) {
+            return function(viewValue, modelValue,scope) {
+                return regexp.test(viewValue);
+            };
+        };
+        return RegExpValidatorFactory;
     });

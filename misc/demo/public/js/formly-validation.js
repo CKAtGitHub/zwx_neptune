@@ -3,7 +3,7 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope,QueryCtrlCode) {
+    .controller("formlyExampleController", function ($scope,QueryCtrlCode,RegExpValidatorFactory) {
         var vm = this;
         vm.onSubmit = function onSubmit() {
             if (vm.form.$valid) {
@@ -48,6 +48,19 @@ angular.module('formlyExample', ['ui.neptune'])
                 templateOptions: {
                     label: '验证信用卡号',
                     placeholder: '378282246310005'
+                }
+            },
+            {
+                key: 'customValidator',
+                type: 'input',
+                templateOptions: {
+                    label: '自定义验证器'
+                },
+                validators: {
+                    ipAddress: {
+                        expression: RegExpValidatorFactory.createRegExpValidator(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i),
+                        message: '$viewValue + " 无效的电话号码"'
+                    }
                 }
             },
             {
