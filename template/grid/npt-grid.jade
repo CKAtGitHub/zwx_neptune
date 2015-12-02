@@ -1,6 +1,6 @@
 div
     div.grid(ui-grid="vm.gridOptions",ui-grid-pagination,ui-grid-resize-columns,ui-grid-move-columns,ui-grid-auto-resize,ui-grid-selection)
-    div.dropdown.position-fixed(id="nptGridContextMenu")
+    div.dropdown.position-fixed(id="nptGridContextMenu",style="z-index:9999;")
         ul.dropdown-menu(role="menu")
             li(ng-repeat='(key,menu) in vm.action')
 
