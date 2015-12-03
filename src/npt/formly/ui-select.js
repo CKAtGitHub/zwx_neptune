@@ -12,6 +12,11 @@ angular.module("ui.neptune.formly.ui-select")
             templateUrl: "/template/formly/ui-select.html",
             defaultOptions: {
                 wrapper:["showErrorMessage"],
+                ngModelAttrs: {
+                    multiple: {
+                        attribute: 'multiple'
+                    }
+                },
                 templateOptions: {
                     ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
                     refresh: function refresh(value, model, field) {

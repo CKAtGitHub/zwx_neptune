@@ -16,13 +16,14 @@ angular.module('formlyExample', ['ui.neptune'])
             }
         };
         vm.model = {
-            "cycle1": "11111",
-            "cycle3": "once"
+            "cycle1": ["11111"],
+            "cycle3": ["once"]
         };
         vm.fields = [
             {
                 "key": "cycle1",
                 "type": "ui-select",
+                optionsTypes: ['notempty'],
                 templateOptions: {
                     optionsAttr: 'bs-options',
                     label: '服务周期(静态数据):',
@@ -31,6 +32,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     smallLabelProp: "defname",
                     placeholder: '请选择服务周期',
                     required: true,
+                    multiple:'',
                     options: [{
                         id: "11111",
                         name: "测试1"
@@ -40,7 +42,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     }, {
                         id: "3333",
                         name: "测试3"
-                    }],
+                    }]
                 }
             },
             {
@@ -68,6 +70,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     labelProp: 'name',
                     smallLabelProp: "defname",
                     placeholder: '请选择服务周期',
+                    multiple:'',
                     required: true,
                     options: [],
                     repository: QueryCtrlCode,

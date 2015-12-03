@@ -25,13 +25,22 @@ angular.module("ui.neptune.formly.ui-validation")
         addTypeForValidator('ip');
         is.setRegexp(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i,'nanpPhone');
         addTypeForValidator('nanpPhone'); // 电话号码
+        addTypeForValidator('empty',true,"to.label+' 为必填项'"); // 非空
 
-        function addTypeForValidator(validatorName) {
+        function addTypeForValidator(validatorName,isNot,message) {
             var validators = {};
+            var originName = validatorName;
+            validatorName = isNot?'not'+validatorName:validatorName;
             validators[validatorName] = {
                 expression: is[validatorName],
-                message: '"无效的 ' + validatorName + '"'
+                message: "'无效的 " + validatorName + "'"
             };
+            if (isNot) {
+                validators[validatorName].expression = is.not[originName];
+            }
+            if (message) {
+                validators[validatorName].message = message;
+            }
             formlyConfig.setType({
                 name: validatorName,
                 defaultOptions: {
@@ -75,7 +84,7 @@ angular.module("ui.neptune.formly.ui-validation")
 
                             return defer.promise;
                         },
-                        message: '"无效的资源"+to.searchProp'
+                        message: '(to.reversal?"已经存在":"不存在")+to.label+" " +$viewValue'
                     }
                 },
                 modelOptions:{ updateOn: 'blur' }
