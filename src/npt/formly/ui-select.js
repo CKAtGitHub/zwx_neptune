@@ -41,7 +41,7 @@ angular.module("ui.neptune.formly.ui-select")
 
                             var filterBy = $filter("filterBy");
                             var params = angular.copy(field.templateOptions.repositoryParams,{});
-                            var oldOptions = field.templateOptions.options;
+                            var oldOptions = field.templateOptions.options || [];
                             if (value){
                                 //检查到输入内容,检索数据
                                 oldOptions = filterBy(field.templateOptions.options,[labelProp],value);
