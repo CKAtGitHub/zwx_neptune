@@ -28,6 +28,10 @@ angular.module("ui.neptune.formly.ui-select")
                             data: []
                         });
 
+
+                        var searchFields = angular.copy(field.templateOptions.search || []);
+                        var searchValue = value;
+
                         if (field.templateOptions.search && field.templateOptions.repository) {
                             //存在search以及repository,表示按输入条件检索
                             //model[field.key];
@@ -45,13 +49,17 @@ angular.module("ui.neptune.formly.ui-select")
                             if (value){
                                 //检查到输入内容,检索数据
                                 oldOptions = filterBy(field.templateOptions.options,[labelProp],value);
-                                field.templateOptions.search.forEach(function(field) {
-                                    params[field] = value;
-                                });
+                                if (searchFields.length === 0) {
+                                    searchFields.push(labelProp);
+                                }
+                                searchValue = value;
                             } else if (model[field.key]) {
                                 //使用模型值,检索数据
                                 oldOptions = filterBy(field.templateOptions.options,[valueProp],model[field.key]);
-                                params[valueProp] = model[field.key];
+                                if (searchFields.length === 0) {
+                                    searchFields.push(valueProp);
+                                }
+                                searchValue = model[field.key];
                             }
 
                             if (oldOptions.length > 0) {    // 用户输入或者model里面的值在现有的options中存在，不检索
@@ -59,6 +67,9 @@ angular.module("ui.neptune.formly.ui-select")
                                     data: oldOptions
                                 });
                             } else {
+                                searchFields.forEach(function(field) {
+                                    params[field] = searchValue;
+                                });
                                 promise = field.templateOptions.repository.post(params);
                             }
                         } else if (field.templateOptions.options && field.templateOptions.options.length > 0) {

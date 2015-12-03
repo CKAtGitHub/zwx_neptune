@@ -9,6 +9,7 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
         templateUrl: "/template/formly/npt-select-tree-single.html",
         extends: 'input',
         defaultOptions: {
+            wrapper:["showErrorMessage"],
             controller: function ($scope, $log, $injector) {
                 var options = $scope.options;
                 var to = options.templateOptions;

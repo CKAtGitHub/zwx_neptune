@@ -9,6 +9,7 @@ angular.module("ui.neptune.formly.select-image", [])
             templateUrl: "/template/formly/npt-select-image.html",
             extends: 'input',
             defaultOptions: {
+                wrapper:["showErrorMessage"],
                 templateOptions: {
                     onSelect: function (model, options) {
                         var self = this;

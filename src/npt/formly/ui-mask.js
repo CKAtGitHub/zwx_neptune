@@ -11,6 +11,7 @@ angular.module("ui.neptune.formly.ui-mask")
             name: 'maskedInput',
             extends: 'input',
             defaultOptions: {
+                wrapper:["showErrorMessage"],
                 ngModelAttrs: {
                     mask: {
                         attribute: 'ui-mask'
@@ -32,6 +33,7 @@ angular.module("ui.neptune.formly.ui-mask")
             name: 'numberInput',
             extends: 'input',
             defaultOptions: {
+                wrapper:["showErrorMessage"],
                 ngModelAttrs: {
                     numberMask: {
                         attribute: 'ui-number-mask'
@@ -58,6 +60,7 @@ angular.module("ui.neptune.formly.ui-mask")
             name: 'dateInput',
             extends: 'input',
             defaultOptions: {
+                wrapper:["showErrorMessage"],
                 ngModelAttrs: {
                     mask: {
                         attribute: 'ui-mask'
@@ -87,6 +90,7 @@ angular.module("ui.neptune.formly.ui-mask")
                 return viewValue;
             }
             var date = new Date(scope.fc.$viewValue.replace(/-/,"/")).getTime();
+            scope.fc.$setValidity('dateMask', !!date);
             return date||undefined;
         };
         factory.formateToString = function(viewValue,modleValue,scope) {

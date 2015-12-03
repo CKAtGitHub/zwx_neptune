@@ -57,7 +57,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     label: '自定义验证器'
                 },
                 validators: {
-                    ipAddress: {
+                    checkphone: {
                         expression: RegExpValidatorFactory.createRegExpValidator(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i),
                         message: '$viewValue + " 无效的电话号码"'
                     }

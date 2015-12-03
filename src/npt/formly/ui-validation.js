@@ -7,18 +7,12 @@
 angular.module("ui.neptune.formly.ui-validation")
     .run(function (formlyConfig, is,$q,formlyValidationMessages) {
 
-        formlyValidationMessages.addTemplateOptionValueMessage('maxlength', 'maxlength', '长度过长', '', '长度过长');
-        formlyValidationMessages.addTemplateOptionValueMessage('minlength', 'minlength', '长度太短', '', '长度太短');
-        formlyValidationMessages.messages.required = 'to.label + " 为必填项"';
-
         // 集成IS框架
 
-        addTypeForValidator('boolean');
         addTypeForValidator('date');// Date
         addTypeForValidator('nan');// NaN
         addTypeForValidator('null');
         addTypeForValidator('string');
-        addTypeForValidator('char');
         addTypeForValidator('undefined');
         addTypeForValidator('empty');
         addTypeForValidator('existy');// not null,not undefinder
@@ -27,8 +21,6 @@ angular.module("ui.neptune.formly.ui-validation")
         addTypeForValidator('url');
         addTypeForValidator('email');
         addTypeForValidator('creditCard');
-        addTypeForValidator('timeString');
-        addTypeForValidator('dateString');
         addTypeForValidator('hexColor');
         addTypeForValidator('ip');
         is.setRegexp(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i,'nanpPhone');

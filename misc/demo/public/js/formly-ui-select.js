@@ -17,7 +17,6 @@ angular.module('formlyExample', ['ui.neptune'])
         };
         vm.model = {
             "cycle1": "11111",
-            "cycle2": "117",
             "cycle3": "once"
         };
         vm.fields = [

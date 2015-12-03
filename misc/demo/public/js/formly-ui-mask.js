@@ -19,6 +19,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 type: 'numberInput',
                 templateOptions: {
                     label: '数字类型-numberInput',
+                    required:true,
                     min:10.8,
                     max:1000
                 }
@@ -37,7 +38,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 type: 'dateInput',
                 templateOptions: {
                     label: '使用dateInput处理时间戳数据-长格式',
-                    description:"formateType(short|long)可以不配，默认long;"
+                    required:true
                 },
                 defaultValue:new Date().getTime()
             },
