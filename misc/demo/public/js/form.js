@@ -17,7 +17,7 @@ angular.module("formDemo", ["ui.neptune"])
                     templateOptions: {
                         required: true,
                         label: '订单编号:',
-                        disabled:true,
+                        disabled: true,
                         placeholder: "请输入订单编号"
                     }
                 },
@@ -120,7 +120,7 @@ angular.module("formDemo", ["ui.neptune"])
                 createdate: 12312312312321,
                 remark: "测试"
 
-            }
+            };
         }, 1000);
 
         vm.options = {
@@ -139,8 +139,9 @@ angular.module("formDemo", ["ui.neptune"])
                         demo: model
                     }
                 }).setOnActionListen(function (model, action) {
-                    vm.nptFormApi.disabled(vm.disabled);
-                    vm.disabled = !vm.disabled;
+                    //vm.nptFormApi.disabled(vm.disabled);
+                    //vm.disabled = !vm.disabled;
+                    vm.nptFormApi.updateInitialValue();
                 });
             }
         }
