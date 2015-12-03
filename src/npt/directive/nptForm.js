@@ -174,6 +174,13 @@ angular.module("ui.neptune.directive.form", [])
             }
         };
 
+        NptFormApi.prototype.updateInitialValue = function () {
+            var options = this.options();
+            if (options) {
+                options.updateInitialValue();
+            }
+        };
+
         NptFormApi.prototype.getForm = function () {
             return this.form;
         };
@@ -189,7 +196,7 @@ angular.module("ui.neptune.directive.form", [])
 
             angular.forEach(vm.fields, function (field) {
                 field.expressionProperties = field.expressionProperties || {};
-                field.expressionProperties['templateOptions.disabled'] = function(viewValue,modelValue,field) {
+                field.expressionProperties['templateOptions.disabled'] = function (viewValue, modelValue, field) {
                     var to = field.to;
                     if (angular.isDefined(to.disabled)) {
                         return to.disabled;

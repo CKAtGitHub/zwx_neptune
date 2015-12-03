@@ -3,7 +3,7 @@ div
         formly-form(model="model",fields="vm.fields",options="vm.options",form="vm.nptFormApi.form")
             button.btn.btn-primary.submit-button(type="submit",ng-disabled="vm.nptFormApi.form.$invalid || vm.nptFormApi.loading()",ng-show="vm.buttons.ok") 确定
             | &nbsp
-            button.btn.btn-danger(type="button",ng-click="vm.options.resetModel()",ng-show="vm.buttons.reset",ng-disabled="vm.nptFormApi.loading()") 重置
+            button.btn.btn-danger(type="button",ng-click="vm.nptFormApi.reset()",ng-show="vm.buttons.reset",ng-disabled="vm.nptFormApi.loading()") 重置
 
             span(ng-repeat="action in vm.actions")
                 | &nbsp
