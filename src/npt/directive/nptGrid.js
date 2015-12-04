@@ -147,6 +147,13 @@ angular.module("ui.neptune.directive.grid",
                                 action.listens.push(listener);
                             }
                         };
+
+                        self.action[key].addPreListener = function (listener) {
+                            action.listens = action.listens || [];
+                            if (listener) {
+                                action.listens.unshift(listener);
+                            }
+                        };
                     });
                 }
 
