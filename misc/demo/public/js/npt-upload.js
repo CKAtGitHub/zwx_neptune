@@ -5,7 +5,7 @@
  */
 
 angular.module("nptUploadApp", ["ui.neptune"])
-    .controller("nptUploadDemoController", function ($scope,AddOrUpdateFileRepo) {
+    .controller("nptUploadDemoController", function ($scope,$http,AddOrUpdateFileRepo) {
         var vm = this;
 
         vm.uploadOptions = {
@@ -17,8 +17,11 @@ angular.module("nptUploadApp", ["ui.neptune"])
                     max_file_size: '100kb'
                 }
             },
-            onRegisterApi:function(nptUploadApi) {
-                vm.nptUploadApi = nptUploadApi;
+            getSignature:function(){
+                return $http.get("/api/aliuploadAuth");
+            },
+            fileUploaded : function(file,info) {
+                console.log("文件上传成功："+file.UUID);
             },
             repository: AddOrUpdateFileRepo,
             repositoryParams: {

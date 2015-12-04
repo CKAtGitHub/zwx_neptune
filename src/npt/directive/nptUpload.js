@@ -28,8 +28,8 @@ angular.module("ui.neptune.directive.upload", [])
             console.log('get_signature ...');
             console.log('expire:' + expire.toString());
             console.log('now:', +now.toString());
-            if (expire < now + 3) {
-                return $http.get("/api/aliuploadAuth");
+            if (expire < now + 3 && vm.options.getSignature) {
+                return vm.options.getSignature();
             }
             return false;
         }
@@ -39,7 +39,6 @@ angular.module("ui.neptune.directive.upload", [])
             var ret = get_signature();//通过服务器获取上传配置
             var new_multipart_params = {};
             new_multipart_params.key = guid();
-            console.log("key:"+new_multipart_params.key);
             if (ret) {
                 ret.then(function (response) {
                     var data = response.data;
@@ -100,19 +99,18 @@ angular.module("ui.neptune.directive.upload", [])
                 },
 
                 FileUploaded: function (up, file, info) {
-                    var key = up.getOption().multipart_params.key;
-                    console.log('uploaded');
-                    console.log(info.status);
-                    console.log("完成上传："+key);
-                    if (key.indexOf("/") > 0) {
-                        var path = key.split("/");
-                        key = path[path.length - 1];
-                    }
-                    file.UUID = key;
-                    console.log("file.UUID:"+file.UUID);
                     set_upload_param(up);
                     if (info.status >= 200 || info.status < 200) {
-                        file.uploadState = "success";
+                        var key = up.getOption().multipart_params.key;
+                        if (key.indexOf("/") > 0) {
+                            var path = key.split("/");
+                            key = path[path.length - 1];
+                        }
+                        file.UUID = key;
+                        file.uploadState = "成功";
+                        if (vm.options.fileUploaded) {
+                            vm.options.fileUploaded(file,info);
+                        }
                     }
                     else {
                         file.uploadState = info.response;
