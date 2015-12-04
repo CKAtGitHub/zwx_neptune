@@ -73,6 +73,7 @@ angular.module("ui.neptune.directive.form", [])
         vm.onAction = onAction;
 
         function NptFormApi(nptForm) {
+            nptForm = angular.copy(nptForm);
             var self = this;
             this._options = nptForm;
             this._onSubmitListen = [];

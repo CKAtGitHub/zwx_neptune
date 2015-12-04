@@ -38,6 +38,7 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
             templateOptions: {
                 label: "请选择:",
                 placeholder: "请选择.",
+                disabled:true,
                 valueProp: 'id',
                 labelProp: 'name',
                 viewvalueQueryProp: "id",

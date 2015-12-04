@@ -1,0 +1,16 @@
+//
+   Created by huangbinglong on 15/11/30.
+extends layout/layout
+block content
+   script(src="/js/npt-message-box.js")
+   div(ng-app="nptMessageBoxApp")
+      div.page-header
+         h1 NPT Message Box
+      div(ng-controller="nptMessageBoxDemoController as vm")
+         button.btn.btn-primary(type="button",ng-click="vm.tip()") 提示框
+         p
+         button.btn.btn-primary(type="button",ng-click="vm.confirm()") 确认框
+         p
+         button.btn.btn-primary(type="button",ng-click="vm.useTemplate()") 自定义模板内容
+         p
+         button.btn.btn-primary(type="button",ng-click="vm.useTemplateUrl()") 指定模板URL

@@ -13,7 +13,8 @@ angular.module("ui.neptune.service", [
     "ui.neptune.service.cache",
     "ui.neptune.service.session",
     "ui.neptune.service.datatableStore",
-    "ui.neptune.service.formStore"
+    "ui.neptune.service.formStore",
+    "ui.neptune.service.messageBox"
 ]);
 
 angular.module("ui.neptune.validator", [

@@ -68,4 +68,8 @@ router.get("/npt-upload", function (req, res, next) {
 
 router.get("/api/aliuploadAuth",require("./api/aliuploadAuth")());
 
+router.get("/npt-message-box", function (req, res, next) {
+    res.render("npt-message-box");
+});
+
 module.exports = router;

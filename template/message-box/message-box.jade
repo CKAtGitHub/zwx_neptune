@@ -1,0 +1,9 @@
+div
+   div.modal-header
+      button.close(type='button',ng-click="vm.cancel()",aria-label="关闭")
+         span &times
+      h4.modal-title {{vm.modalOptions.title}}
+   div.modal-body(ng-if="vm.modalContent",npt-compile="vm.modalContent")
+   div.modal-footer(ng-if="vm.modalOptions.action")
+      button.btn.btn-primary(ng-repeat="action in vm.modalOptions.action",type="button",ng-disabled="false",ng-click="vm.btnClick(action.type)",ng-class="[{'btn-primary':!action.class},action.class]") {{action.label}}
+      button.btn.btn-warning(type="button",ng-click="vm.cancel()") 取消
