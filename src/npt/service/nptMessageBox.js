@@ -137,14 +137,14 @@ angular.module("ui.neptune.service.messageBox", ['ui.bootstrap'], function ($com
         // 监听窗口关闭事件
         $scope.$on("modal.closing", function (event, result) {
             // result 为true时为dismiss事件，不处理
-            if (result !== true) {
+            if (angular.isDefined(result)) {
                 event.preventDefault(); // 阻止窗口关闭
                 var actionType = "cancel";
                 if (angular.isObject(result)) {
                     actionType = result.type;
                 }
                 fireListener(actionType).then(function () {
-                    $uibModalInstance.dismiss(true);
+                    $uibModalInstance.dismiss();
                 });
             }
 

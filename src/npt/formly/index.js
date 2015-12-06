@@ -11,6 +11,7 @@ angular.module("ui.neptune.formly", [
     "ui.neptune.formly.wrapper-validation",
     "ui.neptune.formly.select-tree-single",
     "ui.neptune.formly.select-image",
+    "ui.neptune.formly.npt-formly-upload",
     "ui.neptune.formly.messages"]);
 
 angular.module("ui.neptune.formly.ui-select",
@@ -26,3 +27,5 @@ angular.module("ui.neptune.formly.ui-mask", ['ui.utils.masks', "ui.mask"]);
 angular.module("ui.neptune.formly.wrapper-validation", []);
 
 angular.module("ui.neptune.formly.messages",[]);
+
+angular.module("ui.neptune.formly.npt-formly-upload",[]);

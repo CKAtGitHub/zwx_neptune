@@ -6,6 +6,8 @@ div
          span(ng-if="file.uploadState") {{file.uploadState}}
       div.progress
          div.progress-bar(style="width:{{2 * file.percent}}px",{{'aria-valuenow'}})
+      div.close(ng-click="vm.removeFile(file)")
+         | X
    br
    div#container
       button#selectfiles(type="button",class="btn btn-primary") 选择文件

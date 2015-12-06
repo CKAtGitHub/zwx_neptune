@@ -11,12 +11,18 @@ angular.module("ui.neptune.directive.upload", [])
 
         vm.filesInfo = [];
         vm.errors = [];
+        // 开始上传文件
         vm.startUpload = function () {
             set_upload_param(uploader).then(function () {
                 uploader.start();
             }, function (err) {
                 console.error(err);
             });
+        };
+
+        // 删除指定文件
+        vm.removeFile = function (file) {
+            uploader.removeFile(file);
         };
 
         var expire = 0;
@@ -81,6 +87,7 @@ angular.module("ui.neptune.directive.upload", [])
             silverlight_xap_url: '/vendor/plupload-2.1.2/js/Moxie.xap',
             url:'http://oss-cn-shenzhen.aliyuncs.com',
             prevent_duplicates:true,
+            multi_selection:true,
 
             init: {
                 PostInit: function () {
@@ -91,6 +98,9 @@ angular.module("ui.neptune.directive.upload", [])
                         file.formateSize = plupload.formatSize(file.size);
                         vm.filesInfo.push(file);
                     });
+                    if (vm.options.filesAdded) {
+                        vm.options.filesAdded(files);
+                    }
                     $scope.$apply();
                 },
 
@@ -120,7 +130,20 @@ angular.module("ui.neptune.directive.upload", [])
                 Browse:function(up,file) {
                     vm.errors = [];
                 },
-
+                UploadComplete : function(up,files) {
+                    if (vm.options.uploadComplete) {
+                        vm.options.uploadComplete(files);
+                    }
+                },
+                FilesRemoved:function(up,files) {
+                    vm.filesInfo = [];
+                    up.files.forEach(function(f) {
+                        vm.filesInfo.push(f);
+                    });
+                    if (vm.options.filesRemoved) {
+                        vm.options.filesRemoved(files);
+                    }
+                },
                 Error: function (up, err) {
                     set_upload_param(up);
                     vm.errors.push(err);
@@ -131,6 +154,12 @@ angular.module("ui.neptune.directive.upload", [])
         uploadOptions = angular.extend(uploadOptions,vm.options.up || {});
         var uploader = new plupload.Uploader(uploadOptions);
         uploader.init();
+
+        if (vm.options.onRegisterApi) {
+            vm.options.onRegisterApi({
+                uploader:uploader
+            });
+        }
 
     })
     .directive("nptUpload", [function () {
