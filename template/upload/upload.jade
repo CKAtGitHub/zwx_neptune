@@ -1,13 +1,12 @@
 div
-   div(ng-repeat="file in vm.filesInfo",id="{{file.id}}")
+   div(ng-repeat="file in vm.filesInfo",id="{{file.id}}",style="width:215px")
       | {{file.name}} ({{file.formateSize}})
       b
          span(ng-if="file.percent > 0 && file.percent !==100") {{file.percent}}%
          span(ng-if="file.uploadState") {{file.uploadState}}
+      div.close.glyphicon.glyphicon-remove(ng-click="vm.removeFile(file)",aria-label="关闭")
       div.progress
          div.progress-bar(style="width:{{2 * file.percent}}px",{{'aria-valuenow'}})
-      div.close(ng-click="vm.removeFile(file)")
-         | X
    br
    div#container
       button#selectfiles(type="button",class="btn btn-primary") 选择文件
