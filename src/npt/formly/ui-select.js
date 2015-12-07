@@ -38,6 +38,8 @@ angular.module("ui.neptune.formly.ui-select")
                         var searchFields = angular.copy(field.templateOptions.search || []);
                         var searchValue = value;
 
+                        field.templateOptions.placeholder = field.templateOptions.placeholder || "";
+
                         if (field.templateOptions.search && field.templateOptions.repository) {
                             //存在search以及repository,表示按输入条件检索
                             //model[field.key];
@@ -85,7 +87,7 @@ angular.module("ui.neptune.formly.ui-select")
                             });
                         } else if (field.templateOptions.repository) {
                             //存在repository表示,检索资源作为待选列表,只在首次检索
-                            field.templateOptions.placeholder = (field.templateOptions.placeholder||"") + " (正在查询...)";
+                            field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
                             promise = field.templateOptions.repository.post(field.templateOptions.repositoryParams || {});
                         }
 
