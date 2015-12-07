@@ -155,6 +155,8 @@ angular.module("ui.neptune.directive.upload", [])
         var uploader = new plupload.Uploader(uploadOptions);
         uploader.init();
 
+        uploader.startUpload = vm.startUpload;
+
         if (vm.options.onRegisterApi) {
             vm.options.onRegisterApi({
                 uploader:uploader

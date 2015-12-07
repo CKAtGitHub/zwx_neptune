@@ -25,9 +25,9 @@ angular.module("ui.neptune.formly.ui-validation")
         addTypeForValidator('ip');
         is.setRegexp(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i, 'nanpPhone');
         addTypeForValidator('nanpPhone'); // 电话号码
-        addTypeForValidator('empty', true, "to.label+' 为必填项'"); // 非空
+        addTypeForValidator('empty', "to.label+' 为必填项'", true); // 非空
 
-        function addTypeForValidator(validatorName, isNot, message) {
+        function addTypeForValidator(validatorName, message, isNot) {
             var validators = {};
             var originName = validatorName;
             validatorName = isNot ? 'not' + validatorName : validatorName;

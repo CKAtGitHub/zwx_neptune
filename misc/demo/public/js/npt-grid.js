@@ -69,7 +69,26 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                 },
                 del: {
                     label: "删除",
-                    type: "del"
+                    type: "del",
+                    listens: [function ($q, $timeout) {
+                        var deferd = $q.defer();
+                        console.info("正在执行删除方法：1");
+                        $timeout(function () {
+                            deferd.resolve();
+                            console.info("删除方法1完成");
+                        }, 1000);
+
+                        return deferd.promise;
+                    },function ($q, $timeout) {
+                        var deferd = $q.defer();
+                        console.info("正在执行删除方法：2");
+                        $timeout(function () {
+                            deferd.reject();
+                            console.info("删除方法2完成");
+                        }, 1000);
+
+                        return deferd.promise;
+                    }]
                 },
                 edit: {
                     label: "编辑",

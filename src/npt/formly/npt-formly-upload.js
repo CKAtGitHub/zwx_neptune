@@ -12,66 +12,57 @@ angular.module("ui.neptune.formly.npt-formly-upload")
             extends: 'input',
             defaultOptions: {
                 wrapper: ["showErrorMessage"],
-                controller: function ($scope, $http,nptMessageBox) {
+                controller: function ($scope, $q, nptMessageBox) {
                     var vm = this;
                     var options = $scope.options;
                     var to = options.templateOptions;
                     var model = $scope.model;
+                    var bigDefer = $q.defer();
 
                     vm.uploadOptions = {
-                        up: {
-                            filters: {
-                                mime_types: [
-                                    {title: "Image File", extensions: "jpg,gif,png"}
-                                ],
-                                max_file_size: '100kb'
-                            }
-                        },
-                        getSignature: function () {
-                            return $http.get("/api/aliuploadAuth");
-                        },
+                        up: to.up || {},
+                        getSignature: to.getSignature,
                         filesAdded: function (files) {
-
+                            //console.log("添加了文件");
                         },
                         fileUploaded: function (file, info) {
-                            console.log("文件上传成功：" + file.UUID);
+                            //console.log("文件上传成功：" + file.UUID);
                         },
-                        uploadComplete : function(files) {
-
+                        uploadComplete: function (files) {
+                            //console.log("所有文件上传成功");
                         },
                         onRegisterApi: function (api) {
                             vm.uploaderApi = api;
                         }
                     };
 
-                    vm.onClickUpload = function() {
+                    vm.onClickUpload = function () {
                         nptMessageBox.open({
-                            title:to.label,
-                            content:"<div npt-upload='$$ms.uploadOptions'></div>",
-                            scope:{
-                                uploadOptions:vm.uploadOptions
+                            title: to.label,
+                            content: "<div npt-upload='$$ms.uploadOptions'></div>",
+                            scope: {
+                                uploadOptions: vm.uploadOptions
                             },
-                            action:{
-                                success:{
-                                    label:"确定",
+                            modal: {
+                                backdrop: 'static'
+                            },
+                            action: {
+                                success: {
+                                    label: "确定",
                                     listens: [function (modalResult) {
                                         var upFiles = vm.uploaderApi.uploader.files;
                                         var files = [];
-                                        var fileNames = [];
-                                        angular.forEach(upFiles,function(file) {
+                                        angular.forEach(upFiles, function (file) {
                                             if (file.UUID) {
-                                                fileNames.push(file.name);
                                                 files.push(file);
                                             }
                                         });
-                                        vm.viewValue = fileNames.join(";");
-                                        model[options.key] = files;
-                                        //$scope.$apply();
+                                        addFiles(files);
                                         vm.uploaderApi.uploader.destroy();
                                     }]
                                 },
-                                cancel:{
-                                    label:"取消",
+                                cancel: {
+                                    label: "取消",
                                     listens: [function (modalResult) {
                                         vm.uploaderApi.uploader.destroy();
                                     }]
@@ -80,12 +71,74 @@ angular.module("ui.neptune.formly.npt-formly-upload")
                         });
                     };
 
+                    function addFiles(files) {
+                        if (!to.repository) {
+                            return;
+                        }
+                        function addFile(file) {
+                            var params = angular.copy(to.repositoryParams || {});
+                            params.sn = file.UUID;
+                            params.name = file.name;
+                            params.type = file.type;
+                            return to.repository.post(params);
+
+                        }
+                        var promiseArr = [];
+                        angular.forEach(files, function (sn) {
+                            promiseArr.push(addFile(sn));
+                        });
+                        $q.all(promiseArr).then(function (responses) {
+                            showValue(responses);
+                            bigDefer.resolve(responses);
+                        }, function (error) {
+                            bigDefer.reject(error);
+                        });
+
+                        function showValue(responses) {
+                            var datas = [];
+                            var ids = [];
+                            var names = [];
+                            angular.forEach(responses, function (resp) {
+                                var data = resp.data;
+                                datas.push(data);
+                                if (to.valueProp) {
+                                    ids.push(data[to.valueProp]);
+                                }
+                                if (to.labelProp) {
+                                    names.push(data[to.labelProp]);
+                                }
+                            });
+
+                            if (ids.length === 0) {
+                                ids = datas;
+                                names = datas;
+                            }
+
+                            if (to.splitChar) {
+                                vm.viewValue = names.join(to.splitChar);
+                                model[options.key] = ids.join(to.splitChar);
+                            } else {
+                                model[options.key] = ids;
+                                vm.viewValue = JSON.stringify(names);
+                            }
+                        }
+                    }
+
+                    if (to.onRegisterApi) {
+                        to.onRegisterApi({
+                            result: bigDefer.promise
+                        });
+                    }
+
                     $scope.vm = vm;
                 },
                 templateOptions: {
                     label: "请选择:",
                     placeholder: "请选择.",
-                    disabled: true
+                    disabled: true,
+                    splitChar: ",",
+                    valueProp: "id",
+                    labelProp: "name"
                 }
             }
 
