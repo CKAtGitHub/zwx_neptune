@@ -3,7 +3,7 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope,QueryCtrlCode,RegExpValidatorFactory) {
+    .controller("formlyExampleController", function ($scope,$timeout,QueryCtrlCode,RegExpValidatorFactory) {
         var vm = this;
         vm.onSubmit = function onSubmit() {
             if (vm.form.$valid) {
@@ -12,6 +12,9 @@ angular.module('formlyExample', ['ui.neptune'])
             }
         };
         vm.model = {};
+        $timeout(function() {
+            vm.model.ctrlCode = "once";
+        },1000);
         vm.fields = [
             {
                 key: 'url',
