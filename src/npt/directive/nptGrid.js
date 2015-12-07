@@ -127,9 +127,10 @@ angular.module("ui.neptune.directive.grid",
 
                 //添加序号区域,
                 this._config.gridOptions.columnDefs.unshift({
-                    field: '$index',
+                    name: '$index',
                     displayName: "序号",
                     enableSorting: true,
+                    cellTemplate: '<div class="ui-grid-cell-contents ng-binding ng-scope">{{row.grid.appScope.model.indexOf(row.entity)+1}}</div>',
                     width: 60
                 });
 
@@ -276,7 +277,7 @@ angular.module("ui.neptune.directive.grid",
                 oneData = selectedData[0];
             }
             if (this._handler[action.type]) {
-                this._handler[action.type](action,oneData , oneData.$index - 1);
+                this._handler[action.type](action,oneData , $scope.model.indexOf(oneData));
             } else {
                 this._handler.none(action, selectedData);
             }
@@ -289,16 +290,6 @@ angular.module("ui.neptune.directive.grid",
             vm.gridOptions = vm.nptGridApi.gridOptions();
             vm.action = vm.nptGridApi.getActions();
             vm.gridStyle = vm.nptGridApi.getGridStyle();
-
-            //观察data变化计算行号
-            $scope.$watch("model", function (newValue) {
-                if (newValue) {
-                    var index = 1;
-                    angular.forEach(newValue, function (value) {
-                        value.$index = index++;
-                    });
-                }
-            }, true);
         };
 
         vm.triggerAction = function (menu) {

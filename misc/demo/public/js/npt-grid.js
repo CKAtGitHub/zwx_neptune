@@ -83,7 +83,7 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                         var deferd = $q.defer();
                         console.info("正在执行删除方法：2");
                         $timeout(function () {
-                            deferd.reject();
+                            deferd.resolve();
                             console.info("删除方法2完成");
                         }, 1000);
 
