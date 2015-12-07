@@ -73,7 +73,7 @@ angular.module('formlyExample', ['ui.neptune'])
                 templateOptions: {
                     label: '异步验证控制编码',
                     placeholder: 'once',
-                    reversal: false,
+                    reversal: true,
                     searchProp:"no",
                     repository: QueryCtrlCode,
                     repositoryParams: {"defno": "cycle"}

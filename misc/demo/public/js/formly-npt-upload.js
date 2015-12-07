@@ -35,10 +35,6 @@ angular.module('formlyExample', ['ui.neptune'])
                     repository: AddOrUpdateFileRepo,
                     repositoryParams: {
                         "instid": "10000001463017",
-                        "storagetype": "aliyun",
-                        "bucket": "aliyun",
-                        "level": "system",
-                        "filetype": "image",
                         "createby": "10000001519061"
                     }
                 }

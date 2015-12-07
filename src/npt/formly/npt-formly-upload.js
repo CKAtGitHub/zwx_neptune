@@ -76,7 +76,13 @@ angular.module("ui.neptune.formly.npt-formly-upload")
                             return;
                         }
                         function addFile(file) {
-                            var params = angular.copy(to.repositoryParams || {});
+                            var _baseParams = {
+                                "storagetype": "aliyun",
+                                "bucket": "aliyun",
+                                "level": "user",
+                                "filetype": "image"
+                            };
+                            var params = angular.extend({},_baseParams,to.repositoryParams || {});
                             params.sn = file.UUID;
                             params.name = file.name;
                             params.type = file.type;
@@ -88,19 +94,20 @@ angular.module("ui.neptune.formly.npt-formly-upload")
                             promiseArr.push(addFile(sn));
                         });
                         $q.all(promiseArr).then(function (responses) {
-                            showValue(responses);
-                            bigDefer.resolve(responses);
+                            var datas = [];
+                            angular.forEach(responses, function (resp) {
+                                datas.push(resp.data);
+                            });
+                            showValue(datas);
+                            bigDefer.resolve(datas);
                         }, function (error) {
                             bigDefer.reject(error);
                         });
 
-                        function showValue(responses) {
-                            var datas = [];
+                        function showValue(datas) {
                             var ids = [];
                             var names = [];
-                            angular.forEach(responses, function (resp) {
-                                var data = resp.data;
-                                datas.push(data);
+                            angular.forEach(datas, function (data) {
                                 if (to.valueProp) {
                                     ids.push(data[to.valueProp]);
                                 }

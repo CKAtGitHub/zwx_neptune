@@ -5,7 +5,7 @@
  */
 
 angular.module("nptUploadApp", ["ui.neptune"])
-    .controller("nptUploadDemoController", function ($scope, $http, AddOrUpdateFileRepo) {
+    .controller("nptUploadDemoController", function ($scope, $http) {
         var vm = this;
 
         vm.uploadOptions = {
@@ -25,20 +25,6 @@ angular.module("nptUploadApp", ["ui.neptune"])
             },
             fileUploaded: function (file, info) {
                 console.log("文件上传成功：" + file.UUID);
-            },
-            repository: AddOrUpdateFileRepo,
-            repositoryParams: {
-                "instid": "10000001463017",
-                "sn": "111111111111",
-                "name": "22222",
-                "type": "jpg",
-                "storagetype": "aliyun",
-                "bucket": "aliyun",
-                "level": "system",
-                "filetype": "image",
-                "createby": "10000001519061"
             }
         };
-    }).factory("AddOrUpdateFileRepo", function (nptRepository) {
-        return nptRepository("AddOrUpdateFile");
     });
