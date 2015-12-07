@@ -75,7 +75,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     options: [],
                     repository: QueryCtrlCode,
                     repositoryParams: {"defno": "cycle"},
-                    search: ['name'],
+                    search: ['no'],
                     allowClear:false
                 }
             }];

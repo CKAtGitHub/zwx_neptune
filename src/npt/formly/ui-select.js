@@ -37,6 +37,7 @@ angular.module("ui.neptune.formly.ui-select")
 
                         var searchFields = angular.copy(field.templateOptions.search || []);
                         var searchValue = value;
+                        var keepModelValue = model[field.key];
 
                         field.templateOptions.placeholder = field.templateOptions.placeholder || "";
 
@@ -68,6 +69,7 @@ angular.module("ui.neptune.formly.ui-select")
                                     searchFields.push(valueProp);
                                 }
                                 searchValue = model[field.key];
+                                model[field.key] = undefined;
                             }
 
                             if (oldOptions.length > 0) {    // 用户输入或者model里面的值在现有的options中存在，不检索
@@ -75,10 +77,25 @@ angular.module("ui.neptune.formly.ui-select")
                                     data: oldOptions
                                 });
                             } else {
-                                searchFields.forEach(function(field) {
-                                    params[field] = searchValue;
-                                });
-                                promise = field.templateOptions.repository.post(params);
+                                field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
+                                if (angular.isArray(searchValue)) {
+                                    var promiseArr = [];
+                                    angular.forEach(searchValue,function(sv) {
+                                        promiseArr.push(function() {
+                                            var pParams = angular.copy(params);
+                                            searchFields.forEach(function(field) {
+                                                pParams[field] = sv;
+                                            });
+                                            return field.templateOptions.repository.post(pParams);
+                                        }());
+                                    });
+                                    promise = $q.all(promiseArr);
+                                } else {
+                                    searchFields.forEach(function(field) {
+                                        params[field] = searchValue;
+                                    });
+                                    promise = field.templateOptions.repository.post(params);
+                                }
                             }
                         } else if (field.templateOptions.options && field.templateOptions.options.length > 0) {
                             //存在options,使用静态选择
@@ -93,7 +110,19 @@ angular.module("ui.neptune.formly.ui-select")
 
                         return promise.then(function (response) {
                             field.templateOptions.placeholder = field.templateOptions.placeholder.replace(" (正在查询...)","");
-                            field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
+                            model[field.key] = keepModelValue;
+                            if (angular.isArray(response)) {
+                                field.templateOptions.options = [];
+                                angular.forEach(response,function(resp) {
+                                    var dd = angular.isArray(resp.data)?resp.data:[resp.data];
+                                    dd.forEach(function(d) {
+                                        field.templateOptions.options.push(d);
+                                    });
+                                });
+                            } else {
+                                field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
+                            }
+
                         });
                     },
                     refreshDelay: 0
