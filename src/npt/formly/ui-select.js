@@ -85,7 +85,7 @@ angular.module("ui.neptune.formly.ui-select")
                             });
                         } else if (field.templateOptions.repository) {
                             //存在repository表示,检索资源作为待选列表,只在首次检索
-                            field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
+                            field.templateOptions.placeholder = (field.templateOptions.placeholder||"") + " (正在查询...)";
                             promise = field.templateOptions.repository.post(field.templateOptions.repositoryParams || {});
                         }
 
