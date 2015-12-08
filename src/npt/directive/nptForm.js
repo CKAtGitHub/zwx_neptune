@@ -186,6 +186,25 @@ angular.module("ui.neptune.directive.form", [])
             return this.form;
         };
 
+        NptFormApi.prototype.getErrorMessages = function () {
+            var fields = this.fields();
+            var messageTexts = [];
+
+            angular.forEach(fields, function (value) {
+                //检查当前错误对象
+                angular.forEach(value.formControl.$error, function (errorValue, errorKey) {
+                    //根据错误Key查找验证器消息处理方法
+                    if (value.validation.messages[errorKey]) {
+                        var msg = value.validation.messages[errorKey]();
+                        if (msg) {
+                            messageTexts.push(msg);
+                        }
+                    }
+                });
+            });
+            return messageTexts;
+        };
+
 
         vm.init = function (nptForm) {
             //初始化API

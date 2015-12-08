@@ -142,6 +142,9 @@ angular.module("formDemo", ["ui.neptune"])
                     //vm.nptFormApi.disabled(vm.disabled);
                     //vm.disabled = !vm.disabled;
                     vm.nptFormApi.updateInitialValue();
+
+                    var errors = vm.nptFormApi.getErrorMessages();
+                    console.info(errors);
                 });
             }
         }
