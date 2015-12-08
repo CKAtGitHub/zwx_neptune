@@ -145,9 +145,69 @@ angular.module("ui.neptune.formly.npt-formly-upload")
                     disabled: true,
                     splitChar: ",",
                     valueProp: "id",
-                    labelProp: "name"
+                    labelProp: "name",
+                    uploadImage:true,
+                    uploadDoc:true
                 }
             }
 
         });
-    });
+    })
+    .controller("FormlyUploadControllect",function($scope, $q, nptMessageBox) {
+        var vm = this;
+        vm.options = $scope.nptFormlyUpload || {};
+        vm.isUploadDoc = angular.isDefined(vm.options.uploadDoc)?vm.options.uploadDoc:true;
+        vm.isUploadImage = angular.isDefined(vm.options.uploadImage)?vm.options.uploadImage:true;
+        vm.isUploadOther = angular.isDefined(vm.options.uploadOther)?vm.options.uploadImage:false;
+
+        var _templateOptions = {
+            image:{
+                filters: {
+                    mime_types: [
+                        {title: "Image File", extensions: "jpg,gif,png"}
+                    ],
+                    max_file_size: '10M'
+                },
+                multi_selection: true
+            },
+            doc:{
+                filters: {
+                    mime_types: [
+                        {title: "Doc File", extensions: "doc,excel,docx,excelx,pdf,txt,wps"}
+                    ],
+                    max_file_size: '10M'
+                },
+                multi_selection: true
+            }
+        };
+
+        function mergeOptions(tempOptions,customOptions) {
+
+        }
+
+        /*上传图片*/
+        vm.uploadImage = function() {
+            var theOptions = mergeOptions(_templateOptions.image);
+        };
+
+        /*上传文件*/
+        vm.uploadDoc = function() {
+
+        };
+
+    })
+    .directive("nptFormlyUpload", [function ($scope, $q, nptMessageBox) {
+        return {
+            restrict: "EA",
+            controller: "FormlyUploadControllect as vm",
+            replace: true,
+            templateUrl: function (element, attrs) {
+                return attrs.templateUrl || "/template/formly/npt-formly-upload-directive.html";
+            },
+            scope: {
+                nptFormlyUpload: "="
+            },
+            link: function () {
+            }
+        };
+    }]);

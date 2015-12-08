@@ -3,6 +3,8 @@ div
     div.row
         div.col-md-12
             button.btn.btn-primary(type="button",ng-click="to.onSelect(model, options)") 从相册选择
+            |&nbsp;
+            div(npt-formly-upload="to.uploadOptions")
             input.form-control(type="text",ng-model="model[options.key]",ng-hide="true")
     div.row
         div.col-md-2(ng-repeat="image in to.selectedImages")

@@ -109,7 +109,6 @@ angular.module("ui.neptune.directive.upload", [])
                 },
 
                 FileUploaded: function (up, file, info) {
-                    set_upload_param(up);
                     if (info.status >= 200 || info.status < 200) {
                         var key = up.getOption().multipart_params.key;
                         if (key.indexOf("/") > 0) {
@@ -125,6 +124,7 @@ angular.module("ui.neptune.directive.upload", [])
                     else {
                         file.uploadState = info.response;
                     }
+                    set_upload_param(up);
                     $scope.$apply();
                 },
                 Browse:function(up,file) {
