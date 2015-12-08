@@ -61,7 +61,7 @@ angular.module("ui.neptune.formly.ui-validation")
                             var repositoryParams = scope.options.templateOptions.repositoryParams || {};
                             var lastModelName = scope.options.key + "_lastModel";
                             scope[lastModelName] = scope[lastModelName] || [];
-                            if (!viewValue) {
+                            if (!modelValue) {
                                 defer.resolve();
                             } else if (!repository) {
                                 defer.reject();
@@ -74,7 +74,7 @@ angular.module("ui.neptune.formly.ui-validation")
                                 var params = {};
                                 var reversal = scope.options.templateOptions.reversal;
                                 if (scope.options.templateOptions.searchProp) {
-                                    params[scope.options.templateOptions.searchProp] = viewValue;
+                                    params[scope.options.templateOptions.searchProp] = modelValue;
                                 }
                                 params = angular.extend({}, repositoryParams, params);
                                 repository.post(params)
