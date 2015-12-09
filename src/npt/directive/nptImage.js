@@ -10,24 +10,38 @@ angular.module("ui.neptune.directive.nptImage", ['ui.bootstrap'])
 
         vm.imageId = $scope.nptImage;
         vm.options = $scope.nptImageOptions||{};
-        var cacheFilter = $filter("cacheFilter");
-        $scope.thumbnailUrl = cacheFilter(vm.imageId,'file','thumbnailUrl');
-        if (!$scope.thumbnailUrl && vm.options.repository) {
-            nptImageService.init(vm.options).post(vm.imageId,function(url,error) {
-                if (error || !url) {
-                    var newCacheUrl = cacheFilter(vm.imageId,'file','thumbnailUrl');
-                    if (newCacheUrl) {
-                        $scope.thumbnailUrl = newCacheUrl;
-                    } else if (vm.options.errorImage){
-                        $scope.thumbnailUrl = vm.options.errorImage;
+
+        vm.reDealWithId = function() {
+            var cacheFilter = $filter("cacheFilter");
+            $scope.thumbnailUrl = cacheFilter(vm.imageId,'file','thumbnailUrl');
+            if (!$scope.thumbnailUrl && vm.options.repository) {
+                nptImageService.init(vm.options).post(vm.imageId,function(url,error) {
+                    if (error || !url) {
+                        var newCacheUrl = cacheFilter(vm.imageId,'file','thumbnailUrl');
+                        if (newCacheUrl) {
+                            $scope.thumbnailUrl = newCacheUrl;
+                        } else if (vm.options.errorImage){
+                            $scope.thumbnailUrl = vm.options.errorImage;
+                        }
+                    } else {
+                        $scope.thumbnailUrl = url;
                     }
-                } else {
-                    $scope.thumbnailUrl = url;
-                }
+                });
+            } else if (vm.options.emptyImage) {
+                $scope.thumbnailUrl = vm.options.emptyImage;
+            }
+        };
+
+        if ($scope.nptImageAttr != vm.imageId) {
+            $scope.$watch("nptImage",function(value) {
+                vm.imageId = value;
+                vm.reDealWithId();
             });
-        } else if (vm.options.emptyImage) {
-            $scope.thumbnailUrl = vm.options.emptyImage;
+        } else {
+            vm.reDealWithId();
         }
+
+
     })
     .service("nptImageService",function() {
         this.init = function(options) {
@@ -75,7 +89,8 @@ angular.module("ui.neptune.directive.nptImage", ['ui.bootstrap'])
             },
             scope: {
                 nptImage: "=",
-                nptImageOptions: "="
+                nptImageOptions: "=",
+                nptImageAttr : "@"
             },
             link: function (scope, element, attrs, ctrl) {
             }
