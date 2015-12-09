@@ -13,6 +13,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
         vm.isUploadImage = angular.isDefined(vm.options.uploadImage) ? vm.options.uploadImage : true;
         vm.isUploadOther = angular.isDefined(vm.options.uploadOther) ? vm.options.uploadImage : false;
 
+        vm.theFileType = vm.options.fileType;
         if (vm.options.fileType) {
             if (vm.options.fileType == "image") {
                 vm.isUploadImage = true;
@@ -40,7 +41,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
             doc: {
                 filters: {
                     mime_types: [
-                        {title: "Doc File", extensions: "doc,excel,docx,excelx,pdf,txt,wps"}
+                        {title: "Doc File", extensions: "doc,xls,docx,xlsx,pdf,txt,wps"}
                     ],
                     max_file_size: '10M'
                 },
@@ -49,8 +50,8 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
         };
 
         function mergeOptions(tempOptions, customOptions) {
-            tempOptions = tempOptions || {};
-            customOptions = customOptions || {};
+            tempOptions = angular.copy(tempOptions || {});
+            customOptions = angular.copy(customOptions || {});
 
             if (customOptions.fileExtensions) {
                 tempOptions.filters = tempOptions.filters || {};
@@ -151,7 +152,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
                     "storagetype": "aliyun",
                     "bucket": "aliyun",
                     "level": "user",
-                    "filetype": vm.options.fileType?vm.options.fileType:(vm.isUploadImage?"image":"doc")
+                    "filetype": vm.theFileType?vm.theFileType:(vm.isUploadImage?"image":"doc")
                 };
                 var params = angular.extend({}, _baseParams, vm.options.repositoryParams || {});
                 params.sn = file.UUID;
@@ -180,26 +181,26 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
         }
 
         /*上传图片*/
-        vm.uploadImage = function (title) {
-            vm.options.fileType = "image";
-            var theOptions = mergeOptions(_templateOptions.image, vm.options);
+        vm.uploadImage = function (title,options) {
+            vm.theFileType = "image";
+            var theOptions = mergeOptions(_templateOptions.image, angular.extend({},vm.options,options || {}));
             openModal(title || "上传图片", theOptions);
             return bigDefer.promise;
         };
 
         /*上传文件*/
-        vm.uploadDoc = function (title) {
-            vm.options.fileType = "doc";
-            var theOptions = mergeOptions(_templateOptions.doc, vm.options);
+        vm.uploadDoc = function (title,options) {
+            vm.theFileType = "doc";
+            var theOptions = mergeOptions(_templateOptions.doc, angular.extend({},vm.options,options || {}));
             openModal(title || "上传文档", theOptions);
             return bigDefer.promise;
 
         };
 
         /*上传其他*/
-        vm.uploadOther = function (title) {
-            vm.options.fileType = "doc";
-            var theOptions = mergeOptions(vm.options.otherUpload);
+        vm.uploadOther = function (title,options) {
+            vm.theFileType = "doc";
+            var theOptions = mergeOptions(vm.options.otherUpload,angular.extend({},vm.options,options || {}));
             openModal(title || "上传文件", theOptions);
             return bigDefer.promise;
         };
