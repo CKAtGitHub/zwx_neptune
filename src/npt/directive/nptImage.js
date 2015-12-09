@@ -90,7 +90,7 @@ angular.module("ui.neptune.directive.nptImage", ['ui.bootstrap'])
             scope: {
                 nptImage: "=",
                 nptImageOptions: "=",
-                nptImageAttr : "@"
+                nptImageAttr : "@nptImage"
             },
             link: function (scope, element, attrs, ctrl) {
             }
