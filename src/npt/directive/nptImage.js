@@ -14,7 +14,7 @@ angular.module("ui.neptune.directive.nptImage", ['ui.bootstrap'])
         vm.reDealWithId = function() {
             var cacheFilter = $filter("cacheFilter");
             $scope.thumbnailUrl = cacheFilter(vm.imageId,'file','thumbnailUrl');
-            if (!$scope.thumbnailUrl && vm.options.repository) {
+            if (!$scope.thumbnailUrl && vm.options.repository && vm.imageId) {
                 nptImageService.init(vm.options).post(vm.imageId,function(url,error) {
                     if (error || !url) {
                         var newCacheUrl = cacheFilter(vm.imageId,'file','thumbnailUrl');
