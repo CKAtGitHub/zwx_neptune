@@ -11,7 +11,7 @@ div
    div#container
       button#selectfiles(type="button",class="btn btn-primary") 选择文件
       |&nbsp;
-      button(type="button",class="btn btn-primary",ng-click="vm.startUpload()") 开始上传
+      button(type="button",class="btn btn-primary",ng-click="vm.startUpload()",ng-if="vm.options.showUploadBtn") 开始上传
    pre(ng-if="vm.errors.length > 0")
       div(ng-repeat="err in vm.errors")
          | {{err.file.name +' : '+err.message}}

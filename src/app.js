@@ -34,5 +34,6 @@ angular.module("ui.neptune.directive", [
     "ui.neptune.directive.form",
     "ui.neptune.directive.selectImage",
     "ui.neptune.directive.nptImage",
-    "ui.neptune.directive.upload"
+    "ui.neptune.directive.upload",
+    "ui.neptune.directive.npt-upload-custom"
 ]);

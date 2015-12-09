@@ -7,7 +7,10 @@
 angular.module("ui.neptune.directive.upload", [])
     .controller("UploadControllect", function ($scope, $http, $q) {
         var vm = this;
-        vm.options = $scope.nptUpload || {};
+        vm.options = {
+            showUploadBtn:true
+        };
+        vm.options = angular.extend(vm.options,$scope.nptUpload || {});
 
         vm.filesInfo = [];
         vm.errors = [];
