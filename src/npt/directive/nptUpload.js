@@ -109,6 +109,9 @@ angular.module("ui.neptune.directive.upload", [])
 
                 UploadProgress: function (up, file) {
                     $scope.$apply();
+                    if (vm.options.uploadProgress) {
+                        vm.options.uploadProgress(file);
+                    }
                 },
 
                 FileUploaded: function (up, file, info) {

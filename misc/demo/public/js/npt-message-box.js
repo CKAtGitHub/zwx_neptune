@@ -40,6 +40,7 @@ angular.module("nptMessageBoxApp", ["ui.neptune"])
                     second: {
                         label: "异常-不关闭窗口",
                         class: "btn-warning",
+                        ngDisabled:false,
                         listens: [function ($q, $timeout, modalResult) {
                             var deferd = $q.defer();
                             $timeout(function () {
@@ -64,6 +65,7 @@ angular.module("nptMessageBoxApp", ["ui.neptune"])
                 action: {
                     success: {
                         label: "确认",
+                        ngDisabled:"$$ms.url=='http://www.baidu.com'",
                         listens: [function ($q, $timeout, modalResult) {
                             var deferd = $q.defer();
                             $timeout(function () {

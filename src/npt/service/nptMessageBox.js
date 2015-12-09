@@ -95,7 +95,7 @@ angular.module("ui.neptune.service.messageBox", ['ui.bootstrap'], function ($com
         return factory;
     })
     .controller("messageBoxController",
-    function ($scope, $uibModalInstance, $q, $injector, $templateCache, modalOptions) {
+    function ($scope, $uibModalInstance, $q, $injector, $templateCache, modalOptions,$parse) {
         var vm = this;
 
         vm.modalOptions = modalOptions;
@@ -111,6 +111,22 @@ angular.module("ui.neptune.service.messageBox", ['ui.bootstrap'], function ($com
             $uibModalInstance.close({
                 type: type
             });
+        };
+
+        // 检查是否置灰按钮
+        vm.checkDisabled = function(expression) {
+            if (angular.isUndefined(expression)) {
+                return false;
+            }
+            if (typeof expression == "boolean") {
+                return expression;
+            }
+            return !!$parse(expression)($scope);
+        };
+
+        // 获得取消按钮的配置
+        vm.getCancelAction = function() {
+            return vm.modalOptions.action.cancel || {};
         };
 
         // 执行指定按钮类型的监听器

@@ -86,6 +86,9 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
                 fileUploaded: function (file, info) {
                     //console.log("文件上传成功：" + file.UUID);
                 },
+                uploadProgress : function(file) {
+                    vm.messageBox.updateScope("isUploading",true);
+                },
                 uploadComplete: function (files) {
                     var filesSns = [];
                     angular.forEach(files, function (f) {
@@ -115,7 +118,8 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
                 title: title,
                 content: "<div npt-upload='$$ms.uploadOptions'></div>",
                 scope: {
-                    uploadOptions: uploadOptions
+                    uploadOptions: uploadOptions,
+                    isUploading:false
                 },
                 modal: {
                     backdrop: 'static'
@@ -123,6 +127,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
                 action: {
                     success: {
                         label: "开始上传",
+                        ngDisabled:"$$ms.isUploading",
                         listens: [function (modalResult) {
                             var defer = $q.defer();
                             vm.uploaderApi.uploader.startUpload();
@@ -132,6 +137,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
                     },
                     cancel: {
                         label: "取消",
+                        ngDisabled:"$$ms.isUploading",
                         listens: [function (modalResult) {
                             vm.uploaderApi.uploader.destroy();
                         }]
