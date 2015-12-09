@@ -36,7 +36,7 @@ angular.module("ui.neptune.directive.grid",
                     rowHeight: 35,
                     rowTemplate: "/template/grid/npt-grid-row.html"
                 };
-                this._gridOptions = angular.extend(setting.gridOptions, this._gridOptions);
+                this._gridOptions = angular.extend({}, this._gridOptions,setting.gridOptions);
                 this._action = setting.action;
                 this._gridStyle = setting.gridStyle;
             };

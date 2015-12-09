@@ -20,6 +20,7 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                 ],
                 gridHeight: 600,
                 enableGridMenu: true,
+                multiSelect:false,
                 gridMenuCustomItems: [
                     {
                         title: "添加",
