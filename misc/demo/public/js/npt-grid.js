@@ -5,7 +5,7 @@
 angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
     .factory("DemoNptGrid", function (nptGridStore, uiGridConstants, OrderForm) {
         return nptGridStore("DemoNptGrid", {
-            gridStyle: "height:600px;",
+            gridStyle: "height:300px;",
             gridOptions: {
                 columnDefs: [
                     {field: 'sn', displayName: "订单编号", width: 150,
@@ -18,9 +18,11 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                     {field: 'createdate', displayName: "创建日期", cellFilter: "date|json"},
                     {field: 'remark', displayName: "备注"}
                 ],
-                gridHeight: 600,
                 enableGridMenu: true,
                 multiSelect:false,
+                autoHeight:true,
+                maxVisibleRowCount:20,
+                minRowsToShow:3,
                 gridMenuCustomItems: [
                     {
                         title: "添加",
@@ -132,7 +134,7 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
 
         $timeout(function () {
             var tempDatas = [];
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 30; i++) {
                 tempDatas.push({
                     "sn": "1000000232206" + i,
                     "state": "buy",

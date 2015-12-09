@@ -36,7 +36,7 @@ angular.module("ui.neptune.directive.grid",
                     rowHeight: 35,
                     rowTemplate: "/template/grid/npt-grid-row.html"
                 };
-                this._gridOptions = angular.extend({}, this._gridOptions,setting.gridOptions);
+                this._gridOptions = angular.extend({}, this._gridOptions, setting.gridOptions);
                 this._action = setting.action;
                 this._gridStyle = setting.gridStyle;
             };
@@ -112,6 +112,22 @@ angular.module("ui.neptune.directive.grid",
                     //如果存在注册Api回调则执行
                     if (self._options.onRegisterApi) {
                         self._options.onRegisterApi(self);
+                    }
+
+                    if (angular.isDefined(nptGridOptions.store.gridOptions().autoHeight)) {
+                        var maxVisibleRowCount = nptGridOptions.store.gridOptions().maxVisibleRowCount || 10;
+                        var minRowsToShow = nptGridOptions.store.gridOptions().minRowsToShow || 1;
+                        // 32导航，30底部total+30顶部条+30底部条
+                        $scope.$watch("model", function (datas) {
+                            datas = datas || [];
+                            var row = datas.length;
+                            row = row < minRowsToShow?minRowsToShow:row;
+                            row = row > maxVisibleRowCount?maxVisibleRowCount:row;
+                            $(self.uiGridApi.grid.element).height(
+                                (row * nptGridOptions.store.gridOptions().rowHeight) +
+                                32 + 30 + 30 + 30
+                            );
+                        });
                     }
                 };
 
@@ -277,7 +293,7 @@ angular.module("ui.neptune.directive.grid",
                 oneData = selectedData[0];
             }
             if (this._handler[action.type]) {
-                this._handler[action.type](action,oneData , $scope.model.indexOf(oneData));
+                this._handler[action.type](action, oneData, $scope.model.indexOf(oneData));
             } else {
                 this._handler.none(action, selectedData);
             }
