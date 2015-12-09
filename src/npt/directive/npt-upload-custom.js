@@ -13,6 +13,20 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
         vm.isUploadImage = angular.isDefined(vm.options.uploadImage) ? vm.options.uploadImage : true;
         vm.isUploadOther = angular.isDefined(vm.options.uploadOther) ? vm.options.uploadImage : false;
 
+        if (vm.options.fileType) {
+            if (vm.options.fileType == "image") {
+                vm.isUploadImage = true;
+                vm.isUploadDoc = false;
+            } else if (vm.options.fileType == "doc") {
+                vm.isUploadImage = false;
+                vm.isUploadDoc = true;
+            } else {
+                vm.isUploadOther = true;
+                vm.isUploadImage = false;
+                vm.isUploadDoc = true;
+            }
+        }
+
         var _templateOptions = {
             image: {
                 filters: {
@@ -137,7 +151,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
                     "storagetype": "aliyun",
                     "bucket": "aliyun",
                     "level": "user",
-                    "filetype": "image"
+                    "filetype": vm.options.fileType?vm.options.fileType:(vm.isUploadImage?"image":"doc")
                 };
                 var params = angular.extend({}, _baseParams, vm.options.repositoryParams || {});
                 params.sn = file.UUID;
