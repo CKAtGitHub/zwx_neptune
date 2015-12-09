@@ -181,6 +181,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
 
         /*上传图片*/
         vm.uploadImage = function (title) {
+            vm.options.fileType = "image";
             var theOptions = mergeOptions(_templateOptions.image, vm.options);
             openModal(title || "上传图片", theOptions);
             return bigDefer.promise;
@@ -188,6 +189,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
 
         /*上传文件*/
         vm.uploadDoc = function (title) {
+            vm.options.fileType = "doc";
             var theOptions = mergeOptions(_templateOptions.doc, vm.options);
             openModal(title || "上传文档", theOptions);
             return bigDefer.promise;
@@ -196,6 +198,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
 
         /*上传其他*/
         vm.uploadOther = function (title) {
+            vm.options.fileType = "doc";
             var theOptions = mergeOptions(vm.options.otherUpload);
             openModal(title || "上传文件", theOptions);
             return bigDefer.promise;
