@@ -123,6 +123,17 @@ angular.module("ui.neptune.formly.ui-select")
                                 field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
                             }
 
+                            if (!model[field.key] && angular.isDefined(field.templateOptions.selectIndex) &&
+                                field.templateOptions.options && field.templateOptions.options.length > 0 && !value) {
+                                var indx = field.templateOptions.selectIndex;
+                                if (field.templateOptions.multiple) {
+                                    model[field.key] = [];
+                                    model[field.key].push(field.templateOptions.options[indx][valueProp]);
+                                } else {
+                                    model[field.key] = field.templateOptions.options[indx][valueProp];
+                                }
+                            }
+
                         });
                     },
                     refreshDelay: 0

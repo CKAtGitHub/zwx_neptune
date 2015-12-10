@@ -32,7 +32,6 @@ angular.module('formlyExample', ['ui.neptune'])
                     smallLabelProp: "defname",
                     placeholder: '请选择服务周期',
                     required: true,
-                    multiple:'',
                     options: [{
                         id: "11111",
                         name: "测试1"
@@ -56,6 +55,7 @@ angular.module('formlyExample', ['ui.neptune'])
                     smallLabelProp: "defname",
                     placeholder: '请选择服务周期',
                     required: true,
+                    selectIndex:2,
                     options: [],
                     repository: QueryCtrlCode,
                     repositoryParams: {"defno": "cycle"},
