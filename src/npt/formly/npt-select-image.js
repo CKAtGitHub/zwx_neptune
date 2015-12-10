@@ -38,7 +38,6 @@ angular.module("ui.neptune.formly.select-image", [])
                 controller:function($scope) {
                     var vm = this;
                     var to = $scope.to;
-                    var model = $scope.model;
                     var options = $scope.options;
                     to.selectedImages = []; // 初始化时，置空已选图片
                     var uploadOptions = {
@@ -47,11 +46,11 @@ angular.module("ui.neptune.formly.select-image", [])
                             api.onComplete(function(datas) {
                                 //如果是单选,则将第一行设置为数据, 如果是多选则提取所有数据的id
                                 if (to.single && datas && datas.length > 0) {
-                                    model[options.key] = datas[0][to.valueProp];
+                                    $scope.model[options.key] = datas[0][to.valueProp];
                                 } else if (!to.single && datas) {
-                                    model[options.key] = [];
+                                    $scope.model[options.key] = [];
                                     angular.forEach(datas, function (data) {
-                                        model[options.key].push(data[to.valueProp]);
+                                        $scope.model[options.key].push(data[to.valueProp]);
                                     });
                                 }
                             });
