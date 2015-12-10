@@ -11,6 +11,12 @@ angular.module("ui.neptune.formly.ui-select")
             extends: 'select',
             templateUrl: "/template/formly/ui-select.html",
             defaultOptions: {
+                wrapper:["showErrorMessage"],
+                ngModelAttrs: {
+                    multiple: {
+                        attribute: 'multiple'
+                    }
+                },
                 templateOptions: {
                     ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
                     refresh: function refresh(value, model, field) {
@@ -28,6 +34,13 @@ angular.module("ui.neptune.formly.ui-select")
                             data: []
                         });
 
+
+                        var searchFields = angular.copy(field.templateOptions.search || []);
+                        var searchValue = value;
+                        var keepModelValue = model[field.key];
+
+                        field.templateOptions.placeholder = field.templateOptions.placeholder || "";
+
                         if (field.templateOptions.search && field.templateOptions.repository) {
                             //存在search以及repository,表示按输入条件检索
                             //model[field.key];
@@ -41,17 +54,22 @@ angular.module("ui.neptune.formly.ui-select")
 
                             var filterBy = $filter("filterBy");
                             var params = angular.copy(field.templateOptions.repositoryParams,{});
-                            var oldOptions = field.templateOptions.options;
+                            var oldOptions = field.templateOptions.options || [];
                             if (value){
                                 //检查到输入内容,检索数据
                                 oldOptions = filterBy(field.templateOptions.options,[labelProp],value);
-                                field.templateOptions.search.forEach(function(field) {
-                                    params[field] = value;
-                                });
+                                if (searchFields.length === 0) {
+                                    searchFields.push(labelProp);
+                                }
+                                searchValue = value;
                             } else if (model[field.key]) {
                                 //使用模型值,检索数据
                                 oldOptions = filterBy(field.templateOptions.options,[valueProp],model[field.key]);
-                                params[valueProp] = model[field.key];
+                                if (searchFields.length === 0) {
+                                    searchFields.push(valueProp);
+                                }
+                                searchValue = model[field.key];
+                                model[field.key] = undefined;
                             }
 
                             if (oldOptions.length > 0) {    // 用户输入或者model里面的值在现有的options中存在，不检索
@@ -59,7 +77,25 @@ angular.module("ui.neptune.formly.ui-select")
                                     data: oldOptions
                                 });
                             } else {
-                                promise = field.templateOptions.repository.post(params);
+                                field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
+                                if (angular.isArray(searchValue)) {
+                                    var promiseArr = [];
+                                    angular.forEach(searchValue,function(sv) {
+                                        promiseArr.push(function() {
+                                            var pParams = angular.copy(params);
+                                            searchFields.forEach(function(field) {
+                                                pParams[field] = sv;
+                                            });
+                                            return field.templateOptions.repository.post(pParams);
+                                        }());
+                                    });
+                                    promise = $q.all(promiseArr);
+                                } else {
+                                    searchFields.forEach(function(field) {
+                                        params[field] = searchValue;
+                                    });
+                                    promise = field.templateOptions.repository.post(params);
+                                }
                             }
                         } else if (field.templateOptions.options && field.templateOptions.options.length > 0) {
                             //存在options,使用静态选择
@@ -68,11 +104,25 @@ angular.module("ui.neptune.formly.ui-select")
                             });
                         } else if (field.templateOptions.repository) {
                             //存在repository表示,检索资源作为待选列表,只在首次检索
+                            field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
                             promise = field.templateOptions.repository.post(field.templateOptions.repositoryParams || {});
                         }
 
                         return promise.then(function (response) {
-                            field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
+                            field.templateOptions.placeholder = field.templateOptions.placeholder.replace(" (正在查询...)","");
+                            model[field.key] = keepModelValue;
+                            if (angular.isArray(response)) {
+                                field.templateOptions.options = [];
+                                angular.forEach(response,function(resp) {
+                                    var dd = angular.isArray(resp.data)?resp.data:[resp.data];
+                                    dd.forEach(function(d) {
+                                        field.templateOptions.options.push(d);
+                                    });
+                                });
+                            } else {
+                                field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
+                            }
+
                         });
                     },
                     refreshDelay: 0

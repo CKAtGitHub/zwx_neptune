@@ -36,7 +36,7 @@ angular.module("ui.neptune.directive.grid",
                     rowHeight: 35,
                     rowTemplate: "/template/grid/npt-grid-row.html"
                 };
-                this._gridOptions = angular.extend(setting.gridOptions, this._gridOptions);
+                this._gridOptions = angular.extend({}, this._gridOptions, setting.gridOptions);
                 this._action = setting.action;
                 this._gridStyle = setting.gridStyle;
             };
@@ -113,6 +113,22 @@ angular.module("ui.neptune.directive.grid",
                     if (self._options.onRegisterApi) {
                         self._options.onRegisterApi(self);
                     }
+
+                    if (angular.isDefined(nptGridOptions.store.gridOptions().autoHeight)) {
+                        var maxVisibleRowCount = nptGridOptions.store.gridOptions().maxVisibleRowCount || 10;
+                        var minRowsToShow = nptGridOptions.store.gridOptions().minRowsToShow || 1;
+                        // 32导航，30底部total+30顶部条+30底部条
+                        $scope.$watch("model", function (datas) {
+                            datas = datas || [];
+                            var row = datas.length;
+                            row = row < minRowsToShow?minRowsToShow:row;
+                            row = row > maxVisibleRowCount?maxVisibleRowCount:row;
+                            $(self.uiGridApi.grid.element).height(
+                                (row * nptGridOptions.store.gridOptions().rowHeight) +
+                                32 + 30 + 30 + 30
+                            );
+                        });
+                    }
                 };
 
                 //添加操作区域
@@ -127,9 +143,10 @@ angular.module("ui.neptune.directive.grid",
 
                 //添加序号区域,
                 this._config.gridOptions.columnDefs.unshift({
-                    field: '$index',
+                    name: '$index',
                     displayName: "序号",
                     enableSorting: true,
+                    cellTemplate: '<div class="ui-grid-cell-contents ng-binding ng-scope">{{row.grid.appScope.model.indexOf(row.entity)+1}}</div>',
                     width: 60
                 });
 
@@ -145,6 +162,13 @@ angular.module("ui.neptune.directive.grid",
                             action.listens = action.listens || [];
                             if (listener) {
                                 action.listens.push(listener);
+                            }
+                        };
+
+                        self.action[key].addPreListener = function (listener) {
+                            action.listens = action.listens || [];
+                            if (listener) {
+                                action.listens.unshift(listener);
                             }
                         };
                     });
@@ -264,11 +288,12 @@ angular.module("ui.neptune.directive.grid",
 
         NptGridApi.prototype.triggerAction = function (action) {
             var selectedData = this.uiGridApi.selection.getSelectedRows();
-            if (selectedData.length === 0) {
-                return;
+            var oneData;
+            if (selectedData.length > 0) {
+                oneData = selectedData[0];
             }
             if (this._handler[action.type]) {
-                this._handler[action.type](action, selectedData[0], selectedData[0].$index - 1);
+                this._handler[action.type](action, oneData, $scope.model.indexOf(oneData));
             } else {
                 this._handler.none(action, selectedData);
             }
@@ -281,16 +306,6 @@ angular.module("ui.neptune.directive.grid",
             vm.gridOptions = vm.nptGridApi.gridOptions();
             vm.action = vm.nptGridApi.getActions();
             vm.gridStyle = vm.nptGridApi.getGridStyle();
-
-            //观察data变化计算行号
-            $scope.$watch("model", function (newValue) {
-                if (newValue) {
-                    var index = 1;
-                    angular.forEach(newValue, function (value) {
-                        value.$index = index++;
-                    });
-                }
-            }, true);
         };
 
         vm.triggerAction = function (menu) {

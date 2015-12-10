@@ -9,6 +9,7 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
         templateUrl: "/template/formly/npt-select-tree-single.html",
         extends: 'input',
         defaultOptions: {
+            wrapper:["showErrorMessage"],
             controller: function ($scope, $log, $injector) {
                 var options = $scope.options;
                 var to = options.templateOptions;
@@ -28,6 +29,8 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
                                 $scope.model[options.key] = undefined;
                             });
                         }
+                    } else {
+                        to.viewvalue = newValue;
                     }
                 });
 
@@ -35,6 +38,7 @@ angular.module("ui.neptune.formly.select-tree-single", [], function config(forml
             templateOptions: {
                 label: "请选择:",
                 placeholder: "请选择.",
+                disabled:true,
                 valueProp: 'id',
                 labelProp: 'name',
                 viewvalueQueryProp: "id",

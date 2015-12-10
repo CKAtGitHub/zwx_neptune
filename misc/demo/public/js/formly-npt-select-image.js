@@ -14,7 +14,7 @@ angular.module("formly.npt.select.image.demo", ["ui.neptune"])
             return request;
         });
     })
-    .controller("FormlyNptSelectImageDemoController", function (QueryImageByUserLevel) {
+    .controller("FormlyNptSelectImageDemoController", function (QueryImageByUserLevel,AddOrUpdateFileRepo,$http) {
         var vm = this;
 
         vm.onSubmit = function () {
@@ -24,6 +24,7 @@ angular.module("formly.npt.select.image.demo", ["ui.neptune"])
             }
         };
         vm.options = {};
+        //vm.model = {selectImage:["10000001549030","10000001526186"]};
         vm.model = {};
         vm.fields = [
             {
@@ -31,10 +32,28 @@ angular.module("formly.npt.select.image.demo", ["ui.neptune"])
                 type: 'npt-select-image',
                 templateOptions: {
                     label: "选择图片",
-                    imageRepository: QueryImageByUserLevel
+                    single: false,
+                    required: true,
+                    imageRepository: QueryImageByUserLevel,
+                    uploadOptions: {
+                        getSignature: function () {
+                            return $http.get("/api/aliuploadAuth");
+                        },
+                        repository: AddOrUpdateFileRepo,
+                        repositoryParams: {
+                            "instid": "10000001463017",
+                            "createby": "10000001519061"
+                        }
+                    }
                 }
             }
         ];
 
         vm.originalFields = angular.copy(vm.fields);
+    }).factory("AddOrUpdateFileRepo", function (nptRepository, nptSessionManager) {
+        return nptRepository("AddOrUpdateFile").addRequestInterceptor(function (request) {
+            //request.params.createby = nptSessionManager.getSession.getUser().id;
+            //request.params.instid = nptSessionManager.getSession.getInst().id;
+            return request;
+        });
     });

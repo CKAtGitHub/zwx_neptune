@@ -54,12 +54,14 @@ angular.module("formly.npt.select.tree.demo", ["ui.neptune"])
             }
         };
         vm.options = {};
-        vm.model = {selectUser: "11"};
+        //vm.model = {selectUser: "10000001498059"};
+        vm.model = {};
         vm.fields = [
             {
                 key: 'selectUser',
                 type: 'npt-select-tree-single',
                 templateOptions: {
+                    required:true,
                     viewvalueQueryProp: "userid",
                     treeRepository: OrgListBySelectTree,
                     listRepository: UserListBySelectTree,

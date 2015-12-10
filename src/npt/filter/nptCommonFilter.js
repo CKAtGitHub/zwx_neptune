@@ -12,8 +12,15 @@ angular.module('ui.neptune.filter.commonFilter', [])
                 return input;
             }
             var dateFilter = $filter('date');
-            formate = formate || "yyyy-MM-dd hh:mm:ss";
+            formate = formate || "yyyy-MM-dd HH:mm:ss";
             var dateString = dateFilter(input,formate);
             return dateString || undefined;
         };
-});
+}).filter('yesOrNo', function () {
+        return function (input, yes,no) {
+            if (input) {
+                return yes || "是";
+            }
+            return no || "否";
+        };
+    });

@@ -3,7 +3,7 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope,QueryCtrlCode) {
+    .controller("formlyExampleController", function ($scope,$timeout,QueryCtrlCode,RegExpValidatorFactory) {
         var vm = this;
         vm.onSubmit = function onSubmit() {
             if (vm.form.$valid) {
@@ -12,6 +12,9 @@ angular.module('formlyExample', ['ui.neptune'])
             }
         };
         vm.model = {};
+        $timeout(function() {
+            vm.model.ctrlCode = "once";
+        },1000);
         vm.fields = [
             {
                 key: 'url',
@@ -51,13 +54,26 @@ angular.module('formlyExample', ['ui.neptune'])
                 }
             },
             {
+                key: 'customValidator',
+                type: 'input',
+                templateOptions: {
+                    label: '自定义验证器'
+                },
+                validators: {
+                    checkphone: {
+                        expression: RegExpValidatorFactory.createRegExpValidator(/^(13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9])\d{8}$/i),
+                        message: '$viewValue + " 无效的电话号码"'
+                    }
+                }
+            },
+            {
                 key: 'ctrlCode',
                 type: 'input',
                 optionsTypes: ['bizValidator'],
                 templateOptions: {
                     label: '异步验证控制编码',
                     placeholder: 'once',
-                    reversal: false,
+                    reversal: true,
                     searchProp:"no",
                     repository: QueryCtrlCode,
                     repositoryParams: {"defno": "cycle"}

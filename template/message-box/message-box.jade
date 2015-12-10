@@ -1,0 +1,9 @@
+div
+   div.modal-header
+      button.close(type='button',ng-click="vm.btnClick('cancel')",ng-disabled="vm.checkDisabled(vm.getCancelAction().ngDisabled)",aria-label="关闭")
+         span &times
+      h4.modal-title {{vm.modalOptions.title}}
+   div.modal-body(ng-if="vm.modalContent",npt-compile="vm.modalContent")
+   div.modal-footer(ng-if="vm.modalOptions.action")
+      button.btn.btn-primary(ng-repeat="(key,action) in vm.modalOptions.action",ng-if="action.label",type="button",ng-click="vm.btnClick(key)",ng-class="[{'btn-primary':!action.class},action.class]",ng-disabled="vm.checkDisabled(action.ngDisabled)") {{action.label}}
+      button.btn.btn-primary(ng-if="vm.modalOptions.showCancel",type="button",ng-click="vm.btnClick('cancel')") 取消

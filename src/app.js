@@ -13,7 +13,8 @@ angular.module("ui.neptune.service", [
     "ui.neptune.service.cache",
     "ui.neptune.service.session",
     "ui.neptune.service.datatableStore",
-    "ui.neptune.service.formStore"
+    "ui.neptune.service.formStore",
+    "ui.neptune.service.messageBox"
 ]);
 
 angular.module("ui.neptune.validator", [
@@ -32,5 +33,7 @@ angular.module("ui.neptune.directive", [
     "ui.neptune.directive.selectTree",
     "ui.neptune.directive.form",
     "ui.neptune.directive.selectImage",
-    "ui.neptune.directive.nptImage"
+    "ui.neptune.directive.nptImage",
+    "ui.neptune.directive.upload",
+    "ui.neptune.directive.npt-upload-custom"
 ]);

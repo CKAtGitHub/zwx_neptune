@@ -1,0 +1,11 @@
+//
+   Created by huangbinglong on 15/11/30.
+extends layout/layout
+block content
+   script(src="/vendor/plupload-2.1.2/js/plupload.full.min.js")
+   script(src="/js/npt-upload.js")
+   div(ng-app="nptUploadApp")
+      div.page-header
+         h1 NPT Upload
+      div(ng-controller="nptUploadDemoController as vm")
+         div(npt-upload="vm.uploadOptions")

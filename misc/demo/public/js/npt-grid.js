@@ -2,22 +2,27 @@
  * Created by leon on 15/11/24.
  */
 
-angular.module("nptGridApp", ["ui.neptune"])
+angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
     .factory("DemoNptGrid", function (nptGridStore, uiGridConstants, OrderForm) {
         return nptGridStore("DemoNptGrid", {
-            gridStyle: "height:600px;",
+            gridStyle: "height:300px;",
             gridOptions: {
                 columnDefs: [
-                    {field: 'sn', displayName: "订单编号", width: 150},
-                    {field: 'state', displayName: "订单状态", width: 80},
+                    {field: 'sn', displayName: "订单编号", width: 150,
+                        cellTemplate:"/template/grid/npt-grid-row-cell-biz.html",
+                        nptBizFilter:'orderFilter:{"userid":"10000001498059","ordersn":"$value"}|pick:"ordersn=="+$value|pickup:"name"'},
+                    {field: 'state', displayName: "订单状态",width: 80},
                     {field: 'clientid', displayName: "客户名称", enableSorting: false},
                     {field: 'sales', displayName: "业务员", cellFilter: "cacheFilter:'user':'name':'id'"},
                     {field: 'amount', displayName: "订单金额", aggregationType: uiGridConstants.aggregationTypes.sum},
-                    {field: 'createdate', displayName: "创建日期"},
+                    {field: 'createdate', displayName: "创建日期", cellFilter: "date|json"},
                     {field: 'remark', displayName: "备注"}
                 ],
-                gridHeight: 600,
                 enableGridMenu: true,
+                multiSelect:false,
+                autoHeight:true,
+                maxVisibleRowCount:20,
+                minRowsToShow:3,
                 gridMenuCustomItems: [
                     {
                         title: "添加",
@@ -67,7 +72,26 @@ angular.module("nptGridApp", ["ui.neptune"])
                 },
                 del: {
                     label: "删除",
-                    type: "del"
+                    type: "del",
+                    listens: [function ($q, $timeout) {
+                        var deferd = $q.defer();
+                        console.info("正在执行删除方法：1");
+                        $timeout(function () {
+                            deferd.resolve();
+                            console.info("删除方法1完成");
+                        }, 1000);
+
+                        return deferd.promise;
+                    },function ($q, $timeout) {
+                        var deferd = $q.defer();
+                        console.info("正在执行删除方法：2");
+                        $timeout(function () {
+                            deferd.resolve();
+                            console.info("删除方法2完成");
+                        }, 1000);
+
+                        return deferd.promise;
+                    }]
                 },
                 edit: {
                     label: "编辑",
@@ -110,9 +134,9 @@ angular.module("nptGridApp", ["ui.neptune"])
 
         $timeout(function () {
             var tempDatas = [];
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 30; i++) {
                 tempDatas.push({
-                    "sn": "DD20150101000" + i,
+                    "sn": "1000000232206" + i,
                     "state": "buy",
                     "clientid": "10000002315692",
                     "sales": "10000001498059",
@@ -212,4 +236,10 @@ angular.module("nptGridApp", ["ui.neptune"])
         });
     }).factory("QueryCtrlCode", function (nptRepository) {
         return nptRepository("QueryMdCtrlcode");
+    }).config(function (nptBizFilterProviderProvider) {
+        nptBizFilterProviderProvider.addConfig('orderFilter', {
+            "bizName": "queryOrderList",
+            "bizParams": {"instid": "10000001463017"},
+            "chains": ["limitTo: 5"]
+        });
     });

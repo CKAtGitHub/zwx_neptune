@@ -59,7 +59,7 @@ angular.module("ui.neptune.service.cache", [])
                     }
                 });
                 return output;
-            } else if (datas){
+            } else if (datas && datas[input]){
                 return datas[input][labelProp];
             }
         };

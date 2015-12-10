@@ -7,7 +7,7 @@ angular.module("formDemo", ["ui.neptune"])
         return nptFormlyStore("OrderInfo", {
             options: {
                 formState: {
-                    disabled: true
+                    disabled: false
                 }
             },
             fields: [
@@ -17,6 +17,7 @@ angular.module("formDemo", ["ui.neptune"])
                     templateOptions: {
                         required: true,
                         label: '订单编号:',
+                        disabled: true,
                         placeholder: "请输入订单编号"
                     }
                 },
@@ -99,6 +100,16 @@ angular.module("formDemo", ["ui.neptune"])
         vm.model = {};
         vm.disabled = false;
 
+        vm.reset = function () {
+            vm.nptFormApi.reset();
+        };
+
+        vm.submit = function () {
+            if (!vm.nptFormApi.form.$invalid) {
+                console.info(vm.model);
+            }
+        };
+
         $timeout(function () {
             vm.model = {
                 sn: "DD213234",
@@ -109,7 +120,7 @@ angular.module("formDemo", ["ui.neptune"])
                 createdate: 12312312312321,
                 remark: "测试"
 
-            }
+            };
         }, 1000);
 
         vm.options = {
@@ -128,8 +139,12 @@ angular.module("formDemo", ["ui.neptune"])
                         demo: model
                     }
                 }).setOnActionListen(function (model, action) {
-                    vm.nptFormApi.disabled(vm.disabled);
-                    vm.disabled = !vm.disabled;
+                    //vm.nptFormApi.disabled(vm.disabled);
+                    //vm.disabled = !vm.disabled;
+                    vm.nptFormApi.updateInitialValue();
+
+                    var errors = vm.nptFormApi.getErrorMessages();
+                    console.info(errors);
                 });
             }
         }

@@ -28,8 +28,8 @@ angular.module("ui.neptune.directive.form", [])
                 this._onSubmitListens = setting.onSubmitListens || [];
                 this._actions = setting.actions || [];
                 this._buttons = setting.buttons || {
-                        ok: true,
-                        reset: true
+                        ok: false,
+                        reset: false
                     };
             };
 
@@ -73,6 +73,7 @@ angular.module("ui.neptune.directive.form", [])
         vm.onAction = onAction;
 
         function NptFormApi(nptForm) {
+            nptForm = angular.copy(nptForm);
             var self = this;
             this._options = nptForm;
             this._onSubmitListen = [];
@@ -167,6 +168,43 @@ angular.module("ui.neptune.directive.form", [])
             }
         };
 
+        NptFormApi.prototype.reset = function () {
+            var options = this.options();
+            if (options) {
+                options.resetModel();
+            }
+        };
+
+        NptFormApi.prototype.updateInitialValue = function () {
+            var options = this.options();
+            if (options) {
+                options.updateInitialValue();
+            }
+        };
+
+        NptFormApi.prototype.getForm = function () {
+            return this.form;
+        };
+
+        NptFormApi.prototype.getErrorMessages = function () {
+            var fields = this.fields();
+            var messageTexts = [];
+
+            angular.forEach(fields, function (value) {
+                //检查当前错误对象
+                angular.forEach(value.formControl.$error, function (errorValue, errorKey) {
+                    //根据错误Key查找验证器消息处理方法
+                    if (value.validation.messages[errorKey]) {
+                        var msg = value.validation.messages[errorKey]();
+                        if (msg) {
+                            messageTexts.push(msg);
+                        }
+                    }
+                });
+            });
+            return messageTexts;
+        };
+
 
         vm.init = function (nptForm) {
             //初始化API
@@ -178,7 +216,13 @@ angular.module("ui.neptune.directive.form", [])
 
             angular.forEach(vm.fields, function (field) {
                 field.expressionProperties = field.expressionProperties || {};
-                field.expressionProperties['templateOptions.disabled'] = 'formState.disabled';
+                field.expressionProperties['templateOptions.disabled'] = function (viewValue, modelValue, field) {
+                    var to = field.to;
+                    if (angular.isDefined(to.disabled)) {
+                        return to.disabled;
+                    }
+                    return field.formState.disabled;
+                };
             });
 
             $scope.$watch('vm.options.formState', function () {
@@ -210,20 +254,22 @@ angular.module("ui.neptune.directive.form", [])
         }
 
         function onSubmit() {
-            var promises = [];
+            if (!vm.nptFormApi.form.$invalid) {
+                var promises = [];
 
-            angular.forEach(vm.nptFormApi.getOnSubmitListens(), function (listen) {
-                promises.push($q.when($injector.invoke(listen, this, {
-                    model: $scope.model
-                })));
-            });
+                angular.forEach(vm.nptFormApi.getOnSubmitListens(), function (listen) {
+                    promises.push($q.when($injector.invoke(listen, this, {
+                        model: $scope.model
+                    })));
+                });
 
-            var promise = $q.all(promises).then(function (response) {
-                return response;
-            }, function (error) {
-                return error;
-            });
-            vm.nptFormApi.promise(promise);
+                var promise = $q.all(promises).then(function (response) {
+                    return response;
+                }, function (error) {
+                    return error;
+                });
+                vm.nptFormApi.promise(promise);
+            }
         }
     })
     .directive("nptForm", [function () {
