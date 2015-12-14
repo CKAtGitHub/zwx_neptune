@@ -251,7 +251,9 @@ angular.module("ui.neptune.service.repository", [])
                 }
 
                 if (key && value) {
-                    angular.extend(target, {key: value});
+                    var kv = {};
+                    kv[key] = value;
+                    angular.extend(target, kv);
                 }
             }
 
