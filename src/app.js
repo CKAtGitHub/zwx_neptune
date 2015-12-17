@@ -14,7 +14,8 @@ angular.module("ui.neptune.service", [
     "ui.neptune.service.session",
     "ui.neptune.service.datatableStore",
     "ui.neptune.service.formStore",
-    "ui.neptune.service.messageBox"
+    "ui.neptune.service.messageBox",
+    "ui.neptune.service.util"
 ]);
 
 angular.module("ui.neptune.validator", [
