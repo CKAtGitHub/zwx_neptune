@@ -344,7 +344,13 @@ angular.module("ui.neptune.directive.grid",
             controller: "GridController as vm",
             replace: true,
             templateUrl: function (element, attrs) {
-                return attrs.templateUrl || "/template/grid/npt-grid.html";
+                return attrs.templateUrl || function(){
+                        if (is.desktop()) {
+                            return "/template/grid/npt-grid.html";
+                        }
+                        return "/template/grid/npt-grid-mobile.html";
+
+                    }();
             },
             scope: {
                 nptGrid: "=",
