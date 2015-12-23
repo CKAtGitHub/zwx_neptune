@@ -40,14 +40,14 @@ angular.module("ui.neptune.formly.ui-select")
                         var keepModelValue = model[field.key];
 
                         field.templateOptions.placeholder = field.templateOptions.placeholder || "";
-
+                        console.log("进来："+field.key+":"+angular.toJson(field.templateOptions.repository));
                         if (field.templateOptions.search && field.templateOptions.repository) {
                             //存在search以及repository,表示按输入条件检索
                             //model[field.key];
                             //此处会有一个暂时不好解决的问题.如果当前模型数据上有值,在首次刷新页面后,由于没有输入值,会导致此处不刷新后台数据,
                             //从而导致界面显示空,但是实际有模型数据
 
-
+                            console.log("v+k:"+value+":"+model[field.key]);
                             if (!value && ! model[field.key]) { //viewValue跟modelValue都为空
                                 return;
                             }
@@ -94,7 +94,10 @@ angular.module("ui.neptune.formly.ui-select")
                                     searchFields.forEach(function(field) {
                                         params[field] = searchValue;
                                     });
-                                    promise = field.templateOptions.repository.post(params);
+                                    console.log("设置promist："+params);
+                                    promise = field.templateOptions.repository.post(params).then(function(response) {
+                                        console.log("search成功:"+angular.toJson(response));
+                                    });
                                 }
                             }
                         } else if (field.templateOptions.options && field.templateOptions.options.length > 0) {
@@ -105,10 +108,12 @@ angular.module("ui.neptune.formly.ui-select")
                         } else if (field.templateOptions.repository) {
                             //存在repository表示,检索资源作为待选列表,只在首次检索
                             field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
+                            console.log("没有search的查询..");
                             promise = field.templateOptions.repository.post(field.templateOptions.repositoryParams || {});
                         }
 
                         return promise.then(function (response) {
+                            console.log("查询完成！..");
                             field.templateOptions.placeholder = field.templateOptions.placeholder.replace(" (正在查询...)","");
                             model[field.key] = keepModelValue;
                             if (angular.isArray(response)) {
