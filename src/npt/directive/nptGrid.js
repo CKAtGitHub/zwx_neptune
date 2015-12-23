@@ -358,19 +358,15 @@ angular.module("ui.neptune.directive.grid",
                 return $parse(field)(this.pData);
             };
 
-            vm.mobileClickItem = function(pData) {
+            vm.mobileClickItem = function($index,pData) {
+                // 如果有菜单弹出，则关闭菜单
+                if ($("div[id^='nptGridContextMenu_']").hasClass("open")){
+                    $("div[id^='nptGridContextMenu_']").removeClass("open");
+                    return;
+                }
                 //var menu = vm.action.view || vm.action.edit;
                 var menu = vm.action.edit;
                 vm.nptGridApi.triggerAction(menu,[pData]);
-            };
-
-            vm.mobileShowMenu = function(event,pData) {
-                event.preventDefault();
-                event.stopPropagation();
-                var ne = $.Event('contextmenu');
-                ne.pageX=event.pageX;
-                ne.pageY=event.pageY;
-                $(event.currentTarget).trigger(ne);
             };
 
         };

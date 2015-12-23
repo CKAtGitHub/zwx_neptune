@@ -1,11 +1,11 @@
 div
     ul.media-list
         li.media(ng-repeat="pData in model",ng-init="parseField = vm.parseField;mobile=mobile;")
-            div(context-menu="",target="nptGridContextMenu")
-                div.media-body(ng-click="vm.mobileClickItem(pData)")
+            div(context-menu="",target="nptGridContextMenu_{{$index}}")
+                div.media-body(ng-click="vm.mobileClickItem($index,pData)")
                     a.list-group-item
                         div(npt-compile="vm.mobileContent")
-            div.dropdown.position-fixed(id="nptGridContextMenu",style="z-index:9999;")
+            div.dropdown.position-fixed(id="nptGridContextMenu_{{$index}}",style="z-index:9999;")
                 ul.dropdown-menu(role="menu")
                     li(ng-repeat='(key,menu) in vm.action')
                         a(role="menuitem",tabindex=1,ng-click="vm.triggerAction(menu,pData)") {{menu.label}}
