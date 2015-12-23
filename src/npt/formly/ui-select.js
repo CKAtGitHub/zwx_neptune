@@ -46,7 +46,7 @@ angular.module("ui.neptune.formly.ui-select")
                                 // 监控model值的变化；
                                 // 因为refresh仅在viewValue改变时触发
                                 var theWatcher = scope.$watch("model." + field.key, function (nV, oV) {
-                                    if (nV && field.formControl.$viewValue && field.formControl.$viewValue !== nV) {
+                                    if (nV && nV != oV) {
                                         theWatcher();
                                         field.templateOptions.refresh(undefined, model, field, scope);
                                     }
