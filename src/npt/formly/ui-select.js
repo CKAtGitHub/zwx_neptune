@@ -5,13 +5,13 @@
  */
 
 angular.module("ui.neptune.formly.ui-select")
-    .run(function (formlyConfig, $q,$filter) {
+    .run(function (formlyConfig, $q, $filter) {
         formlyConfig.setType({
             name: 'ui-select',
             extends: 'select',
             templateUrl: "/template/formly/ui-select.html",
             defaultOptions: {
-                wrapper:["showErrorMessage"],
+                wrapper: ["showErrorMessage"],
                 ngModelAttrs: {
                     multiple: {
                         attribute: 'multiple'
@@ -19,12 +19,7 @@ angular.module("ui.neptune.formly.ui-select")
                 },
                 templateOptions: {
                     ngOptions: 'option[to.valueProp] as option in to.options | filterBy:[to.valueProp,to.labelProp]: $select.search',
-                    refresh: function refresh(value, model, field) {
-                        //刷新逻辑
-                        //1 如果存在search和repository,表示根据输入内容动态检索
-                        //2 如果存在options,表示使用静态选择
-                        //3 如果存在repository,表示单次检索资源
-                        //4 其他情况返回空数据
+                    refresh: function refresh(value, model, field, scope) {
 
                         var valueProp = field.templateOptions.valueProp;
                         var labelProp = field.templateOptions.labelProp;
@@ -34,37 +29,44 @@ angular.module("ui.neptune.formly.ui-select")
                             data: []
                         });
 
-
                         var searchFields = angular.copy(field.templateOptions.search || []);
                         var searchValue = value;
                         var keepModelValue = model[field.key];
 
                         field.templateOptions.placeholder = field.templateOptions.placeholder || "";
-                        console.log("进来："+field.key+":"+angular.toJson(field.templateOptions.repository));
+
                         if (field.templateOptions.search && field.templateOptions.repository) {
                             //存在search以及repository,表示按输入条件检索
                             //model[field.key];
                             //此处会有一个暂时不好解决的问题.如果当前模型数据上有值,在首次刷新页面后,由于没有输入值,会导致此处不刷新后台数据,
                             //从而导致界面显示空,但是实际有模型数据
 
-                            console.log("v+k:"+value+":"+model[field.key]);
-                            if (!value && ! model[field.key]) { //viewValue跟modelValue都为空
+
+                            if (!value && !model[field.key]) { //viewValue跟modelValue都为空
+                                // 监控model值的变化；
+                                // 因为refresh仅在viewValue改变时触发
+                                var theWatcher = scope.$watch("model." + field.key, function (nV, oV) {
+                                    if (nV && field.formControl.$viewValue && field.formControl.$viewValue !== nV) {
+                                        theWatcher();
+                                        field.templateOptions.refresh(undefined, model, field, scope);
+                                    }
+                                });
                                 return;
                             }
 
                             var filterBy = $filter("filterBy");
-                            var params = angular.copy(field.templateOptions.repositoryParams,{});
+                            var params = angular.copy(field.templateOptions.repositoryParams, {});
                             var oldOptions = field.templateOptions.options || [];
-                            if (value){
+                            if (value) {
                                 //检查到输入内容,检索数据
-                                oldOptions = filterBy(field.templateOptions.options,[labelProp],value);
+                                oldOptions = filterBy(field.templateOptions.options, [labelProp], value);
                                 if (searchFields.length === 0) {
                                     searchFields.push(labelProp);
                                 }
                                 searchValue = value;
                             } else if (model[field.key]) {
                                 //使用模型值,检索数据
-                                oldOptions = filterBy(field.templateOptions.options,[valueProp],model[field.key]);
+                                oldOptions = filterBy(field.templateOptions.options, [valueProp], model[field.key]);
                                 if (searchFields.length === 0) {
                                     searchFields.push(valueProp);
                                 }
@@ -80,10 +82,10 @@ angular.module("ui.neptune.formly.ui-select")
                                 field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
                                 if (angular.isArray(searchValue)) {
                                     var promiseArr = [];
-                                    angular.forEach(searchValue,function(sv) {
-                                        promiseArr.push(function() {
+                                    angular.forEach(searchValue, function (sv) {
+                                        promiseArr.push(function () {
                                             var pParams = angular.copy(params);
-                                            searchFields.forEach(function(field) {
+                                            searchFields.forEach(function (field) {
                                                 pParams[field] = sv;
                                             });
                                             return field.templateOptions.repository.post(pParams);
@@ -91,13 +93,10 @@ angular.module("ui.neptune.formly.ui-select")
                                     });
                                     promise = $q.all(promiseArr);
                                 } else {
-                                    searchFields.forEach(function(field) {
+                                    searchFields.forEach(function (field) {
                                         params[field] = searchValue;
                                     });
-                                    console.log("设置promist："+params);
-                                    promise = field.templateOptions.repository.post(params).then(function(response) {
-                                        console.log("search成功:"+angular.toJson(response));
-                                    });
+                                    promise = field.templateOptions.repository.post(params);
                                 }
                             }
                         } else if (field.templateOptions.options && field.templateOptions.options.length > 0) {
@@ -108,24 +107,22 @@ angular.module("ui.neptune.formly.ui-select")
                         } else if (field.templateOptions.repository) {
                             //存在repository表示,检索资源作为待选列表,只在首次检索
                             field.templateOptions.placeholder = field.templateOptions.placeholder + " (正在查询...)";
-                            console.log("没有search的查询..");
                             promise = field.templateOptions.repository.post(field.templateOptions.repositoryParams || {});
                         }
 
                         return promise.then(function (response) {
-                            console.log("查询完成！..");
-                            field.templateOptions.placeholder = field.templateOptions.placeholder.replace(" (正在查询...)","");
+                            field.templateOptions.placeholder = field.templateOptions.placeholder.replace(" (正在查询...)", "");
                             model[field.key] = keepModelValue;
                             if (angular.isArray(response)) {
                                 field.templateOptions.options = [];
-                                angular.forEach(response,function(resp) {
-                                    var dd = angular.isArray(resp.data)?resp.data:[resp.data];
-                                    dd.forEach(function(d) {
+                                angular.forEach(response, function (resp) {
+                                    var dd = angular.isArray(resp.data) ? resp.data : [resp.data];
+                                    dd.forEach(function (d) {
                                         field.templateOptions.options.push(d);
                                     });
                                 });
                             } else {
-                                field.templateOptions.options = angular.isArray(response.data)?response.data:[response.data];
+                                field.templateOptions.options = angular.isArray(response.data) ? response.data : [response.data];
                             }
 
                             if (!model[field.key] && angular.isDefined(field.templateOptions.selectIndex) &&

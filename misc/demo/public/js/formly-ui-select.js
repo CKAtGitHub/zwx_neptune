@@ -6,7 +6,7 @@ angular.module('formlyExample', ['ui.neptune'])
     .factory("QueryCtrlCode", function (nptRepository) {
         return nptRepository("QueryMdCtrlcode");
     })
-    .controller("formlyExampleController", function ($scope, QueryCtrlCode) {
+    .controller("formlyExampleController", function ($scope, QueryCtrlCode,$timeout) {
         var vm = this;
 
         vm.onSubmit = function onSubmit() {
@@ -15,10 +15,11 @@ angular.module('formlyExample', ['ui.neptune'])
                 alert(JSON.stringify(vm.model), null, 2);
             }
         };
-        vm.model = {
-            "cycle1": ["11111"],
-            "cycle3": ["once"]
-        };
+        vm.model = {};
+        $timeout(function() {
+            vm.model.cycle1 = ["11111"];
+            vm.model.cycle3 = ["once"];
+        },1000);
         vm.fields = [
             {
                 "key": "cycle1",
