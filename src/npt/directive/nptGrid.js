@@ -364,8 +364,7 @@ angular.module("ui.neptune.directive.grid",
                     $("div[id^='nptGridContextMenu_']").removeClass("open");
                     return;
                 }
-                //var menu = vm.action.view || vm.action.edit;
-                var menu = vm.action.edit;
+                var menu = vm.action.view || vm.action.edit;
                 vm.nptGridApi.triggerAction(menu,[pData]);
             };
 
