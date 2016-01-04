@@ -37,5 +37,6 @@ angular.module("ui.neptune.directive", [
     "ui.neptune.directive.nptImage",
     "ui.neptune.directive.upload",
     "ui.neptune.directive.npt-upload-custom",
-    "ui.neptune.directive.longClick"
+    "ui.neptune.directive.longClick",
+    "ui.neptune.directive.nptLoading"
 ]);

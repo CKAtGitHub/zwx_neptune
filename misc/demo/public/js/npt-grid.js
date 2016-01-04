@@ -139,6 +139,11 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
             }
         };
 
+        vm.__isloading = true;
+        vm.isLoading = function() {
+            return vm.__isloading;
+        };
+
         vm.model = [];
 
         $timeout(function () {
@@ -154,9 +159,9 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                     "remark": "测试数据表格配置"+i
                 });
             }
-
+            vm.__isloading = false;
             vm.model = tempDatas;
-        }, 500);
+        }, 1000);
 
 
     }).factory("OrderForm", function (nptFormlyStore, QueryCtrlCode) {
