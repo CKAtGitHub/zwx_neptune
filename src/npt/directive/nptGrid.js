@@ -39,6 +39,7 @@ angular.module("ui.neptune.directive.grid",
                 this._gridOptions = angular.extend({}, this._gridOptions, setting.gridOptions);
                 this._action = setting.action;
                 this._gridStyle = setting.gridStyle;
+                this._mobile = setting.mobile;
             };
 
             NptGridStore.prototype.gridOptions = function () {
@@ -47,6 +48,10 @@ angular.module("ui.neptune.directive.grid",
 
             NptGridStore.prototype.action = function () {
                 return this._action;
+            };
+
+            NptGridStore.prototype.mobile = function () {
+                return this._mobile;
             };
 
             NptGridStore.prototype.getGridStyle = function () {
@@ -61,7 +66,7 @@ angular.module("ui.neptune.directive.grid",
         };
 
     })
-    .controller("GridController", function ($scope, i18nService, $q, $injector, $uibModal) {
+    .controller("GridController", function ($scope, i18nService, $q, $injector, $uibModal,MobileGridService) {
         var vm = this;
 
         //设置中文
@@ -286,8 +291,8 @@ angular.module("ui.neptune.directive.grid",
             return this._config.gridStyle;
         };
 
-        NptGridApi.prototype.triggerAction = function (action) {
-            var selectedData = this.uiGridApi.selection.getSelectedRows();
+        NptGridApi.prototype.triggerAction = function (action,datas) {
+            var selectedData = datas || this.uiGridApi.selection.getSelectedRows();
             var oneData;
             if (selectedData.length > 0) {
                 oneData = selectedData[0];
@@ -299,7 +304,6 @@ angular.module("ui.neptune.directive.grid",
             }
         };
 
-
         vm.init = function (nptGrid) {
             //创建API
             vm.nptGridApi = new NptGridApi(nptGrid);
@@ -308,13 +312,18 @@ angular.module("ui.neptune.directive.grid",
             vm.gridStyle = vm.nptGridApi.getGridStyle();
         };
 
-        vm.triggerAction = function (menu) {
-            vm.nptGridApi.triggerAction(menu);
+        vm.triggerAction = function (menu,data) {
+            if (data) {
+                data = angular.isArray(data)?data:[data];
+            }
+            vm.nptGridApi.triggerAction(menu,data);
         };
 
         if ($scope.nptGrid) {
             vm.init($scope.nptGrid);
+            MobileGridService.service($scope,vm);
         }
+
     })
     .controller("editGridController", function ($uibModalInstance, formData) {
         var vm = this;
@@ -338,13 +347,42 @@ angular.module("ui.neptune.directive.grid",
             $uibModalInstance.dismiss('cancel');
         }
     })
+    .service("MobileGridService",function($templateCache,$parse) {
+        this.service = function($scope,vm) {
+            $scope.mobile = $scope.nptGrid.store.mobile() || {};
+            $scope.mobile.templateUrl = $scope.mobile.templateUrl || "/template/grid/npt-grid-mobile-defaultContent.html";
+            vm.mobileContent = $templateCache.get($scope.mobile.templateUrl);
+
+
+            vm.parseField = function(field) {
+                return $parse(field)(this.pData);
+            };
+
+            vm.mobileClickItem = function($index,pData) {
+                // 如果有菜单弹出，则关闭菜单
+                if ($("div[id^='nptGridContextMenu_']").hasClass("open")){
+                    $("div[id^='nptGridContextMenu_']").removeClass("open");
+                    return;
+                }
+                var menu = vm.action.view || vm.action.edit;
+                vm.nptGridApi.triggerAction(menu,[pData]);
+            };
+
+        };
+    })
     .directive("nptGrid", function () {
         return {
             restrict: "EA",
             controller: "GridController as vm",
             replace: true,
             templateUrl: function (element, attrs) {
-                return attrs.templateUrl || "/template/grid/npt-grid.html";
+                return attrs.templateUrl || function(){
+                        if (is.desktop()) {
+                            return "/template/grid/npt-grid.html";
+                        }
+                        return "/template/grid/npt-grid-mobile.html";
+
+                    }();
             },
             scope: {
                 nptGrid: "=",

@@ -117,6 +117,15 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                         }
                     ]
                 }
+            },
+            mobile:{
+                templateUrl:"/template/grid/npt-grid-mobile-defaultContent.html",
+                fields:{
+                    title:"sn",
+                    tip:"state",
+                    content:"'张三买了：'+remark+'<br/>啦啦啦啦'",
+                    createDate:"createdate|timestampFilter"
+                }
             }
         })
     })
@@ -128,6 +137,11 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
             onRegisterApi: function (nptGridApi) {
                 vm.nptGridApi = nptGridApi;
             }
+        };
+
+        vm.__isloading = true;
+        vm.isLoading = function() {
+            return vm.__isloading;
         };
 
         vm.model = [];
@@ -142,12 +156,12 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                     "sales": "10000001498059",
                     "amount": 10938.88 + i,
                     "createdate": (new Date().getTime() + 1000 * i),
-                    "remark": "测试数据表格配置"
+                    "remark": "测试数据表格配置"+i
                 });
             }
-
+            vm.__isloading = false;
             vm.model = tempDatas;
-        }, 500);
+        }, 1000);
 
 
     }).factory("OrderForm", function (nptFormlyStore, QueryCtrlCode) {

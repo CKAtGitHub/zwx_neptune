@@ -141,7 +141,8 @@ angular.module("ui.neptune.service.repository", [])
                 angular.extend(runParams, params || {});
 
                 var request = {
-                    params: runParams || {}
+                    params: runParams || {},
+                    header:selfRepository._header
                 };
 
                 //pre拦截器
@@ -179,7 +180,8 @@ angular.module("ui.neptune.service.repository", [])
                 var postData = {};
                 postData[self.actionKey] = {
                     name: scope._action,
-                    params: request.params
+                    params: request.params,
+                    header:request.header
                 };
 
                 var result = $http.post(scope._baseURL, postData);
@@ -249,7 +251,9 @@ angular.module("ui.neptune.service.repository", [])
                 }
 
                 if (key && value) {
-                    angular.extend(target, {key: value});
+                    var kv = {};
+                    kv[key] = value;
+                    angular.extend(target, kv);
                 }
             }
 
