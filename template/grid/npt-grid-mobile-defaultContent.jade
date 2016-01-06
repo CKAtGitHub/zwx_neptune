@@ -1,0 +1,10 @@
+div.row
+    div.col-md-10
+        div
+            h4.media-heading(ng-if="mobile.fields.title") {{parseField(mobile.fields.title)}}
+                div.glyphicon.glyphicon-menu-hamburger(style="float:right;",onclick="event.preventDefault();event.stopPropagation();var ne = $.Event(\'contextmenu\');ne.pageX=event.pageX;ne.pageY=event.pageY;$(this).trigger(ne);")
+        small(ng-if="mobile.fields.tip") {{parseField(mobile.fields.tip)}}
+        br(ng-if="mobile.fields.tip")
+        div(ng-bind-html="parseField(mobile.fields.content)")
+    div.col-md-2(ng-if="mobile.fields.createDate")
+        div(style="float:right;") {{parseField(mobile.fields.createDate)}}&nbsp;

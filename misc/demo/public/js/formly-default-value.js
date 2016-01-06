@@ -5,7 +5,7 @@
  */
 
 angular.module('formlyExample', ['ui.neptune'])
-    .controller("formlyExampleController", function ($scope, QueryCtrlCode) {
+    .controller("formlyExampleController", function ($scope, QueryCtrlCode,PinyinUtil) {
         var vm = this;
 
         vm.onSubmit = function onSubmit() {
@@ -13,6 +13,9 @@ angular.module('formlyExample', ['ui.neptune'])
                 vm.options.updateInitialValue();
                 alert(JSON.stringify(vm.model), null, 2);
             }
+        };
+        vm.chinese2Pinyin = function(words) {
+            return PinyinUtil.chinese2Pinyin(words,true);
         };
         vm.model = {};
         vm.fields = [

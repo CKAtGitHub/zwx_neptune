@@ -12,6 +12,7 @@ block content
                button.btn.btn-primary(type="submit") 确定
                button.btn.btn-default(type="button",ng-click="vm.options.resetModel()") 重置
          hr
+         p 测试中文2拼音：{{vm.chinese2Pinyin(vm.model.defaultValue1)}}
          h2 异步获取数据然后设置model
          pre
             |QueryCtrlCode.post({defno:"cycle"})
