@@ -20,7 +20,7 @@ angular.module("ui.neptune.directive.nptLoading", [])
                 scope.loadingMessage = "正在加载...";
                 var div = $compile('<div ng-show="showLoadingMask" style="position: absolute; top: 0px; filter: alpha(opacity=60); ' +
                     'background-color: #eee;z-index: 9999; left: 0px;opacity:0.8; -moz-opacity:0.8;">' +
-                    '<div style="text-align: center;color: black;font-weight: 700;font-size: 16px;"><img src="/image/loading.gif" />{{loadingMessage}}</div>' +
+                    '<div style="text-align: center;color: black;font-weight: 700;font-size: 16px;margin-top:2px;"><img src="/image/loading.gif" style="margin-top:-3px;"/>{{loadingMessage}}</div>' +
                     '</div>')(scope);
                 element.prepend(div);
 
