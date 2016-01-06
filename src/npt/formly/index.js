@@ -11,6 +11,7 @@ angular.module("ui.neptune.formly", [
     "ui.neptune.formly.wrapper-validation",
     "ui.neptune.formly.select-tree-single",
     "ui.neptune.formly.select-image",
+    "ui.neptune.formly.select-file",
     "ui.neptune.formly.messages"]);
 
 angular.module("ui.neptune.formly.ui-select",
