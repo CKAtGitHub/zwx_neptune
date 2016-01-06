@@ -1,0 +1,13 @@
+div
+    div(npt-select-image="to")
+    div.row
+        div.col-md-12
+            button.btn.btn-primary(type="button",ng-click="to.onSelect(model, options)") 选择文件
+            |&nbsp;
+            div(npt-upload-custom="to.uploadOptions")
+            input.form-control(type="text",ng-model="model[options.key]",ng-hide="true")
+    div.row
+        div.col-md-2(ng-repeat="image in to.selectedImages")
+            a.thumbnail(href="")
+                img(npt-image="image.file.id",npt-image-options="to.imageOptions")
+
