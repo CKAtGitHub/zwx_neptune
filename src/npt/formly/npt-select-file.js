@@ -13,7 +13,7 @@ angular.module("ui.neptune.formly.select-file",[])
                 templateOptions: {
                     onSelect: function (model, options) {
                         var self = this;
-                        self.selectImageApi.open().then(function (response) {
+                        self.selectFileApi.open().then(function (response) {
                             //如果是单选,则将第一行设置为数据, 如果是多选则提取所有数据的id
                             if (self.single && response && response.length > 0) {
                                 model[options.key] = response[0].data[self.valueProp];
@@ -28,8 +28,8 @@ angular.module("ui.neptune.formly.select-file",[])
 
                         });
                     },
-                    onRegisterApi: function (selectImageApi) {
-                        this.selectImageApi = selectImageApi;
+                    onRegisterApi: function (selectFileApi) {
+                        this.selectFileApi = selectFileApi;
                     },
                     imageRepository: undefined,
                     single: false,
@@ -39,9 +39,14 @@ angular.module("ui.neptune.formly.select-file",[])
                     var vm = this;
                     var to = $scope.to;
                     var options = $scope.options;
-                    to.selectedImages = []; // 初始化时，置空已选图片
+                    to.selectedFiles = []; // 初始化时，置空已选图片
                     var uploadOptions = {
+                        uploadImage:false,
                         uploadDoc:false,
+                        uploadOther:true,
+                        otherUpload:{
+                          title:"上传文件"
+                        },
                         onRegisterApi:function(api) {
                             api.onComplete(function(datas) {
                                 //如果是单选,则将第一行设置为数据, 如果是多选则提取所有数据的id
@@ -59,38 +64,24 @@ angular.module("ui.neptune.formly.select-file",[])
                     if (to.uploadOptions) {
                         uploadOptions = angular.extend(uploadOptions,to.uploadOptions);
                     } else {
-                        uploadOptions.uploadImage = false;
+                        uploadOptions.uploadDoc = false;
                     }
                     to.uploadOptions = uploadOptions;
 
                 },
                 expressionProperties: {
-                    "templateOptions.selectedImages": function (viewValue, modelValue, field) {
+                    "templateOptions.selectedFiles": function (viewValue, modelValue, field) {
                         if (modelValue) {
-                            var selectedImages = [];
+                            var selectedFiles = [];
                             modelValue = angular.isArray(modelValue) ? modelValue : [modelValue];
                             angular.forEach(modelValue, function (id) {
-                                selectedImages.push({
+                                selectedFiles.push({
                                     file: {
                                         id: id
                                     }
                                 });
                             });
-                            return selectedImages;
-                        }
-                    },
-                    "templateOptions.imageOptions":function(viewValue, modelValue, field) {
-                        var to = field.to;
-                        if (to.imageOptions) {
-                            return to.imageOptions;
-                        }
-
-                        if (to.imageRepository) {
-                            return {
-                                repository: to.imageRepository,
-                                searchProp: "id",
-                                labelProp: "thumbnailUrl"
-                            };
+                            return selectedFiles;
                         }
                     }
                 }

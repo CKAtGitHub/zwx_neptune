@@ -11,7 +11,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
         var bigDefer;
         vm.isUploadDoc = angular.isDefined(vm.options.uploadDoc) ? vm.options.uploadDoc : true;
         vm.isUploadImage = angular.isDefined(vm.options.uploadImage) ? vm.options.uploadImage : true;
-        vm.isUploadOther = angular.isDefined(vm.options.uploadOther) ? vm.options.uploadImage : false;
+        vm.isUploadOther = angular.isDefined(vm.options.uploadOther) ? vm.options.uploadOther : false;
 
         vm.theFileType = vm.options.fileType;
         if (vm.options.fileType) {

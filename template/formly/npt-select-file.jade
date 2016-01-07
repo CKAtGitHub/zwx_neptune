@@ -1,13 +1,17 @@
 div
-    div(npt-select-image="to")
+    div(npt-select-file="to")
     div.row
         div.col-md-12
             button.btn.btn-primary(type="button",ng-click="to.onSelect(model, options)") 选择文件
             |&nbsp;
             div(npt-upload-custom="to.uploadOptions")
             input.form-control(type="text",ng-model="model[options.key]",ng-hide="true")
-    div.row
-        div.col-md-2(ng-repeat="image in to.selectedImages")
-            a.thumbnail(href="")
-                img(npt-image="image.file.id",npt-image-options="to.imageOptions")
+    div.row(style="margin-top:3px;")
+        div.col-xs-4.col-md-4(ng-repeat="row in to.selectedFiles")
+            div.list-group(npt-load-or-get-from-cache="{value:row.file.id,cache:'file',repository:to.fileRepository,valueProp:'id',as:'$$file'}")
+                div.list-group-item(href="")
+                    div.list-group-item-heading
+                        h4 {{$$file.name}}
+                    p {{$$file.createdate | timestampFilter}}
+                    p.list-group-item-text {{$$file.createby|cacheFilter:'user':'name':'id'}}
 

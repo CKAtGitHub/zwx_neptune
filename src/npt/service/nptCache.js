@@ -47,20 +47,24 @@ angular.module("ui.neptune.service.cache", [])
 
     }).filter('cacheFilter', function (nptCache) {
         return function (input, key, labelProp, valueProp) {
-            if (!input || !key || !labelProp) { // 如果值为空，或者没有指定
+            if (!input || !key) { // 如果值为空，或者没有指定
                 return input;
             }
             var datas = nptCache.get(key);
             if (datas && valueProp) {
                 var output;
                 angular.forEach(datas,function(data) {
-                    if (data[valueProp] == input) {
+                    if (data[valueProp] == input && labelProp) {
                         output = data[labelProp];
+                    } else if (data[valueProp] == input) {
+                        output = data;
                     }
                 });
                 return output;
-            } else if (datas && datas[input]){
+            } else if (datas && datas[input] && labelProp){
                 return datas[input][labelProp];
+            } else if (datas && datas[input]) {
+                return datas[input];
             }
         };
     }).filter('ctrlCodeFilter', function (nptCache) {

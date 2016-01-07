@@ -34,9 +34,11 @@ angular.module("ui.neptune.directive", [
     "ui.neptune.directive.selectTree",
     "ui.neptune.directive.form",
     "ui.neptune.directive.selectImage",
+    "ui.neptune.directive.selectFile",
     "ui.neptune.directive.nptImage",
     "ui.neptune.directive.upload",
     "ui.neptune.directive.npt-upload-custom",
     "ui.neptune.directive.longClick",
-    "ui.neptune.directive.nptLoading"
+    "ui.neptune.directive.nptLoading",
+    "ui.neptune.directive.nptLoadOrGetFromCache"
 ]);

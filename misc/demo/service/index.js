@@ -36,6 +36,9 @@ proxy.action("queryOrderList", {
 }).action("AddOrUpdateFile", {
     proxy: "Y9",
     action: "com.yun9.sys.inst.serivce.AddOrUpdateFileService"
+}).action("QueryFileByIdService", {
+    proxy: "Y9",
+    action: "com.yun9.sys.inst.serivce.QueryFileByIdService"
 });
 
 module.exports = proxy;

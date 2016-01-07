@@ -9,7 +9,7 @@ angular.module("formly.npt.select.file.demo", ["ui.neptune"])
             "userid": "186",
             "level": "user",
             "instid": "10000001463017",
-            "filetype": "image"
+            "filetype": "doc"
         }).addRequestInterceptor(function (request) {
             return request;
         });
@@ -25,7 +25,7 @@ angular.module("formly.npt.select.file.demo", ["ui.neptune"])
         };
         vm.options = {};
         //vm.model = {selectImage:["10000001549030","10000001526186"]};
-        vm.model = {};
+        vm.model = {selectFile:"10000002883852"};
         vm.fields = [
             {
                 key: 'selectFile',
@@ -34,7 +34,7 @@ angular.module("formly.npt.select.file.demo", ["ui.neptune"])
                     label: "选择文件",
                     single: false,
                     required: true,
-                    imageRepository: QueryImageByUserLevel,
+                    fileRepository: QueryImageByUserLevel,
                     uploadOptions: {
                         getSignature: function () {
                             return $http.get("/api/aliuploadAuth");
@@ -42,7 +42,8 @@ angular.module("formly.npt.select.file.demo", ["ui.neptune"])
                         repository: AddOrUpdateFileRepo,
                         repositoryParams: {
                             "instid": "10000001463017",
-                            "createby": "10000001519061"
+                            "createby": "10000001519061",
+                            "filetype":"doc"
                         }
                     }
                 }
