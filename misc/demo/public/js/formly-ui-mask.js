@@ -50,6 +50,13 @@ angular.module('formlyExample', ['ui.neptune'])
                     mask:'(9999)9999999',
                     description:'使用可以参考https://github.com/angular-ui/ui-mask'
                 }
+            },
+            {
+                key: 'maskedPercentInput',
+                type: 'maskedPercentInput',
+                templateOptions: {
+                    label: '百分号测试'
+                }
             }
         ];
         vm.originalFields = angular.copy(vm.fields);
