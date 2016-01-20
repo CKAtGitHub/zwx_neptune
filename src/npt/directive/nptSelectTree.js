@@ -52,7 +52,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
 
 
     })
-    .controller("SelectTreeModalController", function ($scope, selectTreeData, $modalInstance) {
+    .controller("SelectTreeModalController", function ($scope, selectTreeData, $modalInstance,IS) {
         var vm = this;
         // function assignment
         vm.ok = ok;
@@ -89,6 +89,11 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
             vm.refreshList(node);
         };
 
+        // 解决在手机端，无法选择项目的问题，已选择就自动取消选择了
+        var column = {name: 'name', displayName: "名称"};
+        if (IS.mobile()) {
+            column.cellTemplate = '<div class="ui-grid-cell-contents" title="TOOLTIP" ng-click="$event.preventDefault();$event.stopPropagation();">{{COL_FIELD}}</div>';
+        }
         vm.gridOptions = {
             enableRowSelection: true,
             enableSelectAll: false,
@@ -102,7 +107,7 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
                 $scope.gridApi = gridApi;
             },
             columnDefs: [
-                {name: 'name', displayName: "名称"}
+                column
             ]
         };
 
@@ -124,4 +129,4 @@ angular.module("ui.neptune.directive.selectTree", ['ui.bootstrap', 'ui.tree', 'u
             link: function (scope, element, attrs, ctrl) {
             }
         };
-    }]);
+    }]).constant("IS",is);

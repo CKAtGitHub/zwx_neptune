@@ -19,7 +19,7 @@ angular.module("nptGridApp", ["ui.neptune", "angular.filter"])
                     {field: 'remark', displayName: "备注"}
                 ],
                 enableGridMenu: true,
-                multiSelect:false,
+                multiSelect:true,
                 autoHeight:true,
                 maxVisibleRowCount:20,
                 minRowsToShow:3,
