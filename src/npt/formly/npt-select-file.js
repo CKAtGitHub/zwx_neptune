@@ -3,7 +3,7 @@
  */
 
 angular.module("ui.neptune.formly.select-file", [])
-    .config(function (formlyConfigProvider) {
+    .config(function (formlyConfigProvider,uniqueArray) {
         formlyConfigProvider.setType({
             name: "npt-select-file",
             templateUrl: "/template/formly/npt-select-file.html",
@@ -18,10 +18,18 @@ angular.module("ui.neptune.formly.select-file", [])
                             if (self.single && response && response.length > 0) {
                                 model[options.key] = response[0].data[self.valueProp];
                             } else if (!self.single && response) {
-                                model[options.key] = [];
+                                if (model[options.key]) {
+                                    if (!angular.isArray(model[options.key])) {
+                                        model[options.key] = [model[options.key]];
+                                    }
+                                } else {
+                                    model[options.key] = [];
+                                }
+
                                 angular.forEach(response, function (value) {
                                     model[options.key].push(value.data[self.valueProp]);
                                 });
+                                model[options.key] = uniqueArray(model[options.key]);
                             }
 
                         }, function () {
@@ -30,6 +38,18 @@ angular.module("ui.neptune.formly.select-file", [])
                     },
                     onRegisterApi: function (selectFileApi) {
                         this.selectFileApi = selectFileApi;
+                    },
+                    deleteItem: function (itemId,model, options) {
+                        var target = model[options.key];
+                        if (angular.isArray(target)) {
+                            angular.forEach(target,function(id,$index) {
+                                if (id == itemId) {
+                                    target.splice($index,1);
+                                }
+                            });
+                        } else {
+                            model[options.key] = "";
+                        }
                     },
                     imageRepository: undefined,
                     single: false,
@@ -60,7 +80,13 @@ angular.module("ui.neptune.formly.select-file", [])
                                 if (to.single && datas && datas.length > 0) {
                                     $scope.model[options.key] = datas[0][to.valueProp];
                                 } else if (!to.single && datas) {
-                                    $scope.model[options.key] = [];
+                                    if ($scope.model[options.key]) {
+                                        if (!angular.isArray($scope.model[options.key])) {
+                                            $scope.model[options.key] = [$scope.model[options.key]];
+                                        }
+                                    } else {
+                                        $scope.model[options.key] = [];
+                                    }
                                     angular.forEach(datas, function (data) {
                                         $scope.model[options.key].push(data[to.valueProp]);
                                     });
@@ -94,4 +120,14 @@ angular.module("ui.neptune.formly.select-file", [])
                 }
             }
         });
+    }).constant("uniqueArray",function unique(arr) {
+        var result = [], hash = {};
+        for (var i = 0, elem; i < arr.length; i++) {
+            elem = arr[i];
+            if (!hash[elem]) {
+                result.push(elem);
+                hash[elem] = true;
+            }
+        }
+        return result;
     });

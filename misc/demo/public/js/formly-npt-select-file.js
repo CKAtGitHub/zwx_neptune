@@ -34,6 +34,9 @@ angular.module("formly.npt.select.file.demo", ["ui.neptune"])
                     label: "选择文件",
                     single: false,
                     required: true,
+                    download:true,
+                    editable:true,
+                    disabled:false,
                     fileRepository: QueryImageByUserLevel,
                     uploadOptions: {
                         getSignature: function () {

@@ -3,7 +3,7 @@
  */
 
 angular.module("ui.neptune.formly.select-image", [])
-    .config(function (formlyConfigProvider) {
+    .config(function (formlyConfigProvider,uniqueArray) {
         formlyConfigProvider.setType({
             name: "npt-select-image",
             templateUrl: "/template/formly/npt-select-image.html",
@@ -18,15 +18,35 @@ angular.module("ui.neptune.formly.select-image", [])
                             if (self.single && response && response.length > 0) {
                                 model[options.key] = response[0].data[self.valueProp];
                             } else if (!self.single && response) {
-                                model[options.key] = [];
+                                if (model[options.key]) {
+                                    if (!angular.isArray(model[options.key])) {
+                                        model[options.key] = [model[options.key]];
+                                    }
+                                } else {
+                                    model[options.key] = [];
+                                }
                                 angular.forEach(response, function (value) {
                                     model[options.key].push(value.data[self.valueProp]);
                                 });
+
+                                model[options.key] = uniqueArray(model[options.key]);
                             }
 
                         }, function () {
 
                         });
+                    },
+                    deleteItem: function (itemId,model, options) {
+                        var target = model[options.key];
+                        if (angular.isArray(target)) {
+                            angular.forEach(target,function(id,$index) {
+                                if (id == itemId) {
+                                    target.splice($index,1);
+                                }
+                            });
+                        } else {
+                            model[options.key] = "";
+                        }
                     },
                     onRegisterApi: function (selectImageApi) {
                         this.selectImageApi = selectImageApi;
@@ -48,7 +68,13 @@ angular.module("ui.neptune.formly.select-image", [])
                                 if (to.single && datas && datas.length > 0) {
                                     $scope.model[options.key] = datas[0][to.valueProp];
                                 } else if (!to.single && datas) {
-                                    $scope.model[options.key] = [];
+                                    if ($scope.model[options.key]) {
+                                        if (!angular.isArray($scope.model[options.key])) {
+                                            $scope.model[options.key] = [$scope.model[options.key]];
+                                        }
+                                    } else {
+                                        $scope.model[options.key] = [];
+                                    }
                                     angular.forEach(datas, function (data) {
                                         $scope.model[options.key].push(data[to.valueProp]);
                                     });
@@ -96,4 +122,14 @@ angular.module("ui.neptune.formly.select-image", [])
                 }
             }
         });
+    }).constant("uniqueArray",function unique(arr) {
+        var result = [], hash = {};
+        for (var i = 0, elem; i < arr.length; i++) {
+            elem = arr[i];
+            if (!hash[elem]) {
+                result.push(elem);
+                hash[elem] = true;
+            }
+        }
+        return result;
     });

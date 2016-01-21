@@ -1,7 +1,7 @@
 div
     div(npt-select-file="to")
     div.row
-        div.col-md-12
+        div.col-md-12(ng-hide="to.disabled")
             button.btn.btn-primary(type="button",ng-click="to.onSelect(model, options)") 选择文件
             |&nbsp;
             div(npt-upload-custom="to.uploadOptions")
@@ -10,6 +10,8 @@ div
         div.col-xs-4.col-md-4(ng-repeat="row in to.selectedFiles")
             div.list-group(npt-load-or-get-from-cache="{value:row.file.id,cache:'file',repository:to.fileRepository,valueProp:'id',as:'$$file'}")
                 div.list-group-item(href="")
+                    a.badge(href="{{$$file.id|cacheFilter:'file':'url'}}",target="_blank",ng-show="to.download && !to.disabled") 下载
+                    a.badge(href="",style="background-color:red",ng-click="to.deleteItem(row.file.id,model,options)",ng-show="to.editable && !to.disabled") 删除
                     div.list-group-item-heading
                         h4 {{$$file.name}}
                     p {{$$file.createdate | timestampFilter}}

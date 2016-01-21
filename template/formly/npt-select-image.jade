@@ -1,13 +1,15 @@
 div
     div(npt-select-image="to")
     div.row
-        div.col-md-12
+        div.col-md-12(ng-hide="to.disabled")
             button.btn.btn-primary(type="button",ng-click="to.onSelect(model, options)") 选择图片
             |&nbsp;
-            div(npt-upload-custom="to.uploadOptions")
+            div(npt-upload-custom="to.uploadOptions",ng-hide="to.disabled")
             input.form-control(type="text",ng-model="model[options.key]",ng-hide="true")
     div.row
         div.col-md-2(ng-repeat="image in to.selectedImages")
+            a.badge(href="{{image.file.id|cacheFilter:'file':'thumbnailUrl'}}",target="_blank",style="float:right",ng-show="to.download && !to.disabled") 下载
+            a.badge(href="javascript:void(0);",style="background-color:red;float:right;",ng-click="to.deleteItem(image.file.id,model,options)",ng-show="to.editable && !to.disabled") 删除
             a.thumbnail(href="")
                 img(npt-image="image.file.id",npt-image-options="to.imageOptions")
 
