@@ -136,6 +136,11 @@ angular.module("ui.neptune.formly.ui-select")
                                 }
                             }
 
+                            // 更新后事件
+                            if (field.templateOptions.afterRrefresh) {
+                                field.templateOptions.afterRrefresh(value, model, field, scope);
+                            }
+
                         });
                     },
                     refreshDelay: 0
