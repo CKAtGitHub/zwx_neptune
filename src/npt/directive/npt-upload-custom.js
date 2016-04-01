@@ -156,7 +156,7 @@ angular.module("ui.neptune.directive.npt-upload-custom", [])
             function addFile(file) {
                 var _baseParams = {
                     "storagetype": "aliyun",
-                    "bucket": "y9mobile-user",
+                    "bucket": "aliyun",
                     "level": "user",
                     "filetype": vm.theFileType?vm.theFileType:(vm.isUploadImage?"image":"doc")
                 };

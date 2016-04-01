@@ -188,7 +188,7 @@ angular.module("ui.neptune.service.repository", [])
 
                 result = result.then(function (response) {
                     //处理逻辑code
-                    if (response.data.code === "100") {
+                    if (response.data.status === "100") {
                         return response;
                     } else {
                         return $q.reject(response);
