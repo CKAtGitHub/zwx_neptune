@@ -46,6 +46,13 @@ angular.module("ui.neptune.directive.nptLoading", ['ui.neptune.service.messageBo
                         } else {
                             closeMask();
                         }
+                        if (options.onRegisterApi) {
+                            options.onRegisterApi({
+                                openMask:openMask,
+                                closeMask:closeMask
+
+                            });
+                        }
                     } else if (typeof options == "boolean") {
                         if (options) {
                             openMask();
