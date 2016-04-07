@@ -28,7 +28,9 @@ angular.module("ui.neptune.directive.nptLoading", ['ui.neptune.service.messageBo
                                 openedClass:"background-color: transparent;"
                             }
                         });
-                    middBox();
+                    modal.uibModal().opened.then(function() {
+                        middBox();
+                    });
                 }
 
                 function middBox() {
