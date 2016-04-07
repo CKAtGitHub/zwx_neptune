@@ -6,7 +6,7 @@
 
 'use strict';
 
-var rep = require('y9-mars-repository');
+var rep = require('zwx-mars-repository');
 
 var modelFactory = rep.ModelFactory();
 

@@ -1,6 +1,6 @@
 {
   "name": "zwx-neptune",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "基于angularjs、bootstrap的适合用于企业级应用的ui组件",
   "main": "index.js",
   "scripts": {
@@ -46,7 +46,8 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-jasmine": "^0.3.6",
     "zwx-mars-repository": "^1.0.0",
-    "zwx-mars-service": "^1.0.0"
+    "zwx-mars-service": "^1.0.0",
+    "zwx-mars-util": "^1.0.0"
   },
   "dependencies": {
     "angular": "1.4.7",

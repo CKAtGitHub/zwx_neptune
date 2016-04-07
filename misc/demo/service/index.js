@@ -1,7 +1,7 @@
 /**
  * Created by leon on 15/10/30.
  */
-var service = require("y9-mars-service");
+var service = require("zwx-mars-service");
 var proxy = service.Proxy();
 
 //注册策略
