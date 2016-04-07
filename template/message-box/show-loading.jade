@@ -21,12 +21,4 @@ div
     div#loadingmessagebox.message-container
         img.img-center(src="/image/loading.gif")
         p.message {{vm.modalOptions.title}}
-    script.
-        window.onload = function(){
-            var screenWidth = window.document.documentElement.clientWidth;
-            var screenHeight = window.document.documentElement.clientHeight;
-            var box = window.document.getElementById('loadingmessagebox');
-            box.style.marginTop = (screenHeight - box.offsetHeight) / 2;
-            box.style.marginLeft = (screenWidth - box.offsetWidth) / 2;
-        }
 

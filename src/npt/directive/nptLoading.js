@@ -28,6 +28,15 @@ angular.module("ui.neptune.directive.nptLoading", ['ui.neptune.service.messageBo
                                 openedClass:"background-color: transparent;"
                             }
                         });
+                    middBox();
+                }
+
+                function middBox() {
+                    var screenWidth = window.document.documentElement.clientWidth;
+                    var screenHeight = window.document.documentElement.clientHeight;
+                    var box = window.document.getElementById('loadingmessagebox');
+                    box.style.marginTop = (screenHeight - box.offsetHeight) / 2;
+                    box.style.marginLeft = (screenWidth - box.offsetWidth) / 2;
                 }
 
                 function closeMask() {
