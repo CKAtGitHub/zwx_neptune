@@ -1,6 +1,6 @@
 {
   "name": "zwx-neptune",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "基于angularjs、bootstrap的适合用于企业级应用的ui组件",
   "main": "index.js",
   "scripts": {
