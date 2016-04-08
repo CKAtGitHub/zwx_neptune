@@ -1,28 +1,27 @@
-div
-    style.
-        .message-container{
-            border-radius: 3px;
-            background-color: rgba(0, 0, 0, 0.7);
-            margin-top: 150px;
-            margin-left:100px;
-            margin-right: 100px;
-            height: 80px;
-        }
-        .img-center{
-            margin:15px 15px 0;
-            position: absolute;
-            width: 50px;
-            height: 50px;
-        }
-        .message{
-            font-size: 16px;
-            padding: 30px 30px 30px 80px;
-            color: white;
-        }
+style.
+    .message-container {
+        border-radius: 3px;
+        margin: 150px 100px 0;
+        height: 80px;
+    }
 
-    p.message
-        img.img-center(src="/image/loading.gif")
-        | {{vm.modalOptions.title}}
+    .img-center {
+        margin: 15px 15px 0;
+        width: 50px;
+        height: 50px;
+    }
+
+    .message {
+        background-color: rgba(0, 0, 0, 0.7);
+        margin: 150px 50px 0;
+        text-align: center;
+        font-size: 16px;
+        color: white;
+    }
+
+p.message
+    img.img-center(src="/image/loading.gif")
+    | {{vm.modalOptions.title}}
 
 
 
